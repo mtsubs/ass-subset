@@ -25,12 +25,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ASS子集化">
-
-<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="preload" href="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" as="script" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js" crossorigin="anonymous"></script>
-
+<script src="/ass-subset/vendor/opentype.min.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -47,7 +42,13 @@
     "name": "MontageSubs",
     "alternateName": "蒙太奇字幕组",
     "url": "https://github.com/MontageSubs"
-  }
+  },
+  "featureList": [
+    "ASS/SSA 绘图指令子集化",
+    "字体子集化嵌入",
+    "纯前端处理，文件不离开浏览器",
+    "支持 TTF / OTF / TTC 字体格式"
+  ]
 }
 </script>
 
@@ -202,7 +203,14 @@ h1.brand-title {
   opacity: 0.6;
 }
 .step.active .step-num { opacity: 1; border-color: rgba(255,255,255,0.4); }
-.step-title { font-weight: 600; font-size: 0.83rem; letter-spacing: 0.01em; }
+h2.step-title {
+  font-weight: 600;
+  font-size: 0.83rem;
+  letter-spacing: 0.01em;
+  margin: 0; padding: 0;
+  line-height: inherit;
+  display: inline;
+}
 .step-subtitle { font-size: 0.75rem; opacity: 0.45; margin-left: auto; font-family: var(--mono); }
 .step-body { padding: 1.25rem; }
 .upload-error {
@@ -266,9 +274,10 @@ h1.brand-title {
   transition: border-color 0.15s, background 0.15s;
   position: relative;
 }
-.opt-row:last-child { margin-bottom: 0; }
-.opt-row:hover { border-color: var(--rule); background: var(--paper); }
+.opt-row:last-of-type { margin-bottom: 0; }
+.opt-row:hover:not(.disabled) { border-color: var(--rule); background: var(--paper); }
 .opt-row.selected { border-color: var(--ink); background: var(--card); }
+.opt-row.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 .opt-row input[type=checkbox] { margin-top: 3px; width: 15px; height: 15px; accent-color: var(--ink); cursor: pointer; flex-shrink: 0; }
 .opt-label strong { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.15rem; }
 .opt-label span { font-size: 0.78rem; color: var(--ink2); line-height: 1.4; }
@@ -547,7 +556,7 @@ h1.brand-title {
   <div class="step active" id="step1">
     <div class="step-head">
       <span class="step-num">1</span>
-      <span class="step-title">上传字幕文件</span>
+      <h2 class="step-title">上传字幕文件</h2>
       <span class="step-subtitle">Upload .ass / .ssa</span>
     </div>
     <div class="step-body">
@@ -556,7 +565,6 @@ h1.brand-title {
         <div class="dz-hint">ASS / SSA 格式 (.ass / .ssa)</div>
       </label>
       <input type="file" id="inp-ass" accept=".ass,.ssa" class="file-input-hidden">
-      <div id="upload-error" class="upload-error hidden"></div>
       <div id="ass-badge" class="hidden mt2"></div>
     </div>
   </div>
@@ -564,40 +572,40 @@ h1.brand-title {
   <div class="step" id="step2" style="display:none">
     <div class="step-head">
       <span class="step-num">2</span>
-      <span class="step-title">选择操作</span>
-      <span class="step-subtitle">Operations</span>
+      <h2 class="step-title">分析结果</h2>
+      <span class="step-subtitle">Analysis</span>
     </div>
     <div class="step-body">
-      <label class="opt-row selected" id="opt-row-draw">
-        <input type="checkbox" id="opt-draw" checked>
-        <div class="opt-label">
-          <strong>子集化绘图指令</strong>
-          <span>将字幕中的 \p1…\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积</span>
-        </div>
-        <span class="opt-tag">\p1 / \p0</span>
-      </label>
-      <label class="opt-row selected" id="opt-row-font">
-        <input type="checkbox" id="opt-font" checked>
-        <div class="opt-label">
-          <strong>嵌入引用字体</strong>
-          <span>扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积</span>
-        </div>
-        <span class="opt-tag">TTF / OTF / TTC</span>
-      </label>
-      <div class="notice mt2">
-        <strong>注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
-      </div>
+      <div id="analysis-area"></div>
     </div>
   </div>
 
   <div class="step" id="step3" style="display:none">
     <div class="step-head">
       <span class="step-num">3</span>
-      <span class="step-title">分析结果</span>
-      <span class="step-subtitle">Analysis</span>
+      <h2 class="step-title">选择操作</h2>
+      <span class="step-subtitle">Operations</span>
     </div>
     <div class="step-body">
-      <div id="analysis-area"></div>
+      <label class="opt-row" id="opt-row-draw">
+        <input type="checkbox" id="opt-draw">
+        <div class="opt-label">
+          <strong>子集化绘图指令</strong>
+          <span>将字幕中的 \p1…\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积</span>
+        </div>
+        <span class="opt-tag">\p1 / \p0</span>
+      </label>
+      <label class="opt-row" id="opt-row-font">
+        <input type="checkbox" id="opt-font">
+        <div class="opt-label">
+          <strong>嵌入引用字体</strong>
+          <span>扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积</span>
+        </div>
+        <span class="opt-tag">TTF / OTF / TTC</span>
+      </label>
+      <div id="drawing-notice" class="notice hidden">
+        <strong>注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
+      </div>
       <div id="font-section" class="hidden">
         <hr class="divider">
         <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">上传字体文件</p>
@@ -613,7 +621,7 @@ h1.brand-title {
   <div class="step" id="step4" style="display:none">
     <div class="step-head">
       <span class="step-num">4</span>
-      <span class="step-title">转换 &amp; 下载</span>
+      <h2 class="step-title">转换 &amp; 下载</h2>
       <span class="step-subtitle">Convert &amp; Download</span>
     </div>
     <div class="step-body">
@@ -666,7 +674,7 @@ if (typeof opentype === 'undefined') {
     'Failed to load opentype.js — please check your connection and reload.</div>';
 }
 
-const DRAW_FONT_NAME = 'ASSDrawSubset';
+const DRAW_FONT_NAME = 'ASSDrawSubset_MontageSubs';
 const EM     = 1024;
 const TARGET = 820;
 const MARGIN = (EM - TARGET) / 2;
@@ -701,6 +709,7 @@ const SYSTEM_FONTS = new Set([
   'liberation sans','liberation serif','liberation mono',
   'noto sans','noto serif','noto sans cjk sc','noto sans cjk tc','noto sans cjk jp',
   'noto sans cjk kr','wqy microhei','wqy zenhei','droid sans','droid sans fallback',
+  'assdrawsubset_montagesubs',
 ]);
 
 function assUUEncode(uint8Array) {
@@ -979,6 +988,7 @@ function rewriteASS(rawContent, opts) {
     lines.push(`fontname: ${fontName}_0.ttf`);
     const enc = assUUEncode(ttfData);
     for (let i = 0; i < enc.length; i += 80) lines.push(enc.slice(i, i + 80));
+    lines.push('');
   };
   if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
   for (const [name, ttf] of embeddedFonts) encodeAndAppend(name, ttf);
@@ -999,13 +1009,14 @@ function log(msg, cls = '') {
 }
 
 function renderAnalysis() {
-  const doc      = S.assDoc;
-  const wantDraw = document.getElementById('opt-draw').checked;
-  const wantFont = document.getElementById('opt-font').checked;
-  const draws    = doc.getUniqueDrawings();
-  const extFnt   = doc.getExternalFonts();
-  const area     = document.getElementById('analysis-area');
-  const totalChars = Object.values(extFnt).reduce((s, c) => s + c.size, 0);
+  const doc    = S.assDoc;
+  const draws  = doc.getUniqueDrawings();
+  const extFnt = doc.getExternalFonts();
+  const hasDrawings = draws.size > 0;
+  const hasFonts    = Object.keys(extFnt).length > 0;
+  const totalChars  = Object.values(extFnt).reduce((s, c) => s + c.size, 0);
+
+  const area = document.getElementById('analysis-area');
   area.innerHTML = `
     <div class="stats-bar">
       <div class="stat"><div class="stat-val">${doc.drawings.length}</div><div class="stat-lbl">绘图块</div></div>
@@ -1014,30 +1025,47 @@ function renderAnalysis() {
       <div class="stat"><div class="stat-val">${totalChars}</div><div class="stat-lbl">待嵌入字符</div></div>
     </div>
   `;
-  if (wantDraw) {
+
+  const addRow = (label, cls, text) => {
     const row = document.createElement('div');
     row.className = 'info-item';
-    row.innerHTML = draws.size > 0
-      ? `<span class="ii-label">绘图指令（\\p1）</span><span class="badge badge-ok">发现 ${draws.size} 个唯一形状，${doc.drawings.length} 处引用</span>`
-      : `<span class="ii-label">绘图指令（\\p1）</span><span class="badge badge-warn">未发现绘图指令</span>`;
+    row.innerHTML = `<span class="ii-label">${label}</span><span class="badge ${cls}">${text}</span>`;
     area.appendChild(row);
+  };
+
+  addRow('绘图指令（\p1）',
+    hasDrawings ? 'badge-ok' : 'badge-warn',
+    hasDrawings ? `发现 ${draws.size} 个唯一形状，${doc.drawings.length} 处引用` : '未发现绘图指令'
+  );
+  addRow('外部字体',
+    hasFonts ? 'badge-ok' : 'badge-info',
+    hasFonts ? `发现 ${Object.keys(extFnt).length} 个外部字体，共 ${totalChars} 字符` : '未发现外部字体（均为系统字体）'
+  );
+
+  const cbDraw  = document.getElementById('opt-draw');
+  const cbFont  = document.getElementById('opt-font');
+  const rowDraw = document.getElementById('opt-row-draw');
+  const rowFont = document.getElementById('opt-row-font');
+
+  cbDraw.disabled = !hasDrawings;
+  cbDraw.checked  = hasDrawings;
+  rowDraw.classList.toggle('selected', hasDrawings);
+  rowDraw.classList.toggle('disabled', !hasDrawings);
+
+  cbFont.disabled = !hasFonts;
+  cbFont.checked  = hasFonts;
+  rowFont.classList.toggle('selected', hasFonts);
+  rowFont.classList.toggle('disabled', !hasFonts);
+
+  document.getElementById('drawing-notice').classList.toggle('hidden', !hasDrawings);
+  document.getElementById('font-section').classList.toggle('hidden', !hasFonts);
+  if (hasFonts) renderFontList();
+
+  if (hasDrawings || hasFonts) {
+    document.getElementById('step3').style.display = '';
+    document.getElementById('step3').classList.add('active');
+    document.getElementById('step4').style.display = '';
   }
-  const fontSection = document.getElementById('font-section');
-  if (wantFont && Object.keys(extFnt).length > 0) {
-    fontSection.classList.remove('hidden');
-    renderFontList();
-  } else if (wantFont) {
-    fontSection.classList.add('hidden');
-    const row = document.createElement('div');
-    row.className = 'info-item';
-    row.innerHTML = `<span class="ii-label">外部字体</span><span class="badge badge-ok">未发现需嵌入的外部字体（均为系统字体）</span>`;
-    area.appendChild(row);
-  } else {
-    fontSection.classList.add('hidden');
-  }
-  document.getElementById('step3').style.display = '';
-  document.getElementById('step4').style.display = '';
-  document.getElementById('step3').classList.add('active');
 }
 
 function renderFontList() {
@@ -1202,10 +1230,15 @@ document.addEventListener('DOMContentLoaded', () => {
   dzASS.addEventListener('dragleave', () => dzASS.classList.remove('drag-over'));
   dzASS.addEventListener('drop', e => { e.preventDefault(); dzASS.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) handleASS(f); });
 
-  const cbDraw = document.getElementById('opt-draw');
-  const cbFont = document.getElementById('opt-font');
-  cbDraw.addEventListener('change', () => { document.getElementById('opt-row-draw').classList.toggle('selected', cbDraw.checked); if (S.assDoc) renderAnalysis(); });
-  cbFont.addEventListener('change', () => { document.getElementById('opt-row-font').classList.toggle('selected', cbFont.checked); if (S.assDoc) renderAnalysis(); });
+  const cbDraw  = document.getElementById('opt-draw');
+  const cbFont  = document.getElementById('opt-font');
+  const rowDraw = document.getElementById('opt-row-draw');
+  const rowFont = document.getElementById('opt-row-font');
+  cbDraw.addEventListener('change', () => rowDraw.classList.toggle('selected', cbDraw.checked));
+  cbFont.addEventListener('change', () => {
+    rowFont.classList.toggle('selected', cbFont.checked);
+    document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
+  });
 
   const dzFont  = document.getElementById('dz-font');
   const inpFont = document.getElementById('inp-font');
@@ -1218,21 +1251,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function handleASS(file) {
-  if (!file.name.toLowerCase().match(/\.(ass|ssa)$/)) { showUploadError('请上传 .ass 或 .ssa 格式的字幕文件。'); return; }
-  const raw     = await file.text();
-  const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
-  if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
-    showUploadError(`文件格式验证失败：「${file.name}」不是有效的 ASS/SSA 字幕文件。`);
-    return;
-  }
-  if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
-    showUploadError(`文件格式验证失败：「${file.name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。`);
-    return;
-  }
-  S.assFile = file; S.assContent = content;
-  S.assDoc  = new ASSDocument(content);
-  S.uploadedFonts.clear();
-  document.getElementById('upload-error').classList.add('hidden');
   document.getElementById('dz-ass').style.display = 'none';
   document.getElementById('ass-badge').classList.remove('hidden');
   document.getElementById('ass-badge').innerHTML = `
@@ -1246,14 +1264,32 @@ async function handleASS(file) {
   document.getElementById('step1').classList.add('done');
   document.getElementById('step2').style.display = '';
   document.getElementById('step2').classList.add('active');
-  renderAnalysis();
-}
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step3').classList.remove('active');
+  document.getElementById('step4').style.display = 'none';
 
-function showUploadError(msg) {
-  const el = document.getElementById('upload-error');
-  el.textContent = '⚠ ' + msg;
-  el.classList.remove('hidden');
-  document.getElementById('inp-ass').value = '';
+  const area = document.getElementById('analysis-area');
+  area.innerHTML = '';
+
+  if (!file.name.toLowerCase().match(/\.(ass|ssa)$/)) {
+    area.innerHTML = '<div class="upload-error">⚠ 请上传 .ass 或 .ssa 格式的字幕文件。</div>';
+    return;
+  }
+  const raw     = await file.text();
+  const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
+  if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
+    area.innerHTML = `<div class="upload-error">⚠ 文件格式验证失败：「${file.name}」不是有效的 ASS/SSA 字幕文件。</div>`;
+    return;
+  }
+  if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
+    area.innerHTML = `<div class="upload-error">⚠ 文件格式验证失败：「${file.name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。</div>`;
+    return;
+  }
+  S.assFile = file;
+  S.assContent = content;
+  S.assDoc  = new ASSDocument(content);
+  S.uploadedFonts.clear();
+  renderAnalysis();
 }
 
 async function handleFonts(files) {

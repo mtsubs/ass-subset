@@ -1,11 +1,11 @@
 'use strict';
 
-const CACHE_NAME = 'ass-subset-v2';
+const CACHE_NAME = 'ass-subset-v1.3';
 const PRECACHE = [
   '/ass-subset/',
   '/ass-subset/index.html',
   '/ass-subset/manifest.json',
-  'https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js',
+  '/ass-subset/vendor/opentype.min.js',
 ];
 
 self.addEventListener('install', e => {
@@ -28,22 +28,17 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  const url = e.request.url;
-  const shouldCache =
-    url.includes('/ass-subset/') ||
-    url.includes('cdn.jsdelivr.net');
-  if (!shouldCache) return;
+  if (!e.request.url.includes('/ass-subset/')) return;
+
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(resp => {
-        if (!resp || resp.status !== 200 || (resp.type !== 'basic' && resp.type !== 'cors')) {
+    caches.open(CACHE_NAME).then(cache =>
+      cache.match(e.request).then(cached => {
+        const fetchPromise = fetch(e.request).then(resp => {
+          if (resp && resp.status === 200) cache.put(e.request, resp.clone());
           return resp;
-        }
-        const clone = resp.clone();
-        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-        return resp;
-      });
-    })
+        }).catch(() => {});
+        return cached || fetchPromise;
+      })
+    )
   );
 });
