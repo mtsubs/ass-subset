@@ -1,11 +1,11 @@
 'use strict';
-const CACHE_NAME = 'ass-subset-v2'; 
+
+const CACHE_NAME = 'ass-subset-v2';
 const PRECACHE = [
   '/ass-subset/',
   '/ass-subset/index.html',
   '/ass-subset/manifest.json',
-  'https://montagesubs.github.io/assets/images/montagesubs_logo-512.jpg',
-  'https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js'
+  'https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js',
 ];
 
 self.addEventListener('install', e => {
@@ -28,7 +28,11 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-
+  const url = e.request.url;
+  const shouldCache =
+    url.includes('/ass-subset/') ||
+    url.includes('cdn.jsdelivr.net');
+  if (!shouldCache) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
