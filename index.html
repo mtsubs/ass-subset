@@ -1031,7 +1031,7 @@ async function subsetFont(fontBuffer, charSet, fontName, isTTC) {
 
 function rewriteASS(rawContent, opts) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts } = opts;
-  let content = rawContent.replace(/\n\[Fonts\][\s\S]*/i, '').trimEnd();
+  let content = rawContent.replace(/\n\[Fonts\][\s\S]*?(?=\n\[|$)/i, '').trimEnd();
   if (drawingDataToChar && drawingDataToChar.size > 0) {
     content = content.replace(
       /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
