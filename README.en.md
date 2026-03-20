@@ -15,7 +15,7 @@
 
 <div align="center">
 
-| [Open Tool](https://montagesubs.github.io/ass-subset/) | [Report an Issue](https://github.com/MontageSubs/ass-subset/issues) | [Join the Discussion](https://github.com/MontageSubs/ass-subset/discussions) |
+| [Open Tool](https://subs.js.org/ass-subset/) | [Report an Issue](https://github.com/MontageSubs/ass-subset/issues) | [Join the Discussion](https://github.com/MontageSubs/ass-subset/discussions) |
 | :---: | :---: | :---: |
 
 </div><br/>
@@ -42,7 +42,7 @@ Scans the subtitle file for non-system font references, subsets the uploaded fon
 
 This tool runs entirely in the browser. No installation is needed:
 
-1. Open [https://montagesubs.github.io/ass-subset/](https://montagesubs.github.io/ass-subset/)
+1. Open [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
 2. Upload your `.ass` or `.ssa` subtitle file
 3. Review the analysis results, which show detected drawing commands and external font references
 4. If font embedding is needed, upload the corresponding font files (TTF / OTF / TTC)

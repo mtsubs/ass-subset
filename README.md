@@ -15,7 +15,7 @@
 
 <div align="center">
 
-| [打开工具](https://montagesubs.github.io/ass-subset/) | [提交反馈](https://github.com/MontageSubs/ass-subset/issues) | [参与讨论](https://github.com/MontageSubs/ass-subset/discussions) |
+| [打开工具](https://subs.js.org/ass-subset/) | [提交反馈](https://github.com/MontageSubs/ass-subset/issues) | [参与讨论](https://github.com/MontageSubs/ass-subset/discussions) |
 | :---: | :---: | :---: |
 
 </div><br/>
@@ -42,7 +42,7 @@ ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独
 
 本工具完全基于浏览器运行，无需安装：
 
-1. 打开 [https://montagesubs.github.io/ass-subset/](https://montagesubs.github.io/ass-subset/)
+1. 打开 [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
 2. 上传 `.ass` 或 `.ssa` 字幕文件
 3. 查看分析结果，确认检测到的绘图指令与外部字体
 4. 如需嵌入字体，上传对应的字体文件（TTF / OTF / TTC）
