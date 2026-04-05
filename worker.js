@@ -320,25 +320,38 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
   }
 }
 function getVisibleChar(index) {
-  if (index < 26) return String.fromCharCode(97 + index);
-  if (index < 52) return String.fromCharCode(65 + index - 26);
-  if (index < 62) return String.fromCharCode(48 + index - 52);
-  const symbols = "!#$%&()*+./;<>?@[]^_`|~";
-  if (index < 62 + symbols.length) return symbols[index - 62];
-  return String.fromCodePoint(0x4E00 + (index - 62 - symbols.length));
+  let charCode = 33;
+  let skipped = 0;
+  while (skipped < index) {
+    charCode++;
+    const s = String.fromCharCode(charCode);
+    if ([',', '{', '}', '\\'].includes(s)) continue;
+    if (charCode >= 127 && charCode <= 160) continue;
+    skipped++;
+  }
+  return String.fromCharCode(charCode);
 }
 function buildUniqueDrawings(drawings) {
-  const counts = new Map();
+  const meta = new Map();
   for (const d of drawings) {
-    counts.set(d.data, (counts.get(d.data) || 0) + 1);
+    if (!meta.has(d.data)) {
+      meta.set(d.data, { count: 0, firstStart: d.tStart, firstEnd: d.tEnd, lastStart: d.tStart, lastEnd: d.tEnd });
+    }
+    const m = meta.get(d.data);
+    m.count++;
+    m.lastStart = d.tStart;
+    m.lastEnd = d.tEnd;
   }
-  const uniqueDatas = Array.from(counts.keys()).sort();
+  const uniqueDatas = Array.from(meta.keys()).sort();
   const seen = new Map();
   for (let i = 0; i < uniqueDatas.length; i++) {
     const data = uniqueDatas[i];
+    const m = meta.get(data);
     seen.set(data, {
       char: getVisibleChar(i),
-      count: counts.get(data)
+      count: m.count,
+      firstStart: m.firstStart, firstEnd: m.firstEnd,
+      lastStart: m.lastStart, lastEnd: m.lastEnd
     });
   }
   return seen;
@@ -422,46 +435,58 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
     name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path()
   });
   const glyphs = [notdef];
-  const drawingEntries = uniqueDrawingsMap;
-  if (existingFontBuffer && referencedChars && referencedChars.size > 0) {
+  const charToData = new Map();
+  const dataToChar = new Map();
+  const nextChar = (idx) => getVisibleChar(idx);
+
+  if (existingFontBuffer) {
     try {
       const existingFont = opentype.parse(existingFontBuffer);
-      for (const ch of referencedChars) {
-        const cp = ch.codePointAt(0);
+      const usedChars = new Set(referencedChars);
+      for (const ch of usedChars) {
         const glyph = existingFont.charToGlyph(ch);
         if (glyph && glyph.index !== 0) {
-          const rendered = existingFont.getPath(ch, 0, 0, existingFont.unitsPerEm);
-          const newPath = new opentype.Path();
-          for (const cmd of rendered.commands) {
-            switch (cmd.type) {
-              case 'M': newPath.moveTo(cmd.x, -cmd.y); break;
-              case 'L': newPath.lineTo(cmd.x, -cmd.y); break;
-              case 'C': newPath.curveTo(cmd.x1, -cmd.y1, cmd.x2, -cmd.y2, cmd.x, -cmd.y); break;
-              case 'Q': newPath.quadraticCurveTo(cmd.x1, -cmd.y1, cmd.x, -cmd.y); break;
-              case 'Z': newPath.close(); break;
-            }
-          }
-          glyphs.push(new opentype.Glyph({
-            name: `draw_${cp}`, unicode: cp, advanceWidth: EM, path: newPath
-          }));
+          const path = existingFont.getPath(ch, 0, 0, existingFont.unitsPerEm);
+          const drawStr = path.toPathData(); 
+          charToData.set(ch, drawStr);
+          dataToChar.set(drawStr, ch);
         }
       }
-      emitLog(id, 'log.draw.kept_existing', 'info', { count: referencedChars.size });
-    } catch (e) {
-      emitLog(id, 'log.draw.decode_fail', 'warn', {});
+    } catch (_) {}
+  }
+
+  const drawingDataToChar = {};
+  const currentSafeIndex = { val: 0 };
+  const getNextSafeChar = () => {
+    while (true) {
+      const c = nextChar(currentSafeIndex.val++);
+      if (!charToData.has(c)) return c;
     }
+  };
+
+  const sortedSubsets = Array.from(uniqueDrawingsMap.entries()).sort();
+  for (const [data, meta] of sortedSubsets) {
+    const tempGlyph = buildDrawGlyph(data, 0);
+    const normalizedData = tempGlyph.path.toPathData();
+    
+    let char = dataToChar.get(normalizedData); 
+    if (!char) {
+      char = getNextSafeChar();
+    }
+    drawingDataToChar[data] = char;
+    const cp = char.codePointAt(0);
+    glyphs.push(buildDrawGlyph(data, cp));
   }
-  const dataToCharArr = [];
-  for (const item of drawingEntries) {
-    const cp = item.char.codePointAt(0);
-    glyphs.push(buildDrawGlyph(item.data, cp));
-    dataToCharArr.push({ data: item.data, char: item.char });
-  }
+
   const font = new opentype.Font({
-    familyName: DRAW_FONT_NAME, styleName: 'Regular',
-    unitsPerEm: EM, ascender: TARGET, descender: 0, glyphs
+    familyName: DRAW_FONT_NAME,
+    styleName: 'Regular',
+    unitsPerEm: EM,
+    ascender: TARGET,
+    descender: -(EM - TARGET),
+    glyphs: glyphs
   });
-  return { ttf: new Uint8Array(font.toArrayBuffer()), dataToCharArr };
+  return { font, drawingDataToChar };
 }
 function extractFontNames(fontObj) {
   const names = new Set();
@@ -823,7 +848,13 @@ function doConvert(data, id) {
       embeddedCount: embeddedFonts.length + (drawTTF ? 1 : 0),
       drawingCount: parsed.drawings,
       uniqueDrawings: parsed.uniqueDrawings.length,
-    }
+    },
+    detailedDrawings: Array.from(parsed.uniqueDrawings.values()).map(d => ({
+      char: drawingDataToChar[d.data] || d.char,
+      count: d.count,
+      firstStart: d.firstStart, firstEnd: d.firstEnd,
+      lastStart: d.lastStart, lastEnd: d.lastEnd
+    }))
   };
 }
 self.onmessage = function (e) {

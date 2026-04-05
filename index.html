@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.7">
+  <meta name="version" content="2.1.9">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1749,9 +1749,51 @@
       }).join('<br>');
     }
 
+    async function decodeText(buffer) {
+      const utf8 = new TextDecoder('utf-8', { fatal: true });
+      try {
+        return utf8.decode(buffer);
+      } catch (e) {
+        const gbk = new TextDecoder('gbk');
+        return gbk.decode(buffer);
+      }
+    }
+    async function processZipFile(file, type, depth = 0) {
+      if (depth > 3) return [];
+      const zip = await JSZip.loadAsync(file);
+      const results = [];
+      for (const [name, entry] of Object.entries(zip.files)) {
+        if (entry.dir) continue;
+        const lowName = name.toLowerCase();
+        if (type === 'ass' && (lowName.endsWith('.ass') || lowName.endsWith('.ssa'))) {
+          const buf = await entry.async('arraybuffer');
+          const content = await decodeText(buf);
+          results.push({ file: { name: entry.name, size: buf.byteLength }, content });
+        } else if (type === 'font' && (lowName.endsWith('.ttf') || lowName.endsWith('.otf') || lowName.endsWith('.ttc'))) {
+          const buf = await entry.async('arraybuffer');
+          results.push({ file: { name: entry.name, size: buf.byteLength }, buffer: buf });
+        } else if (lowName.endsWith('.zip')) {
+          const buf = await entry.async('arraybuffer');
+          const nested = await processZipFile(buf, type, depth + 1);
+          results.push(...nested);
+        }
+      }
+      return results;
+    }
+
     async function handleASSFiles(files) {
-      const assFiles = Array.from(files).filter(f => /\.(ass|ssa)$/i.test(f.name));
-      if (assFiles.length === 0) {
+      const assEntries = [];
+      for (const f of Array.from(files)) {
+        if (f.name.toLowerCase().endsWith('.zip')) {
+          const extracted = await processZipFile(f, 'ass');
+          assEntries.push(...extracted);
+        } else if (/\.(ass|ssa)$/i.test(f.name)) {
+          const text = await f.text();
+          const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
+          assEntries.push({ file: f, content });
+        }
+      }
+      if (assEntries.length === 0) {
         document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + t('err.format') + '</div>';
         return;
       }
@@ -1763,9 +1805,9 @@
       document.getElementById('dz-ass').style.display = 'none';
       const badge = document.getElementById('ass-badge');
       badge.classList.remove('hidden');
-      badge.innerHTML = assFiles.map(f =>
-        '<div class="file-badge"><span class="fb-name">' + f.name + '</span>' +
-        '<span class="fb-size">' + (f.size / 1024).toFixed(0) + ' KB</span>' +
+      badge.innerHTML = assEntries.map(e =>
+        '<div class="file-badge"><span class="fb-name">' + e.file.name + '</span>' +
+        '<span class="fb-size">' + (e.file.size / 1024).toFixed(0) + ' KB</span>' +
         '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span></div>'
       ).join('');
 
@@ -1788,20 +1830,19 @@
         <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
       `;
 
-      for (const file of assFiles) {
-        const raw = await file.text();
-        const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
+      for (const entry of assEntries) {
+        const content = entry.content;
         if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
-          area.innerHTML = '<div class="upload-error">' + t('err.invalid', { name: file.name }) + '</div>';
+          area.innerHTML = '<div class="upload-error">' + t('err.invalid', { name: entry.file.name }) + '</div>';
           return;
         }
         if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
-          area.innerHTML = '<div class="upload-error">' + t('err.no_events', { name: file.name }) + '</div>';
+          area.innerHTML = '<div class="upload-error">' + t('err.no_events', { name: entry.file.name }) + '</div>';
           return;
         }
         try {
           const result = await workerCall('parseASS', { text: content });
-          S.assFiles.push({ file, content, parsed: result });
+          S.assFiles.push({ file: entry.file, content, parsed: result });
         } catch (e) {
           area.innerHTML = '<div class="upload-error">⚠ ' + e.message + '</div>';
           return;
@@ -1993,21 +2034,29 @@
         }
       }
       const reqArr = Array.from(requiredFonts);
+      const fontEntries = [];
+      for (const f of Array.from(files)) {
+        if (f.name.toLowerCase().endsWith('.zip')) {
+          const extracted = await processZipFile(f, 'font');
+          fontEntries.push(...extracted);
+        } else {
+          try {
+            const buf = await f.arrayBuffer();
+            fontEntries.push({ file: f, buffer: buf });
+          } catch (_) { }
+        }
+      }
       let notMatched = 0;
-
-      for (const file of files) {
-        let buffer;
-        try { buffer = await file.arrayBuffer(); } catch (_) { notMatched++; continue; }
+      for (const entry of fontEntries) {
         try {
-          const result = await workerCall('matchFont', { buffer, requiredFonts: reqArr }, [buffer]);
+          const result = await workerCall('matchFont', { buffer: entry.buffer, requiredFonts: reqArr }, [entry.buffer]);
           if (result.results && result.results.length > 0) {
             for (const match of result.results) {
               const key = match.matchedFor.toLowerCase();
               const existing = S.uploadedFonts.get(key);
               if (!existing || (match.isFamilyMatch && !existing.isFamilyMatch)) {
-                const freshBuffer = await file.arrayBuffer();
                 S.uploadedFonts.set(key, {
-                  file, buffer: freshBuffer, matchedFor: match.matchedFor,
+                  file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
                   isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight, isFamilyMatch: match.isFamilyMatch
                 });
               }
@@ -2104,6 +2153,12 @@
           S.outputBlobs.push({ name: outName, blob });
           if (result.fontBuffers) S.fontBuffers = S.fontBuffers.concat(result.fontBuffers);
 
+          if (result.detailedDrawings && result.detailedDrawings.length > 0) {
+            log(t('log.draw.summary', { count: result.detailedDrawings.length }), 'info');
+            result.detailedDrawings.forEach(d => {
+              log(`  - Character: ${d.char} | Count: ${d.count} | Timeline: [${d.firstStart} -> ${d.lastStart}]`, 'info');
+            });
+          }
 
           const origKB = (result.origSize / 1024).toFixed(0);
           const newKB = (result.newSize / 1024).toFixed(0);
