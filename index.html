@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ASS 在线子集化工具 · 蒙太奇字幕组 MontageSubs</title>
-<meta name="description" content="基于浏览器端实现的 ASS/SSA 字幕在线字体子集化工具。支持绘图指令子集化与字体子集嵌入，纯浏览器本地处理。，无需上传文件至服务器。由蒙太奇字幕组 MontageSubs 开发。">
-<meta name="keywords" content="ASS字幕字体嵌入,ASS字幕嵌入字体,ASS字幕字体子集化,ASS字体嵌入,ASS嵌入字体,ASS子集化,特效字幕字体嵌入,特效字幕嵌入字体,特效字幕子集化,字幕字体嵌入,字幕嵌入字体,字幕子集化,ASS字幕,SSA字幕,字体嵌入,嵌入字体,子集化,在线工具,字幕工具,字体工具,,绘图指令,ass-subset,MontageSubs,蒙太奇字幕组,字幕优化,opentype,TTF子集化,Advanced SubStation Alpha,浏览器工具">
+<meta name="description" content="基于浏览器端实现的 ASS/SSA 字幕在线字体子集化工具。支持绘图指令子集化与字体子集嵌入，纯浏览器本地处理，无需上传文件至服务器。由蒙太奇字幕组 MontageSubs 开发。">
+<meta name="keywords" content="ASS字幕字体嵌入,ASS字幕嵌入字体,ASS字幕字体子集化,ASS字体嵌入,ASS嵌入字体,ASS子集化,特效字幕字体嵌入,特效字幕嵌入字体,特效字幕子集化,字幕字体嵌入,字幕嵌入字体,字幕子集化,ASS字幕,SSA字幕,字体嵌入,嵌入字体,子集化,在线工具,字幕工具,字体工具,绘图指令,ass-subset,MontageSubs,蒙太奇字幕组,字幕优化,opentype,TTF子集化,Advanced SubStation Alpha,浏览器工具">
 <meta name="author" content="MontageSubs (蒙太奇字幕组)">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://subs.js.org/ass-subset/">
 <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-<meta name="version" content="1.8">
+<meta name="version" content="2.0">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
 <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -33,7 +33,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "ASS 在线子集化工具",
-  "alternateName": "ASS Subset Tool （Online）",
+  "alternateName": "ASS Subset Tool (Online)",
   "url": "https://subs.js.org/ass-subset/",
   "description": "基于浏览器端原生实现的 ASS/SSA 字幕优化工具。支持绘图指令子集化与字体子集化嵌入，所有处理均在本地浏览器完成，无需上传服务器。",
   "applicationCategory": "MultimediaApplication",
@@ -129,8 +129,7 @@ h1.brand-title {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--ink);
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   line-height: inherit;
   display: inline;
 }
@@ -171,6 +170,36 @@ h1.brand-title {
 .btn-hdr:hover { border-color: var(--ink); background: var(--rule2); }
 .btn-hdr:active { background: var(--rule); border-color: var(--ink); }
 .btn-hdr svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+/* Language dropdown */
+.lang-wrap { position: relative; }
+.lang-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  min-width: 110px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.lang-wrap.open .lang-menu { display: block; }
+.lang-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-family: var(--sans);
+  background: none;
+  border: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+.lang-menu button:hover { background: var(--rule2); }
+.lang-menu button.active { font-weight: 700; color: var(--accent); }
 .main {
   max-width: 720px;
   width: 100%;
@@ -267,6 +296,7 @@ h2.step-title {
   border-radius: var(--r);
   background: var(--card);
   font-size: 0.88rem;
+  margin-bottom: 0.5rem;
 }
 .file-badge .fb-name { font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-badge .fb-size { color: var(--ink2); font-family: var(--mono); font-size: 0.78rem; }
@@ -299,6 +329,10 @@ h2.step-title {
   padding: 0.1rem 0.4rem;
   border-radius: 3px;
   color: var(--ink2);
+}
+.opt-sub {
+  margin-left: 2rem;
+  margin-top: 0.5rem;
 }
 .stats-bar {
   display: flex;
@@ -363,6 +397,7 @@ h2.step-title {
 .font-item .fi-status { font-size: 0.78rem; padding: 0.15rem 0.5rem; border-radius: 3px; }
 .fi-missing  { background: rgba(181,42,28,0.1); color: var(--err); }
 .fi-uploaded { background: rgba(30,122,70,0.1); color: var(--ok); }
+.fi-system   { background: rgba(30,122,70,0.1); color: var(--ok); }
 .btn {
   display: inline-flex;
   align-items: center;
@@ -386,6 +421,11 @@ h2.step-title {
 .btn-success { background: var(--ok); color: #fff; border-color: var(--ok); }
 .btn-success:hover { opacity: 0.85; }
 .btn-success:active { opacity: 0.7; transform: translateY(1px); }
+.btn-outline {
+  background: transparent; color: var(--ink); border: 1px solid var(--rule);
+  font-size: 0.8rem; padding: 0.45rem 1rem;
+}
+.btn-outline:hover { border-color: var(--ink); background: var(--rule2); }
 .log-box {
   margin-top: 1rem;
   background: #0d1017;
@@ -415,6 +455,7 @@ h2.step-title {
 .result-box .rb-info { flex: 1; }
 .result-box .rb-title { font-weight: 600; margin-bottom: 0.2rem; }
 .result-box .rb-detail { font-size: 0.8rem; color: var(--ink2); font-family: var(--mono); }
+.result-box .rb-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 .notice {
   font-size: 0.78rem;
   color: var(--ink2);
@@ -426,6 +467,97 @@ h2.step-title {
   border-left: 3px solid var(--rule);
 }
 .notice strong { color: var(--ink); }
+.notice-warn {
+  border-left-color: var(--warn);
+  background: rgba(138,80,16,0.08);
+  color: var(--warn);
+}
+/* Progress bar */
+.progress-wrap {
+  margin-top: 1rem;
+  background: var(--rule2);
+  border-radius: var(--r);
+  overflow: hidden;
+  height: 22px;
+  position: relative;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s ease;
+  width: 0%;
+}
+.progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--ink);
+  pointer-events: none;
+}
+/* Preview modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  max-width: 680px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.modal-header h3 { font-size: 0.95rem; font-weight: 600; }
+.modal-close {
+  background: none; border: none; font-size: 1.2rem;
+  cursor: pointer; color: var(--ink2); padding: 0.25rem;
+}
+.modal-close:hover { color: var(--ink); }
+.preview-canvas {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+}
+.preview-slider {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+/* Font path hint */
+.font-path-hint { margin-bottom: 1rem; }
+.font-path-hint summary {
+  font-size: 0.78rem;
+  color: var(--ink2);
+  cursor: pointer;
+  user-select: none;
+}
+.font-path-hint summary:hover { color: var(--ink); }
+.font-path-hint .paths {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink2);
+  padding: 0.5rem 0 0 1rem;
+  line-height: 1.8;
+}
+.font-path-hint .paths strong { color: var(--ink); font-size: 0.75rem; }
 
 .site-footer {
   border-top: 1px solid var(--rule);
@@ -450,7 +582,7 @@ h2.step-title {
 }
 .footer-nav a { color: var(--ink2); text-decoration: none; font-size: 0.75rem; }
 .footer-nav a:hover { color: var(--ink); text-decoration: underline; }
-.footer-sep { color: var(--rule); }
+.footer-sep { color: var(--ink2); }
 .footer-brand {
   display: inline-flex;
   flex-direction: column;
@@ -583,37 +715,46 @@ h2.step-title {
 <header class="site-header">
   <a href="https://subs.js.org/ass-subset/" class="brand-link">
     <span class="brand-org">蒙太奇字幕组 · MontageSubs</span>
-    <h1 class="brand-title">ASS 在线子集化工具</h1>
+    <h1 class="brand-title" data-i18n="app.title">ASS 在线子集化工具</h1>
   </a>
-  <span class="sub">字幕绘图指令子集化 · 字幕字体子集嵌入</span>
+  <span class="sub" data-i18n="app.subtitle">字幕绘图指令子集化 · 字幕字体子集嵌入</span>
   <div class="header-right">
-    <button class="btn-hdr" id="btn-install-pwa" onclick="triggerPwaInstall()" style="display:none">安装</button>
-    <button class="btn-hdr" id="btn-discuss" onclick="loadDiscuss()">讨论</button>
-    <a href="https://subs.js.org/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr">SVG 转 ASS 绘图指令</a>
+    <button class="btn-hdr" id="btn-install-pwa" onclick="triggerPwaInstall()" style="display:none" data-i18n="btn.install">安装</button>
+    <button class="btn-hdr" id="btn-discuss" onclick="loadDiscuss()" data-i18n="btn.discuss">讨论</button>
+    <a href="https://subs.js.org/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr" data-i18n="btn.svg">SVG 转 ASS 绘图指令</a>
+    <div class="lang-wrap" id="lang-wrap">
+      <button class="btn-hdr" onclick="document.getElementById('lang-wrap').classList.toggle('open')">🌐</button>
+      <div class="lang-menu">
+        <button onclick="setLang('zh')" id="lang-zh" class="active">中文</button>
+        <button onclick="setLang('en')" id="lang-en">English</button>
+      </div>
+    </div>
   </div>
 </header>
 
 <main class="main">
+  <!-- Step 1: Upload -->
   <div class="step active" id="step1">
     <div class="step-head">
       <span class="step-num">1</span>
-      <h2 class="step-title">上传字幕文件</h2>
+      <h2 class="step-title" data-i18n="step1.title">上传字幕文件</h2>
       <span class="step-subtitle">Upload .ass / .ssa</span>
     </div>
     <div class="step-body">
       <label class="drop-zone" id="dz-ass" for="inp-ass" aria-label="上传字幕文件，支持拖拽或点击选择">
-        <div class="dz-main">拖拽字幕文件到此，或点击选择</div>
-        <div class="dz-hint">ASS / SSA 格式 (.ass / .ssa)</div>
+        <div class="dz-main" data-i18n="step1.drop">拖拽字幕文件到此，或点击选择</div>
+        <div class="dz-hint" data-i18n="step1.hint">ASS / SSA 格式 (.ass / .ssa)，支持多选</div>
       </label>
-      <input type="file" id="inp-ass" accept=".ass,.ssa" class="file-input-hidden">
+      <input type="file" id="inp-ass" accept=".ass,.ssa" multiple class="file-input-hidden">
       <div id="ass-badge" class="hidden mt2"></div>
     </div>
   </div>
 
+  <!-- Step 2: Analysis -->
   <div class="step" id="step2" style="display:none">
     <div class="step-head">
       <span class="step-num">2</span>
-      <h2 class="step-title">分析结果</h2>
+      <h2 class="step-title" data-i18n="step2.title">分析结果</h2>
       <span class="step-subtitle">Analysis</span>
     </div>
     <div class="step-body">
@@ -621,54 +762,79 @@ h2.step-title {
     </div>
   </div>
 
+  <!-- Step 3: Options -->
   <div class="step" id="step3" style="display:none">
     <div class="step-head">
       <span class="step-num">3</span>
-      <h2 class="step-title">选择操作</h2>
+      <h2 class="step-title" data-i18n="step3.title">选择操作</h2>
       <span class="step-subtitle">Operations</span>
     </div>
     <div class="step-body">
       <label class="opt-row" id="opt-row-draw">
         <input type="checkbox" id="opt-draw">
         <div class="opt-label">
-          <strong>子集化绘图指令</strong>
-          <span>将字幕中的 \p1…\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积</span>
+          <strong data-i18n="opt.draw.title">子集化绘图指令</strong>
+          <span data-i18n="opt.draw.desc">将字幕中的 \p1…\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积</span>
         </div>
         <span class="opt-tag">\p1 / \p0</span>
       </label>
       <label class="opt-row" id="opt-row-font">
         <input type="checkbox" id="opt-font">
         <div class="opt-label">
-          <strong>嵌入引用字体</strong>
-          <span>扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积</span>
+          <strong data-i18n="opt.font.title">嵌入引用字体</strong>
+          <span data-i18n="opt.font.desc">扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积</span>
         </div>
         <span class="opt-tag">TTF / OTF / TTC</span>
       </label>
-      <div id="drawing-notice" class="notice hidden">
+      <div class="opt-sub hidden" id="opt-sub-sysfont">
+        <label class="opt-row" id="opt-row-sysfont">
+          <input type="checkbox" id="opt-sysfont">
+          <div class="opt-label">
+            <strong data-i18n="opt.sysfont.title">嵌入系统字体</strong>
+            <span data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需要通过 Local Font Access 或手动上传获取字体文件）</span>
+          </div>
+        </label>
+      </div>
+      <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">
+        <strong>⚠ 版权提示：</strong>分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。
+      </div>
+      <div id="drawing-notice" class="notice hidden" data-i18n="notice.drawing">
         <strong>注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
       </div>
       <div id="font-section" class="hidden">
         <hr class="divider">
-        <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">上传字体文件</p>
-        <label class="font-upload-zone" id="dz-font" for="inp-font" aria-label="上传字体文件，支持 TTF、OTF、TTC，可多选">
-          点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）
+        <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">上传字体文件</p>
+        <label class="font-upload-zone" id="dz-font" for="inp-font" aria-label="上传字体文件">
+          <span data-i18n="font.upload.drop">点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）</span>
         </label>
         <input type="file" id="inp-font" accept=".ttf,.otf,.ttc" multiple class="file-input-hidden">
+        <details class="font-path-hint">
+          <summary data-i18n="font.path.summary">💡 常见字体安装路径</summary>
+          <div class="paths" id="font-paths"></div>
+        </details>
+        <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn">从系统自动加载字体</button>
         <div id="font-list"></div>
       </div>
     </div>
   </div>
 
+  <!-- Step 4: Convert & Download -->
   <div class="step" id="step4" style="display:none">
     <div class="step-head">
       <span class="step-num">4</span>
-      <h2 class="step-title">转换 &amp; 下载</h2>
+      <h2 class="step-title" data-i18n="step4.title">转换 &amp; 下载</h2>
       <span class="step-subtitle">Convert &amp; Download</span>
     </div>
     <div class="step-body">
       <div class="flex-gap">
-        <button class="btn btn-primary" id="btn-convert">开始转换</button>
-        <button class="btn btn-success hidden" id="btn-download">下载优化后的字幕</button>
+        <button class="btn btn-primary" id="btn-convert" data-i18n="btn.convert">开始转换</button>
+        <button class="btn btn-success hidden" id="btn-download" data-i18n="btn.download">下载优化后的字幕</button>
+      </div>
+      <div id="progress-area" class="hidden">
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progress-bar"></div>
+          <div class="progress-text" id="progress-text"></div>
+        </div>
       </div>
       <div class="log-box hidden" id="log-box" role="log" aria-label="处理日志" aria-live="polite" aria-atomic="false"></div>
       <div id="result-area"></div>
@@ -676,9 +842,22 @@ h2.step-title {
   </div>
 </main>
 
+<!-- Preview Modal -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="preview-title" data-i18n="preview.title">字体预览</h3>
+      <button class="modal-close" onclick="closePreview()">✕</button>
+    </div>
+    <canvas class="preview-canvas" id="preview-canvas" width="640" height="400"></canvas>
+    <input type="range" class="preview-slider hidden" id="preview-slider" min="0" max="100" value="0">
+    <div id="preview-info" style="margin-top:0.5rem;font-size:0.78rem;color:var(--ink2);font-family:var(--mono);"></div>
+  </div>
+</div>
+
 <div id="discuss-section" class="hidden">
-  <div class="discuss-header">讨论 · Discussion</div>
-  <div id="discuss-loading">加载中…</div>
+  <div class="discuss-header" data-i18n="discuss.header">讨论 · Discussion</div>
+  <div id="discuss-loading" data-i18n="discuss.loading">加载中…</div>
 </div>
 
 <footer class="site-footer">
@@ -699,16 +878,16 @@ h2.step-title {
       <span class="footer-slogan">用爱发电 ❤️ Powered by Love</span>
     </div>
   </div>
-    <div class="footer-right">
+  <div class="footer-right">
     <div class="footer-line">
       以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
     </div>
     <div class="footer-line"><span id="ver">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
     <div class="footer-btns">
-      <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn">反馈</a>
+      <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn" data-i18n="footer.feedback">反馈</a>
       <a href="https://github.com/MontageSubs/ass-subset" target="_blank" rel="noopener" class="footer-btn">
          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;fill:currentColor;flex-shrink:0" aria-hidden="true"><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8"/></svg>
-           查看源代码
+         <span data-i18n="footer.source">查看源代码</span>
       </a>
     </div>
   </div>
@@ -716,432 +895,431 @@ h2.step-title {
 
 <script>
 'use strict';
-let discussLoaded = false;
-function loadDiscuss() {
-  const section = document.getElementById('discuss-section');
-  section.classList.remove('hidden');
-  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  if (discussLoaded) return;
-  discussLoaded = true;
 
-  const theme = window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark' : 'light';
+const I18N = {
+  zh: {
+    'app.title': 'ASS 在线子集化工具',
+    'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
+    'btn.install': '安装',
+    'btn.discuss': '讨论',
+    'btn.svg': 'SVG 转 ASS 绘图指令',
+    'btn.convert': '开始转换',
+    'btn.converting': '处理中…',
+    'btn.download': '下载优化后的字幕',
+    'btn.download_zip': '下载全部 (ZIP)',
+    'btn.preview': '预览',
+    'btn.dl_font': '下载字体',
+    'step1.title': '上传字幕文件',
+    'step1.drop': '拖拽字幕文件到此，或点击选择',
+    'step1.hint': 'ASS / SSA 格式 (.ass / .ssa)，支持多选',
+    'step2.title': '分析结果',
+    'step3.title': '选择操作',
+    'step4.title': '转换 & 下载',
+    'opt.draw.title': '子集化绘图指令',
+    'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
+    'opt.font.title': '嵌入引用字体',
+    'opt.font.desc': '扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
+    'opt.sysfont.title': '嵌入系统字体',
+    'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入（需要通过 Local Font Access 或手动上传获取字体文件）',
+    'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
+    'notice.drawing': '注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
+    'font.upload.title': '上传字体文件',
+    'font.upload.drop': '点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
+    'font.path.summary': '💡 常见字体安装路径',
+    'font.local.btn': '从系统自动加载字体',
+    'preview.title': '字体预览',
+    'discuss.header': '讨论 · Discussion',
+    'discuss.loading': '加载中…',
+    'footer.feedback': '反馈',
+    'footer.source': '查看源代码',
+    'stat.drawBlocks': '绘图块',
+    'stat.uniqueShapes': '唯一形状',
+    'stat.extFonts': '外部字体',
+    'stat.chars': '待嵌入字符',
+    'analysis.draw.found': '发现 {unique} 个唯一形状，{total} 处引用',
+    'analysis.draw.none': '未发现绘图指令',
+    'analysis.font.found': '发现 {count} 个外部字体，共 {chars} 字符',
+    'analysis.font.none': '未发现外部字体（均为系统字体）',
+    'analysis.draw.label': '绘图指令（\\p1）',
+    'analysis.font.label': '外部字体',
+    'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
+    'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
+    'err.invalid': '⚠ 文件格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
+    'err.no_events': '⚠ 文件格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
+    'status.analyzing': '正在分析… {current}/{total}',
+    'status.parsing': '正在解析字幕…',
+    'status.subset': '正在子集化…',
+    'status.rewrite': '正在重写字幕…',
+    'result.done': '转换完成',
+    'result.detail': '内嵌 {count} 个字体 · {origKB} KB → {newKB} KB',
+    'change': '更换文件',
+    'font.missing': '待上传',
+    'font.uploaded': '✓ {name}',
+    'font.system': '✓ 系统字体',
+    'font.chars': '{n} 字符',
+    'font.weight.normal': '常规',
+    'font.weight.bold': '粗体',
+    'font.match_fail': '{n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
+    'path.win': 'Windows：C:\\Windows\\Fonts',
+    'path.mac': 'macOS：/Library/Fonts 或 ~/Library/Fonts',
+    'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
+    'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
+    'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
+    'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
+    'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
+    'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
+    'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
+    'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
+    'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗体字体，使用已有字体替代。',
+    'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
+    'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
+    'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
+    'log.font.parse_fail': '[font] 字体解析失败: {error}',
+    'log.rewrite.start': '[ass] 重写字幕文件…',
+    'log.convert.start': '[convert] 开始转换…',
+    'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
+    'leave.confirm': '转换正在进行中，确定要离开吗？',
+  },
+  en: {
+    'app.title': 'ASS Online Subset Tool',
+    'app.subtitle': 'Drawing Subsetting · Font Subset Embedding',
+    'btn.install': 'Install',
+    'btn.discuss': 'Discuss',
+    'btn.svg': 'SVG to ASS Drawing',
+    'btn.convert': 'Start Conversion',
+    'btn.converting': 'Processing…',
+    'btn.download': 'Download Optimized Subtitle',
+    'btn.download_zip': 'Download All (ZIP)',
+    'btn.preview': 'Preview',
+    'btn.dl_font': 'Download Font',
+    'step1.title': 'Upload Subtitle File',
+    'step1.drop': 'Drag and drop subtitle file here, or click to select',
+    'step1.hint': 'ASS / SSA format (.ass / .ssa), multi-select supported',
+    'step2.title': 'Analysis Results',
+    'step3.title': 'Choose Operations',
+    'step4.title': 'Convert & Download',
+    'opt.draw.title': 'Subset Drawing Instructions',
+    'opt.draw.desc': 'Extract \\p1…\\p0 vector drawing data into embedded TTF font, deduplicate drawings, reduce file size',
+    'opt.font.title': 'Embed Referenced Fonts',
+    'opt.font.desc': 'Scan non-system fonts referenced in subtitles, subset and embed; keeps only used characters',
+    'opt.sysfont.title': 'Embed System Fonts',
+    'opt.sysfont.desc': 'Also subset and embed system fonts referenced in subtitles (requires Local Font Access or manual upload)',
+    'notice.copyright': '⚠ Copyright Notice: Distributing unauthorized font files may constitute infringement. Ensure you have distribution rights for embedded fonts.',
+    'notice.drawing': 'Note: After converting drawing instructions, effects may shift slightly. Please check the final result manually.',
+    'font.upload.title': 'Upload Font Files',
+    'font.upload.drop': 'Click to select font files, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
+    'font.path.summary': '💡 Common font installation paths',
+    'font.local.btn': 'Load fonts from system automatically',
+    'preview.title': 'Font Preview',
+    'discuss.header': 'Discussion',
+    'discuss.loading': 'Loading…',
+    'footer.feedback': 'Feedback',
+    'footer.source': 'Source Code',
+    'stat.drawBlocks': 'Draw Blocks',
+    'stat.uniqueShapes': 'Unique Shapes',
+    'stat.extFonts': 'External Fonts',
+    'stat.chars': 'Characters',
+    'analysis.draw.found': 'Found {unique} unique shapes, {total} references',
+    'analysis.draw.none': 'No drawing instructions found',
+    'analysis.font.found': 'Found {count} external fonts, {chars} characters total',
+    'analysis.font.none': 'No external fonts found (all system fonts)',
+    'analysis.draw.label': 'Drawing Instructions (\\p1)',
+    'analysis.font.label': 'External Fonts',
+    'analysis.resubset': 'Detected existing drawing subset; incremental update will be performed.',
+    'err.format': '⚠ Please upload .ass or .ssa subtitle files.',
+    'err.invalid': '⚠ Format validation failed: "{name}" is not a valid ASS/SSA file.',
+    'err.no_events': '⚠ Format validation failed: "{name}" is missing Format or Dialogue lines in [Events].',
+    'status.analyzing': 'Analyzing… {current}/{total}',
+    'status.parsing': 'Parsing subtitle…',
+    'status.subset': 'Subsetting…',
+    'status.rewrite': 'Rewriting subtitle…',
+    'result.done': 'Conversion Complete',
+    'result.detail': 'Embedded {count} fonts · {origKB} KB → {newKB} KB',
+    'change': 'Change file',
+    'font.missing': 'Not uploaded',
+    'font.uploaded': '✓ {name}',
+    'font.system': '✓ System font',
+    'font.chars': '{n} chars',
+    'font.weight.normal': 'Regular',
+    'font.weight.bold': 'Bold',
+    'font.match_fail': '{n} font file(s) did not match any referenced font name. Please check.',
+    'path.win': 'Windows: C:\\Windows\\Fonts',
+    'path.mac': 'macOS: /Library/Fonts or ~/Library/Fonts',
+    'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
+    'log.draw.building': '[draw] Found {unique} unique shapes, {total} references, building font…',
+    'log.draw.done': '[draw] Drawing font generated: {size} KB',
+    'log.draw.none': '[draw] No \\p1 drawing instructions found, skipping.',
+    'log.draw.kept_existing': '[draw] Kept {count} chars from existing drawing subset',
+    'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing drawing font, regenerating',
+    'log.font.none_external': '[font] No external fonts to embed.',
+    'log.font.missing': '[font] ⚠ "{name}" ({weight}) not uploaded, skipping.',
+    'log.font.weight_fallback': '[font] ⚠ Bold variant not found for "{name}", using available font.',
+    'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
+    'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (-{pct}%){skippedText}',
+    'log.font.subset_fail': '[font] "{name}" failed: {error}',
+    'log.font.parse_fail': '[font] Font parse error: {error}',
+    'log.rewrite.start': '[ass] Rewriting subtitle file…',
+    'log.convert.start': '[convert] Starting conversion…',
+    'log.convert.done': '[done] Complete. {origKB} KB → {newKB} KB ({delta} KB)',
+    'leave.confirm': 'Conversion in progress. Are you sure you want to leave?',
+  }
+};
 
-  const script = document.createElement('script');
-  script.src = 'https://giscus.app/client.js';
-  script.setAttribute('data-repo', 'MontageSubs/ass-subset');
-  script.setAttribute('data-repo-id', 'R_kgDORnj_wQ');
-  script.setAttribute('data-category', 'General');
-  script.setAttribute('data-category-id', 'DIC_kwDORnj_wc4C4crU');
-  script.setAttribute('data-mapping', 'pathname');
-  script.setAttribute('data-reactions-enabled', '0');
-  script.setAttribute('data-emit-metadata', '0');
-  script.setAttribute('data-theme', theme);
-  script.setAttribute('data-lang', 'zh-CN');
-  script.crossOrigin = 'anonymous';
-  script.async = true;
-  script.onload = () => {
-    document.getElementById('discuss-loading').remove();
+let currentLang = 'zh';
+
+function t(key, params) {
+  let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), v);
+  }
+  return str;
+}
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (el.tagName === 'INPUT' && el.type !== 'checkbox') el.placeholder = val;
+    else el.textContent = val;
+  });
+  document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+  document.getElementById('lang-zh').classList.toggle('active', currentLang === 'zh');
+  document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  try { localStorage.setItem('ass-subset-lang', lang); } catch(_) {}
+  applyI18n();
+  document.getElementById('lang-wrap').classList.remove('open');
+}
+
+const S = {
+  assFiles: [],
+  uploadedFonts: new Map(),
+  outputBlobs: [],
+  fontBuffers: [],
+  converting: false,
+};
+
+let worker = null;
+let workerReady = false;
+let msgIdCounter = 0;
+const pendingCallbacks = new Map();
+
+function initWorker() {
+  worker = new Worker('worker.js');
+  worker.onmessage = function(e) {
+    const msg = e.data;
+    if (msg.type === 'ready') { workerReady = true; return; }
+    if (msg.type === 'progress') { handleProgress(msg); return; }
+    if (msg.type === 'log') { handleWorkerLog(msg); return; }
+    if (msg.type === 'result' || msg.type === 'error') {
+      const cb = pendingCallbacks.get(msg.id);
+      if (cb) { pendingCallbacks.delete(msg.id); cb(msg); }
+    }
   };
-  document.getElementById('discuss-section').appendChild(script);
+  worker.onerror = function(e) { console.error('Worker error:', e); };
+  const opentypePath = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
+  worker.postMessage({ type: 'init', id: 0, opentypePath });
 }
 
-if (typeof opentype === 'undefined') {
-  document.querySelector('.main').innerHTML =
-    '<div style="padding:2rem;background:rgba(181,42,28,.1);border-radius:3px;font-family:monospace;color:#b52a1c;">' +
-    '⚠ opentype.js 加载失败，请检查网络连接后刷新页面。<br>' +
-    'Failed to load opentype.js — please check your connection and reload.</div>';
+function workerCall(type, data, transfer) {
+  return new Promise((resolve, reject) => {
+    const id = ++msgIdCounter;
+    pendingCallbacks.set(id, msg => {
+      if (msg.type === 'error') reject(new Error(msg.error));
+      else resolve(msg);
+    });
+    worker.postMessage({ type, id, ...data }, transfer || []);
+  });
 }
 
-const DRAW_FONT_NAME = 'ASSDrawSubset_MontageSubs';
-const EM     = 1024;
-const TARGET = 820;
-const MARGIN = (EM - TARGET) / 2;
-
-const SYSTEM_FONTS = new Set([
-  'arial','arial black','comic sans ms','courier new','georgia',
-  'impact','tahoma','times new roman','trebuchet ms','verdana',
-  'webdings','wingdings','symbol',
-  'calibri','cambria','candara','consolas','constantia','corbel',
-  'franklin gothic medium','lucida console','lucida sans unicode',
-  'microsoft sans serif','palatino linotype','segoe ui','segoe print','segoe script',
-  'segoe ui emoji',
-  'microsoft yahei','microsoft yahei ui','微软雅黑',
-  'simsun','宋体','nsimsun','simsun-extb',
-  'simhei','黑体',
-  'simkai','kaiti','楷体','kaiti_gb2312','kaiti sc','kaiti tc',
-  'fangsong','仿宋','fangsong_gb2312',
-  'dengxian','等线',
-  'fzshuti','方正舒体','fzyaoti','方正姚体',
-  'microsoft jhenghei','microsoft jhenghei ui','微軟正黑體',
-  'mingliu','細明體','pmingliu','新細明體','mingliu-extb','dfkai-sb','標楷體',
-  'meiryo','meiryo ui','メイリオ','ms gothic','ms pgothic','ms mincho','ms pmincho',
-  'yu gothic','yu gothic ui','游ゴシック','yu mincho','游明朝',
-  'batang','batangche','dotum','dotumche','gulim','gulimche','malgun gothic',
-  '맑은 고딕','나눔고딕','nanum gothic',
-  'helvetica','helvetica neue','geneva','monaco',
-  'pingfang sc','苹方-简','pingfang tc','苹方-繁','pingfang hk','苹方-港',
-  'hiragino sans gb','冬青黑体简体中文','hiragino sans',
-  'st heiti sc','st heiti tc','stheitisc','stheitist',
-  'st song','华文宋体','stfangsong','华文仿宋','stkaiti','华文楷体','stxihei','华文细黑',
-  'hiragino mincho pron','hiragino kaku gothic pron',
-  'liberation sans','liberation serif','liberation mono',
-  'noto sans','noto serif','noto sans cjk sc','noto sans cjk tc','noto sans cjk jp',
-  'noto sans cjk kr','wqy microhei','wqy zenhei','droid sans','droid sans fallback',
-  'assdrawsubset_montagesubs',
-]);
-
-function assUUEncode(uint8Array) {
-  let out = '';
-  const n = uint8Array.length;
-  for (let i = 0; i < n; i += 3) {
-    const rem = n - i;
-    const b0 = uint8Array[i];
-    const b1 = rem > 1 ? uint8Array[i + 1] : 0;
-    const b2 = rem > 2 ? uint8Array[i + 2] : 0;
-    const v  = (b0 << 16) | (b1 << 8) | b2;
-    out += String.fromCharCode(((v >> 18) & 0x3f) + 33);
-    out += String.fromCharCode(((v >> 12) & 0x3f) + 33);
-    if (rem > 1) out += String.fromCharCode(((v >> 6) & 0x3f) + 33);
-    if (rem > 2) out += String.fromCharCode((v & 0x3f) + 33);
-  }
-  return out;
+function handleProgress(msg) {
+  const area = document.getElementById('progress-area');
+  const bar = document.getElementById('progress-bar');
+  const txt = document.getElementById('progress-text');
+  area.classList.remove('hidden');
+  const pct = msg.total > 0 ? Math.round((msg.current / msg.total) * 100) : 0;
+  bar.style.width = pct + '%';
+  const phaseKey = { parse: 'status.parsing', subset: 'status.subset', rewrite: 'status.rewrite' }[msg.phase] || '';
+  txt.textContent = (phaseKey ? t(phaseKey) + ' ' : '') + pct + '%';
 }
 
-class ASSDocument {
-  constructor(text) {
-    this.raw       = text;
-    this.styles    = {};
-    this.fontChars = {};
-    this.drawings  = [];
-    this._parse();
-  }
-  _norm(fontName) { return fontName.replace(/^@/, '').trim(); }
-  _parse() {
-    const lines = this.raw.split(/\r?\n/);
-    let section = '';
-    let evtFmt  = null;
-    for (const line of lines) {
-      const t = line.trim();
-      if (!t) continue;
-      if (t.startsWith('[')) { section = t.toLowerCase(); continue; }
-      if (section.includes('styles') && /^style\s*:/i.test(t)) {
-        const rest  = t.replace(/^style\s*:\s*/i, '');
-        const parts = rest.split(',');
-        if (parts.length >= 2) {
-          this.styles[parts[0].trim()] = this._norm(parts[1].trim()) || 'Arial';
-        }
-      }
-      if (section === '[events]') {
-        if (/^format\s*:/i.test(t)) {
-          const flds = t.replace(/^format\s*:\s*/i, '').split(',').map(f => f.trim().toLowerCase());
-          evtFmt = {
-            styleIdx: flds.indexOf('style'),
-            textIdx:  flds.indexOf('text'),
-            startIdx: flds.indexOf('start'),
-            endIdx:   flds.indexOf('end'),
-          };
-        }
-        if (/^dialogue\s*:/i.test(t) && evtFmt) {
-          const rest  = t.replace(/^dialogue\s*:\s*/i, '');
-          const parts = rest.split(',');
-          this._parseText(
-            parts.slice(evtFmt.textIdx).join(','),
-            this._norm(this.styles[parts[evtFmt.styleIdx]?.trim()] || 'Arial'),
-            parts[evtFmt.startIdx]?.trim() || '',
-            parts[evtFmt.endIdx]?.trim()   || ''
-          );
-        }
-      }
-    }
-  }
-  _parseText(text, defaultFont, tStart, tEnd) {
-    const segs = text.split(/(\{[^}]*\})/);
-    let font = defaultFont, drawing = false, drawData = '', drawTag = '';
-    for (const seg of segs) {
-      if (seg.startsWith('{')) {
-        const inner = seg.slice(1, -1);
-        const pm = inner.match(/\\p(\d+)/i);
-        if (pm) {
-          const lvl = parseInt(pm[1]);
-          if (lvl > 0 && !drawing) { drawing = true; drawTag = seg; drawData = ''; }
-          else if (lvl === 0 && drawing) {
-            drawing = false;
-            const clean = drawData.trim().replace(/\s+/g, ' ');
-            if (clean) this.drawings.push({ tagBlock: drawTag, data: clean, tStart, tEnd });
-          }
-        }
-        if (!drawing) {
-          const rm = inner.match(/\\r([^\\}]*)/);
-          if (rm) { const sn = rm[1].trim(); font = this._norm((sn && this.styles[sn]) ? this.styles[sn] : defaultFont); }
-          const fm = inner.match(/\\fn([^\\}]*)/);
-          if (fm) { const v = fm[1].trim(); font = v ? this._norm(v) : defaultFont; }
-        }
-      } else if (seg) {
-        if (drawing) {
-          drawData += seg;
-        } else {
-          const clean = seg.replace(/\\[Nn]/g, '').replace(/\\h/g, ' ').replace(/\\([{}\\])/g, '$1');
-          if (!this.fontChars[font]) this.fontChars[font] = new Set();
-          for (const ch of clean) {
-            if (ch !== '\n' && ch !== '\r' && (ch.trim() !== '' || ch === ' ')) {
-              this.fontChars[font].add(ch);
-            }
-          }
-        }
-      }
-    }
-    if (drawing && drawData.trim()) {
-      this.drawings.push({ tagBlock: drawTag, data: drawData.trim().replace(/\s+/g, ' '), tStart, tEnd });
-    }
-  }
-  getUniqueDrawings() {
-    const seen = new Map();
-    let charCode = 97;
-    for (const d of this.drawings) {
-      if (!seen.has(d.data)) {
-        seen.set(d.data, { tagBlock: d.tagBlock, char: String.fromCharCode(charCode++), count: 1, firstStart: d.tStart, firstEnd: d.tEnd, lastStart: d.tStart, lastEnd: d.tEnd });
-      } else {
-        const e = seen.get(d.data); e.count++; e.lastStart = d.tStart; e.lastEnd = d.tEnd;
-      }
-    }
-    return seen;
-  }
-  getExternalFonts() {
-    const res = {};
-    for (const [name, chars] of Object.entries(this.fontChars)) {
-      if (!SYSTEM_FONTS.has(name.toLowerCase())) res[name] = chars;
-    }
-    return res;
-  }
+function handleWorkerLog(msg) {
+  const text = t(msg.key, {
+    ...msg.params,
+    skippedText: msg.params.skipped > 0 ? ` [${msg.params.skipped} missing]` : '',
+    weight: msg.params.weight === 'bold' ? t('font.weight.bold') : t('font.weight.normal'),
+  });
+  log(text, msg.level);
 }
 
-function parseDrawCmds(drawStr) {
-  const toks = drawStr.split(/\s+/).filter(Boolean);
-  const cmds = [], pts = [];
-  let cmd = null, i = 0;
-  const readXY = () => { const x = parseFloat(toks[i]), y = parseFloat(toks[i+1]); i += 2; return [x, y]; };
-  while (i < toks.length) {
-    const tok = toks[i];
-    if (/^[a-zA-Z]$/.test(tok)) { cmd = tok.toLowerCase(); i++; continue; }
-    if (cmd === null || isNaN(parseFloat(tok))) { i++; continue; }
-    switch (cmd) {
-      case 'm': case 'n': { const [x,y] = readXY(); if (!isNaN(x)) { cmds.push({t:'M',x,y}); pts.push(x,y); } break; }
-      case 'l':           { const [x,y] = readXY(); if (!isNaN(x)) { cmds.push({t:'L',x,y}); pts.push(x,y); } break; }
-      case 'b': {
-        if (i + 5 < toks.length + 1) {
-          const x1=parseFloat(toks[i]),y1=parseFloat(toks[i+1]),x2=parseFloat(toks[i+2]),y2=parseFloat(toks[i+3]),x=parseFloat(toks[i+4]),y=parseFloat(toks[i+5]);
-          if (![x1,y1,x2,y2,x,y].some(isNaN)) { cmds.push({t:'C',x1,y1,x2,y2,x,y}); pts.push(x1,y1,x2,y2,x,y); }
-          i += 6;
-        } else { i = toks.length; }
-        break;
-      }
-      case 's': case 'p': { const [x,y] = readXY(); if (!isNaN(x)) { cmds.push({t:'L',x,y}); pts.push(x,y); } break; }
-      case 'c': case 'e': { cmds.push({t:'Z'}); i++; break; }
-      default: i++;
-    }
-  }
-  return {cmds, pts};
-}
-
-function buildDrawGlyph(drawStr, charCode) {
-  const {cmds, pts} = parseDrawCmds(drawStr);
-  const path = new opentype.Path();
-  if (pts.length === 0) return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
-  let xmin=Infinity, ymin=Infinity, xmax=-Infinity, ymax=-Infinity;
-  for (let i = 0; i < pts.length; i += 2) {
-    if (pts[i]   < xmin) xmin = pts[i]; if (pts[i]   > xmax) xmax = pts[i];
-    if (pts[i+1] < ymin) ymin = pts[i+1]; if (pts[i+1] > ymax) ymax = pts[i+1];
-  }
-  const gw = xmax - xmin || 1, gh = ymax - ymin || 1;
-  const scale = TARGET / Math.max(gw, gh);
-  const ox = MARGIN + (TARGET - gw * scale) / 2;
-  const oy = MARGIN + (TARGET - gh * scale) / 2;
-  const tx = x => (x - xmin) * scale + ox;
-  const ty = y => (ymax - y) * scale + oy;
-  let hasContent = false;
-  for (const c of cmds) {
-    switch (c.t) {
-      case 'M': path.moveTo(tx(c.x), ty(c.y)); hasContent = true; break;
-      case 'L': path.lineTo(tx(c.x), ty(c.y)); hasContent = true; break;
-      case 'C': path.curveTo(tx(c.x1), ty(c.y1), tx(c.x2), ty(c.y2), tx(c.x), ty(c.y)); hasContent = true; break;
-      case 'Z': path.close(); break;
-    }
-  }
-  if (hasContent) path.close();
-  return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
-}
-
-function buildDrawingFont(uniqueDrawings) {
-  const notdef = new opentype.Glyph({ name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path() });
-  const glyphs = [notdef];
-  const dataToChar = new Map();
-  for (const [drawData, meta] of uniqueDrawings) {
-    glyphs.push(buildDrawGlyph(drawData, meta.char.codePointAt(0)));
-    dataToChar.set(drawData, meta.char);
-  }
-  return {
-    font: new opentype.Font({ familyName: DRAW_FONT_NAME, styleName: 'Regular', unitsPerEm: EM, ascender: EM, descender: 0, glyphs }),
-    dataToChar
-  };
-}
-
-async function subsetFont(fontBuffer, charSet, fontName, isTTC) {
-  let orig;
-  if (isTTC) {
-    const view = new DataView(fontBuffer);
-    const numFonts = view.getUint32(8, false);
-    const key = fontName.toLowerCase();
-    let bestFont = null;
-    for (let i = 0; i < numFonts; i++) {
-      const offset = view.getUint32(12 + i * 4, false);
-      try {
-        const f = opentype.parse(fontBuffer, {}, offset);
-        const names = new Set();
-        const raw = f.tables?.name?.names;
-        if (raw) {
-          for (const [id, platforms] of Object.entries(raw)) {
-            if (['1','4','6','16'].includes(String(id))) {
-              for (const v of Object.values(platforms)) { if (typeof v === 'string') names.add(v.trim().toLowerCase()); }
-            }
-          }
-        }
-        if (names.has(key)) { bestFont = f; break; }
-        if (!bestFont) bestFont = f;
-      } catch (_) {}
-    }
-    orig = bestFont;
-    if (!orig) throw new Error(`无法从 TTC 文件中解析字体「${fontName}」`);
-  } else {
-    orig = opentype.parse(fontBuffer);
-  }
-  const getName = id => { const e = orig.names[id]; if (!e) return null; return e.en || e['en-US'] || Object.values(e)[0] || null; };
-  const familyName = getName('fontFamily') || fontName;
-  const styleName  = getName('fontSubfamily') || 'Regular';
-  const origNotdef = orig.glyphs.get(0);
-  const notdef = new opentype.Glyph({ name: '.notdef', unicode: 0, advanceWidth: origNotdef?.advanceWidth || 500, path: new opentype.Path() });
-  const glyphs = [notdef];
-  const seen = new Set([0]);
-  let skipped = 0;
-  for (const char of charSet) {
-    const cp = char.codePointAt(0);
-    if (seen.has(cp)) continue;
-    const origGlyph = orig.charToGlyph(char);
-    if (!origGlyph || origGlyph.index === 0) { skipped++; continue; }
-    const rendered = orig.getPath(char, 0, 0, orig.unitsPerEm);
-    const newPath = new opentype.Path();
-    for (const cmd of rendered.commands) {
-      switch (cmd.type) {
-        case 'M': newPath.moveTo(cmd.x, -cmd.y); break;
-        case 'L': newPath.lineTo(cmd.x, -cmd.y); break;
-        case 'C': newPath.curveTo(cmd.x1, -cmd.y1, cmd.x2, -cmd.y2, cmd.x, -cmd.y); break;
-        case 'Q': newPath.quadraticCurveTo(cmd.x1, -cmd.y1, cmd.x, -cmd.y); break;
-        case 'Z': newPath.close(); break;
-      }
-    }
-    glyphs.push(new opentype.Glyph({ name: origGlyph.name || `glyph_${cp}`, unicode: cp, advanceWidth: origGlyph.advanceWidth, path: newPath }));
-    seen.add(cp);
-  }
-  const newFont = new opentype.Font({ familyName, styleName, unitsPerEm: orig.unitsPerEm, ascender: orig.ascender, descender: orig.descender, glyphs });
-  if (orig.tables?.name) newFont.tables.name = orig.tables.name;
-  if (orig.tables?.os2)  newFont.tables.os2  = Object.assign({}, orig.tables.os2);
-  return { ttf: new Uint8Array(newFont.toArrayBuffer()), skipped };
-}
-
-function rewriteASS(rawContent, opts) {
-  const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts } = opts;
-  const hasNewFonts = drawTTF || embeddedFonts.size > 0;
-  let content = hasNewFonts
-    ? rawContent.replace(/\n\[Fonts\][\s\S]*?(?=\n\[|$)/i, '').trimEnd()
-    : rawContent.trimEnd();
-  if (drawingDataToChar && drawingDataToChar.size > 0) {
-    content = content.replace(
-      /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
-      (match, startTag, data) => {
-        const clean = data.trim().replace(/\s+/g, ' ');
-        const ch = drawingDataToChar.get(clean);
-        if (!ch) return match;
-        return startTag.replace(/\\p[1-9]/i, `\\fn${drawFontFamily}\\p0`) + ch;
-      }
-    );
-  }
-  if (!hasNewFonts) return content;
-  const lines = ['\n\n[Fonts]'];
-  const encodeAndAppend = (fontName, ttfData) => {
-    lines.push(`fontname: ${fontName}_0.ttf`);
-    const enc = assUUEncode(ttfData);
-    for (let i = 0; i < enc.length; i += 80) lines.push(enc.slice(i, i + 80));
-    lines.push('');
-  };
-  if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
-  for (const [name, ttf] of embeddedFonts) encodeAndAppend(name, ttf);
-  content += lines.join('\n');
-  return content;
-}
-
-const S = { assFile: null, assContent: null, assDoc: null, uploadedFonts: new Map(), outputBlob: null };
-
-function log(msg, cls = '') {
+function log(msg, cls) {
   const box = document.getElementById('log-box');
   box.classList.remove('hidden');
   const d = document.createElement('div');
   d.textContent = msg;
-  if (cls) d.className = `l-${cls}`;
+  if (cls) d.className = 'l-' + cls;
   box.appendChild(d);
   box.scrollTop = box.scrollHeight;
 }
 
-function renderAnalysis() {
-  const doc    = S.assDoc;
-  const draws  = doc.getUniqueDrawings();
-  const extFnt = doc.getExternalFonts();
-  const hasDrawings = draws.size > 0;
-  const hasFonts    = Object.keys(extFnt).length > 0;
-  const totalChars  = Object.values(extFnt).reduce((s, c) => s + c.size, 0);
+function renderFontPaths() {
+  const paths = document.getElementById('font-paths');
+  const ua = navigator.userAgent.toLowerCase();
+  const items = [];
+  if (ua.includes('win')) items.push(t('path.win'), t('path.mac'), t('path.linux'));
+  else if (ua.includes('mac')) items.push(t('path.mac'), t('path.win'), t('path.linux'));
+  else items.push(t('path.linux'), t('path.win'), t('path.mac'));
+  paths.innerHTML = items.map(p => {
+    const [label, ...rest] = p.split('：');
+    return '<strong>' + label + '：</strong>' + rest.join('：');
+  }).join('<br>');
+}
+
+async function handleASSFiles(files) {
+  const assFiles = Array.from(files).filter(f => /\.(ass|ssa)$/i.test(f.name));
+  if (assFiles.length === 0) {
+    document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + t('err.format') + '</div>';
+    return;
+  }
+  S.assFiles = [];
+  S.uploadedFonts.clear();
+  S.outputBlobs = [];
+  S.fontBuffers = [];
+
+  document.getElementById('dz-ass').style.display = 'none';
+  const badge = document.getElementById('ass-badge');
+  badge.classList.remove('hidden');
+  badge.innerHTML = assFiles.map(f =>
+    '<div class="file-badge"><span class="fb-name">' + f.name + '</span>' +
+    '<span class="fb-size">' + (f.size / 1024).toFixed(0) + ' KB</span>' +
+    '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span></div>'
+  ).join('');
+
+  document.getElementById('step1').classList.remove('active');
+  document.getElementById('step1').classList.add('done');
+  document.getElementById('step2').style.display = '';
+  document.getElementById('step2').classList.add('active');
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step3').classList.remove('active');
+  document.getElementById('step4').style.display = 'none';
 
   const area = document.getElementById('analysis-area');
-  area.innerHTML = `
-    <div class="stats-bar">
-      <div class="stat"><div class="stat-val">${doc.drawings.length}</div><div class="stat-lbl">绘图块</div></div>
-      <div class="stat"><div class="stat-val">${draws.size}</div><div class="stat-lbl">唯一形状</div></div>
-      <div class="stat"><div class="stat-val">${Object.keys(extFnt).length}</div><div class="stat-lbl">外部字体</div></div>
-      <div class="stat"><div class="stat-val">${totalChars}</div><div class="stat-lbl">待嵌入字符</div></div>
-    </div>
-  `;
+  area.innerHTML = '<div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">' + t('status.parsing') + '</div>';
+
+  // Parse each file via worker
+  for (const file of assFiles) {
+    const raw = await file.text();
+    const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
+    if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
+      area.innerHTML = '<div class="upload-error">' + t('err.invalid', { name: file.name }) + '</div>';
+      return;
+    }
+    if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
+      area.innerHTML = '<div class="upload-error">' + t('err.no_events', { name: file.name }) + '</div>';
+      return;
+    }
+    try {
+      const result = await workerCall('parseASS', { text: content });
+      S.assFiles.push({ file, content, parsed: result });
+    } catch (e) {
+      area.innerHTML = '<div class="upload-error">⚠ ' + e.message + '</div>';
+      return;
+    }
+  }
+
+  renderAnalysis();
+}
+
+function resetUpload() {
+  document.getElementById('dz-ass').style.display = '';
+  document.getElementById('ass-badge').classList.add('hidden');
+  document.getElementById('ass-badge').innerHTML = '';
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('step1').classList.remove('done');
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step2').classList.remove('active');
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step4').style.display = 'none';
+  document.getElementById('inp-ass').value = '';
+  S.assFiles = [];
+  S.uploadedFonts.clear();
+}
+
+function renderAnalysis() {
+  const area = document.getElementById('analysis-area');
+  area.innerHTML = '';
+
+  // Aggregate stats across all files
+  let totalDrawings = 0, totalUnique = 0, totalExtFonts = new Set(), totalChars = 0;
+  let hasDrawings = false, hasFonts = false, hasResubset = false;
+
+  for (const entry of S.assFiles) {
+    const p = entry.parsed;
+    totalDrawings += p.drawings;
+    totalUnique += p.uniqueDrawings.length;
+    const extKeys = Object.keys(p.externalFonts);
+    extKeys.forEach(k => totalExtFonts.add(k));
+    for (const info of Object.values(p.externalFonts)) {
+      totalChars += info.normal.length + info.bold.length;
+    }
+    if (p.drawings > 0 || p.hasExistingDrawSubset) hasDrawings = true;
+    if (extKeys.length > 0) hasFonts = true;
+    if (p.hasExistingDrawSubset) hasResubset = true;
+  }
+
+  area.innerHTML = '<div class="stats-bar">' +
+    '<div class="stat"><div class="stat-val">' + totalDrawings + '</div><div class="stat-lbl">' + t('stat.drawBlocks') + '</div></div>' +
+    '<div class="stat"><div class="stat-val">' + totalUnique + '</div><div class="stat-lbl">' + t('stat.uniqueShapes') + '</div></div>' +
+    '<div class="stat"><div class="stat-val">' + totalExtFonts.size + '</div><div class="stat-lbl">' + t('stat.extFonts') + '</div></div>' +
+    '<div class="stat"><div class="stat-val">' + totalChars + '</div><div class="stat-lbl">' + t('stat.chars') + '</div></div>' +
+  '</div>';
 
   const addRow = (label, cls, text) => {
     const row = document.createElement('div');
     row.className = 'info-item';
-    row.innerHTML = `<span class="ii-label">${label}</span><span class="badge ${cls}">${text}</span>`;
+    row.innerHTML = '<span class="ii-label">' + label + '</span><span class="badge ' + cls + '">' + text + '</span>';
     area.appendChild(row);
   };
 
-  addRow('绘图指令（\p1）',
-    hasDrawings ? 'badge-ok' : 'badge-warn',
-    hasDrawings ? `发现 ${draws.size} 个唯一形状，${doc.drawings.length} 处引用` : '未发现绘图指令'
+  addRow(t('analysis.draw.label'),
+    hasDrawings ? 'badge-ok' : 'badge-info',
+    hasDrawings ? t('analysis.draw.found', { unique: totalUnique, total: totalDrawings }) : t('analysis.draw.none')
   );
-  addRow('外部字体',
+  addRow(t('analysis.font.label'),
     hasFonts ? 'badge-ok' : 'badge-info',
-    hasFonts ? `发现 ${Object.keys(extFnt).length} 个外部字体，共 ${totalChars} 字符` : '未发现外部字体（均为系统字体）'
+    hasFonts ? t('analysis.font.found', { count: totalExtFonts.size, chars: totalChars }) : t('analysis.font.none')
   );
 
-  const cbDraw  = document.getElementById('opt-draw');
-  const cbFont  = document.getElementById('opt-font');
+  if (hasResubset) {
+    const notice = document.createElement('div');
+    notice.className = 'notice';
+    notice.textContent = t('analysis.resubset');
+    area.appendChild(notice);
+  }
+
+  // Configure options
+  const cbDraw = document.getElementById('opt-draw');
+  const cbFont = document.getElementById('opt-font');
   const rowDraw = document.getElementById('opt-row-draw');
   const rowFont = document.getElementById('opt-row-font');
 
   cbDraw.disabled = !hasDrawings;
-  cbDraw.checked  = hasDrawings;
+  cbDraw.checked = hasDrawings;
   rowDraw.classList.toggle('selected', hasDrawings);
   rowDraw.classList.toggle('disabled', !hasDrawings);
 
   cbFont.disabled = !hasFonts;
-  cbFont.checked  = hasFonts;
+  cbFont.checked = hasFonts;
   rowFont.classList.toggle('selected', hasFonts);
   rowFont.classList.toggle('disabled', !hasFonts);
 
   document.getElementById('drawing-notice').classList.toggle('hidden', !hasDrawings);
+  document.getElementById('copyright-notice').classList.toggle('hidden', !hasFonts);
   document.getElementById('font-section').classList.toggle('hidden', !hasFonts);
+  document.getElementById('opt-sub-sysfont').classList.toggle('hidden', !hasFonts);
   if (hasFonts) renderFontList();
 
   if (hasDrawings || hasFonts) {
@@ -1152,258 +1330,350 @@ function renderAnalysis() {
 }
 
 function renderFontList() {
-  const extFnt = S.assDoc.getExternalFonts();
-  const list   = document.getElementById('font-list');
+  const allFonts = {};
+  for (const entry of S.assFiles) {
+    for (const [name, info] of Object.entries(entry.parsed.externalFonts)) {
+      if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0 };
+      allFonts[name].normal += info.normal.length;
+      allFonts[name].bold += info.bold.length;
+    }
+  }
+  const list = document.getElementById('font-list');
   list.innerHTML = '';
-  for (const [name, chars] of Object.entries(extFnt)) {
+  for (const [name, info] of Object.entries(allFonts)) {
     const uploaded = S.uploadedFonts.get(name.toLowerCase());
+    const totalChars = info.normal + info.bold;
+    const weights = [];
+    if (info.normal > 0) weights.push(t('font.weight.normal'));
+    if (info.bold > 0) weights.push(t('font.weight.bold'));
     const div = document.createElement('div');
     div.className = 'font-item';
-    div.innerHTML = `
-      <span class="fi-name">${name}</span>
-      <span class="fi-chars">${chars.size} 字符</span>
-      ${uploaded ? `<span class="fi-status fi-uploaded">✓ ${uploaded.file.name}</span>` : '<span class="fi-status fi-missing">待上传</span>'}
-    `;
+    div.innerHTML = '<span class="fi-name">' + name + '</span>' +
+      '<span class="fi-chars">' + t('font.chars', { n: totalChars }) + ' [' + weights.join('+') + ']</span>' +
+      (uploaded
+        ? '<span class="fi-status fi-uploaded">' + t('font.uploaded', { name: uploaded.file.name }) + '</span>'
+        : '<span class="fi-status fi-missing">' + t('font.missing') + '</span>');
     list.appendChild(div);
   }
 }
 
-async function matchFont(file) {
-  let buffer;
-  try { buffer = await file.arrayBuffer(); } catch(e) { return { matched: false }; }
-  const view = new DataView(buffer);
-  const isTTC = buffer.byteLength >= 4 && view.getUint32(0, false) === 0x74746366;
-  const allNames = new Set();
-  const extractNames = font => {
-    const raw = font.tables?.name?.names;
-    if (raw) {
-      for (const [id, platforms] of Object.entries(raw)) {
-        if (['1','4','6','16','17','18'].includes(String(id))) {
-          for (const v of Object.values(platforms)) { if (typeof v === 'string' && v.trim()) allNames.add(v.trim().toLowerCase()); }
+async function handleFonts(files) {
+  const requiredFonts = new Set();
+  for (const entry of S.assFiles) {
+    for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name);
+  }
+  const reqArr = Array.from(requiredFonts);
+  let notMatched = 0;
+
+  for (const file of files) {
+    let buffer;
+    try { buffer = await file.arrayBuffer(); } catch(_) { notMatched++; continue; }
+    try {
+      const result = await workerCall('matchFont', { buffer, requiredFonts: reqArr }, [buffer]);
+      if (result.results && result.results.length > 0) {
+        for (const match of result.results) {
+          const key = match.matchedFor.toLowerCase();
+          const existing = S.uploadedFonts.get(key);
+          // Prefer exact family match and closer weight to 400
+          if (!existing || (match.isFamilyMatch && !existing.isFamilyMatch)) {
+            // Need fresh buffer since we transferred it
+            const freshBuffer = await file.arrayBuffer();
+            S.uploadedFonts.set(key, {
+              file, buffer: freshBuffer, matchedFor: match.matchedFor,
+              isTTC: result.isTTC, weight: match.weight, isFamilyMatch: match.isFamilyMatch
+            });
+          }
+        }
+      } else {
+        notMatched++;
+      }
+    } catch (_) { notMatched++; }
+  }
+
+  if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
+  renderFontList();
+}
+
+async function loadLocalFonts() {
+  if (!('queryLocalFonts' in window)) return;
+  try {
+    const localFonts = await window.queryLocalFonts();
+    const requiredFonts = new Set();
+    for (const entry of S.assFiles) {
+      for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name.toLowerCase());
+    }
+    for (const font of localFonts) {
+      const fam = font.family?.toLowerCase();
+      const full = font.fullName?.toLowerCase();
+      if (requiredFonts.has(fam) || requiredFonts.has(full)) {
+        const matchName = requiredFonts.has(fam) ? fam : full;
+        if (!S.uploadedFonts.has(matchName)) {
+          const blob = await font.blob();
+          const buffer = await blob.arrayBuffer();
+          S.uploadedFonts.set(matchName, {
+            file: { name: font.fullName + ' (system)' },
+            buffer, matchedFor: font.family,
+            isTTC: false, weight: 400, isFamilyMatch: true, isSystem: true
+          });
         }
       }
     }
-    for (const [, val] of Object.entries(font.names || {})) {
-      if (val && typeof val === 'object') { for (const v of Object.values(val)) { if (typeof v === 'string') allNames.add(v.trim().toLowerCase()); } }
-    }
-  };
-  try {
-    if (isTTC) {
-      const numFonts = view.getUint32(8, false);
-      let errs = 0;
-      for (let i = 0; i < numFonts; i++) {
-        try { extractNames(opentype.parse(buffer, { lowMemory: false }, view.getUint32(12 + i * 4, false))); } catch (_) { errs++; }
-      }
-      if (allNames.size === 0 && errs > 0) { try { extractNames(opentype.parse(buffer)); } catch (_) {} }
-    } else {
-      extractNames(opentype.parse(buffer));
-    }
-  } catch (e) { return { matched: false }; }
-  const extFnt = S.assDoc.getExternalFonts();
-  let matched = false;
-  for (const fName of Object.keys(extFnt)) {
-    const key = fName.toLowerCase();
-    if (allNames.has(key)) { S.uploadedFonts.set(key, { file, buffer, matchedFor: fName, isTTC }); matched = true; break; }
+    renderFontList();
+  } catch (e) {
+    log('Local Font Access: ' + e.message, 'warn');
   }
-  if (!matched) {
-    outer: for (const fName of Object.keys(extFnt)) {
-      const key = fName.toLowerCase();
-      for (const n of allNames) {
-        if (n.includes(key) || key.includes(n)) { S.uploadedFonts.set(key, { file, buffer, matchedFor: fName, isTTC }); matched = true; break outer; }
-      }
-    }
-  }
-  let isVariable = false;
-  try {
-    const parsed = isTTC
-      ? opentype.parse(buffer, {}, view.getUint32(12, false))
-      : opentype.parse(buffer);
-    isVariable = parsed.tables?.fvar != null;
-  } catch (_) {}
-  return { matched, isVariable };
 }
 
 async function doConvert() {
-  const btnConvert  = document.getElementById('btn-convert');
+  const btnConvert = document.getElementById('btn-convert');
   const btnDownload = document.getElementById('btn-download');
-  const logBox      = document.getElementById('log-box');
-  const resultArea  = document.getElementById('result-area');
+  const logBox = document.getElementById('log-box');
+  const resultArea = document.getElementById('result-area');
   logBox.innerHTML = '';
   resultArea.innerHTML = '';
   btnDownload.classList.add('hidden');
   btnConvert.disabled = true;
-  btnConvert.innerHTML = '<span class="spinner"></span> 处理中…';
+  btnConvert.innerHTML = '<span class="spinner"></span> ' + t('btn.converting');
+  S.converting = true;
+  S.outputBlobs = [];
+  S.fontBuffers = [];
+
   const wantDraw = document.getElementById('opt-draw').checked;
   const wantFont = document.getElementById('opt-font').checked;
-  const doc      = S.assDoc;
+  const wantSystemFont = document.getElementById('opt-sysfont').checked;
+
+  const fonts = [];
+  for (const [, info] of S.uploadedFonts) {
+    fonts.push({
+      name: info.file.name,
+      buffer: info.buffer,
+      isTTC: info.isTTC,
+      matchedFor: info.matchedFor,
+      weight: info.weight,
+    });
+  }
+
   try {
-    let drawTTF = null, drawingDataToChar = null;
-    const drawFontFamily = DRAW_FONT_NAME;
-    const embeddedFonts  = new Map();
-    if (wantDraw) {
-      const draws = doc.getUniqueDrawings();
-      if (draws.size > 0) {
-        log(`[draw] 发现 ${draws.size} 个唯一绘图形状，共 ${doc.drawings.length} 处引用，正在构建字体…`, 'info');
-        const { font, dataToChar } = buildDrawingFont(draws);
-        drawTTF = new Uint8Array(font.toArrayBuffer());
-        drawingDataToChar = dataToChar;
-        log(`[draw] 绘图字体生成完毕：${(drawTTF.length / 1024).toFixed(1)} KB`, 'ok');
-        for (const [, meta] of draws) {
-          if (meta.count === 1) {
-            log(`[draw]  字符 "${meta.char}" — 使用 1 次  时间轴 ${meta.firstStart} → ${meta.firstEnd}`, 'info');
-          } else {
-            log(`[draw]  字符 "${meta.char}" — 共使用 ${meta.count} 次  首次 ${meta.firstStart} → ${meta.firstEnd}  末次 ${meta.lastStart} → ${meta.lastEnd}`, 'info');
-          }
-        }
-      } else {
-        log('[draw] 未发现 \\p1 绘图指令，跳过。', 'warn');
-      }
+    for (let i = 0; i < S.assFiles.length; i++) {
+      const entry = S.assFiles[i];
+      if (S.assFiles.length > 1) log('--- ' + entry.file.name + ' ---', 'info');
+
+      const result = await workerCall('convert', {
+        text: entry.content,
+        fonts,
+        options: { wantDraw, wantFont, wantSystemFont },
+      });
+
+      const blob = new Blob([result.finalText], { type: 'text/plain;charset=utf-8' });
+      const outName = entry.file.name.replace(/\.(ass|ssa)$/i, '') + '_optimized.ass';
+      S.outputBlobs.push({ name: outName, blob });
+      if (result.fontBuffers) S.fontBuffers = S.fontBuffers.concat(result.fontBuffers);
+
+
+      const origKB = (result.origSize / 1024).toFixed(0);
+      const newKB = (result.newSize / 1024).toFixed(0);
+      resultArea.innerHTML += '<div class="result-box">' +
+        '<div class="rb-info"><div class="rb-title">' + t('result.done') + (S.assFiles.length > 1 ? ' — ' + entry.file.name : '') + '</div>' +
+        '<div class="rb-detail">' + t('result.detail', { count: result.stats.embeddedCount, origKB, newKB }) + '</div></div>' +
+        '<div class="rb-actions">' +
+        (result.fontBuffers && result.fontBuffers.length > 0
+          ? '<button class="btn btn-outline" onclick="openPreview(' + i + ')">' + t('btn.preview') + '</button>' : '') +
+        '</div></div>';
     }
-    if (wantFont) {
-      const extFnt = doc.getExternalFonts();
-      if (Object.keys(extFnt).length === 0) log('[font] 未发现需嵌入的外部字体。', 'warn');
-      for (const [fontName, charSet] of Object.entries(extFnt)) {
-        const uploaded = S.uploadedFonts.get(fontName.toLowerCase());
-        if (!uploaded) { log(`[font] ⚠ 「${fontName}」未上传，跳过。`, 'warn'); continue; }
-        log(`[font] 子集化「${fontName}」（${charSet.size} 字符）…`, 'info');
-        try {
-          const { ttf, skipped } = await subsetFont(uploaded.buffer, charSet, fontName, uploaded.isTTC);
-          embeddedFonts.set(fontName, ttf);
-          const origKB = (uploaded.buffer.byteLength / 1024).toFixed(0);
-          const newKB  = (ttf.length / 1024).toFixed(0);
-          const pct    = ((1 - ttf.length / uploaded.buffer.byteLength) * 100).toFixed(0);
-          log(`[font] 「${fontName}」: ${origKB} KB → ${newKB} KB（缩减 ${pct}%）${skipped > 0 ? ` [${skipped} 字符无字形]` : ''}`, 'ok');
-        } catch (e) {
-          log(`[font] 「${fontName}」处理失败: ${e.message}`, 'err');
-        }
-      }
-    }
-    log('[ass] 重写字幕文件…', 'info');
-    const finalText = rewriteASS(S.assContent, { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts });
-    const blob = new Blob(['\uFEFF' + finalText], { type: 'text/plain;charset=utf-8' });
-    S.outputBlob = blob;
-    const origSize = new Blob([S.assContent]).size;
-    const newSize  = blob.size;
-    const delta    = newSize - origSize;
-    log(`[done] 完成。${(origSize/1024).toFixed(0)} KB → ${(newSize/1024).toFixed(0)} KB（${delta > 0 ? '+' : ''}${(delta/1024).toFixed(1)} KB）`, 'ok');
-    const embCount = embeddedFonts.size + (drawTTF ? 1 : 0);
-    resultArea.innerHTML = `
-      <div class="result-box">
-        <div class="rb-info">
-          <div class="rb-title">转换完成</div>
-          <div class="rb-detail">内嵌 ${embCount} 个字体 · ${(origSize/1024).toFixed(0)} KB → ${(newSize/1024).toFixed(0)} KB</div>
-        </div>
-      </div>
-    `;
+
     btnDownload.classList.remove('hidden');
-    const outName = S.assFile.name.replace(/\.(ass|ssa)$/i, '') + '_optimized.ass';
-    btnDownload.onclick = () => {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = outName;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 3000);
-    };
+    if (S.outputBlobs.length === 1) {
+      btnDownload.onclick = () => downloadBlob(S.outputBlobs[0].blob, S.outputBlobs[0].name);
+    } else {
+      btnDownload.textContent = t('btn.download_zip');
+      btnDownload.onclick = downloadAllZip;
+    }
   } catch (e) {
-    log(`[error] ${e.message}`, 'err');
+    log('[error] ' + e.message, 'err');
     console.error(e);
   }
+
+  S.converting = false;
   btnConvert.disabled = false;
-  btnConvert.innerHTML = '开始转换';
+  btnConvert.innerHTML = t('btn.convert');
+  document.getElementById('progress-area').classList.add('hidden');
+}
+
+function downloadBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+}
+
+async function downloadAllZip() {
+
+  if (!window.JSZip) {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js';
+    document.head.appendChild(s);
+    await new Promise((r, j) => { s.onload = r; s.onerror = j; });
+  }
+  const zip = new JSZip();
+  for (const o of S.outputBlobs) zip.file(o.name, o.blob);
+  const content = await zip.generateAsync({ type: 'blob' });
+  downloadBlob(content, 'ass_subset_output.zip');
+}
+
+function openPreview(fileIdx) {
+  const modal = document.getElementById('preview-modal');
+  const canvas = document.getElementById('preview-canvas');
+  const ctx = canvas.getContext('2d');
+  modal.classList.add('open');
+
+  const buffers = S.fontBuffers;
+  if (!buffers || buffers.length === 0) return;
+
+  const fb = buffers[0]; // show first font by default
+  try {
+    const font = opentype.parse(fb.buffer instanceof ArrayBuffer ? fb.buffer : fb.buffer.slice(0).buffer);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const glyphs = [];
+    for (let i = 0; i < font.glyphs.length; i++) {
+      const g = font.glyphs.get(i);
+      if (g && g.unicode && g.unicode > 0) glyphs.push(g);
+    }
+    const cols = Math.ceil(Math.sqrt(glyphs.length));
+    const cellSize = Math.floor(canvas.width / Math.max(cols, 1));
+    const fontSize = cellSize * 0.7;
+
+    glyphs.forEach((g, idx) => {
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const x = col * cellSize + cellSize * 0.15;
+      const y = row * cellSize + cellSize * 0.8;
+      if (y < canvas.height) {
+        const path = font.getPath(String.fromCodePoint(g.unicode), x, y, fontSize);
+        path.fill = '#333333';
+        path.draw(ctx);
+      }
+    });
+  } catch (e) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#666';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('Preview error: ' + e.message, 20, 30);
+  }
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  try { const saved = localStorage.getItem('ass-subset-lang'); if (saved) currentLang = saved; }
+  catch(_) {}
+  if (!localStorage.getItem('ass-subset-lang') && navigator.language && navigator.language.startsWith('en')) currentLang = 'en';
+  applyI18n();
+
+
   const v = document.querySelector('meta[name="version"]');
   if (v) document.getElementById('ver').textContent += ' v' + v.content;
-  const dzASS  = document.getElementById('dz-ass');
+
+
+  renderFontPaths();
+
+
+  initWorker();
+
+
+  if ('queryLocalFonts' in window) {
+    document.getElementById('btn-local-font').classList.remove('hidden');
+  }
+
+
+  const dzASS = document.getElementById('dz-ass');
   const inpASS = document.getElementById('inp-ass');
-  inpASS.addEventListener('change', () => inpASS.files[0] && handleASS(inpASS.files[0]));
+  inpASS.addEventListener('change', () => inpASS.files.length && handleASSFiles(inpASS.files));
   dzASS.addEventListener('dragover', e => { e.preventDefault(); dzASS.classList.add('drag-over'); });
   dzASS.addEventListener('dragleave', () => dzASS.classList.remove('drag-over'));
-  dzASS.addEventListener('drop', e => { e.preventDefault(); dzASS.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) handleASS(f); });
+  dzASS.addEventListener('drop', e => { e.preventDefault(); dzASS.classList.remove('drag-over'); if (e.dataTransfer.files.length) handleASSFiles(e.dataTransfer.files); });
 
-  const cbDraw  = document.getElementById('opt-draw');
-  const cbFont  = document.getElementById('opt-font');
+
+  const cbDraw = document.getElementById('opt-draw');
+  const cbFont = document.getElementById('opt-font');
   const rowDraw = document.getElementById('opt-row-draw');
   const rowFont = document.getElementById('opt-row-font');
-  cbDraw.addEventListener('change', () => rowDraw.classList.toggle('selected', cbDraw.checked));
+  cbDraw.addEventListener('change', () => {
+    rowDraw.classList.toggle('selected', cbDraw.checked);
+    document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
+  });
   cbFont.addEventListener('change', () => {
     rowFont.classList.toggle('selected', cbFont.checked);
     document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
+    document.getElementById('opt-sub-sysfont').classList.toggle('hidden', !cbFont.checked);
+    document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked);
   });
 
-  const dzFont  = document.getElementById('dz-font');
+
+  const dzFont = document.getElementById('dz-font');
   const inpFont = document.getElementById('inp-font');
   inpFont.addEventListener('change', () => handleFonts(Array.from(inpFont.files)));
   dzFont.addEventListener('dragover', e => { e.preventDefault(); dzFont.style.borderColor = 'var(--accent)'; });
   dzFont.addEventListener('dragleave', () => dzFont.style.borderColor = '');
   dzFont.addEventListener('drop', e => { e.preventDefault(); dzFont.style.borderColor = ''; handleFonts(Array.from(e.dataTransfer.files)); });
 
+
+  document.getElementById('btn-local-font').addEventListener('click', loadLocalFonts);
+
+
   document.getElementById('btn-convert').addEventListener('click', doConvert);
+
+
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('lang-wrap');
+    if (!wrap.contains(e.target)) wrap.classList.remove('open');
+  });
+
+
+  document.getElementById('preview-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closePreview();
+  });
 });
 
-async function handleASS(file) {
-  document.getElementById('dz-ass').style.display = 'none';
-  document.getElementById('ass-badge').classList.remove('hidden');
-  document.getElementById('ass-badge').innerHTML = `
-    <div class="file-badge">
-      <span class="fb-name">${file.name}</span>
-      <span class="fb-size">${(file.size / 1024).toFixed(0)} KB</span>
-      <span class="fb-change" onclick="document.getElementById('inp-ass').click()">更换文件</span>
-    </div>
-  `;
-  document.getElementById('step1').classList.remove('active');
-  document.getElementById('step1').classList.add('done');
-  document.getElementById('step2').style.display = '';
-  document.getElementById('step2').classList.add('active');
-  document.getElementById('step3').style.display = 'none';
-  document.getElementById('step3').classList.remove('active');
-  document.getElementById('step4').style.display = 'none';
 
-  const area = document.getElementById('analysis-area');
-  area.innerHTML = '';
+window.addEventListener('beforeunload', e => {
+  if (S.converting) {
+    e.preventDefault();
+    e.returnValue = t('leave.confirm');
+  }
+});
 
-  if (!file.name.toLowerCase().match(/\.(ass|ssa)$/)) {
-    area.innerHTML = '<div class="upload-error">⚠ 请上传 .ass 或 .ssa 格式的字幕文件。</div>';
-    return;
-  }
-  const raw     = await file.text();
-  const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
-  if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
-    area.innerHTML = `<div class="upload-error">⚠ 文件格式验证失败：「${file.name}」不是有效的 ASS/SSA 字幕文件。</div>`;
-    return;
-  }
-  if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
-    area.innerHTML = `<div class="upload-error">⚠ 文件格式验证失败：「${file.name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。</div>`;
-    return;
-  }
-  S.assFile = file;
-  S.assContent = content;
-  S.assDoc  = new ASSDocument(content);
-  S.uploadedFonts.clear();
-  renderAnalysis();
+let discussLoaded = false;
+function loadDiscuss() {
+  const section = document.getElementById('discuss-section');
+  section.classList.remove('hidden');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (discussLoaded) return;
+  discussLoaded = true;
+  const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const script = document.createElement('script');
+  script.src = 'https://giscus.app/client.js';
+  script.setAttribute('data-repo', 'MontageSubs/ass-subset');
+  script.setAttribute('data-repo-id', 'R_kgDORnj_wQ');
+  script.setAttribute('data-category', 'General');
+  script.setAttribute('data-category-id', 'DIC_kwDORnj_wc4C4crU');
+  script.setAttribute('data-mapping', 'pathname');
+  script.setAttribute('data-reactions-enabled', '0');
+  script.setAttribute('data-emit-metadata', '0');
+  script.setAttribute('data-theme', theme);
+  script.setAttribute('data-lang', currentLang === 'en' ? 'en' : 'zh-CN');
+  script.crossOrigin = 'anonymous';
+  script.async = true;
+  script.onload = () => { const el = document.getElementById('discuss-loading'); if (el) el.remove(); };
+  section.appendChild(script);
 }
 
-async function handleFonts(files) {
-  const results = await Promise.all(files.map(matchFont));
-  const notMatched = results.filter(r => !r.matched).length;
-  const varFonts = results.filter(r => r.isVariable);
-  const logBox = document.getElementById('log-box');
-  if (varFonts.length > 0) {
-    varFonts.forEach((_, i) => {
-      log(`[font] ⚠ 「${files[i].name}」是可变字体，仅导出默认字重，其余字重变体将丢失。`, 'warn');
-    });
-    logBox.classList.remove('hidden');
-  }
-  if (notMatched > 0) {
-    log(`[font] ⚠ ${notMatched} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。`, 'warn');
-    logBox.classList.remove('hidden');
-  }
-  renderFontList();
-}
-</script>
-
-<script>
 let _pwaPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -1418,6 +1688,7 @@ window.addEventListener('appinstalled', () => {
   const btn = document.getElementById('btn-install-pwa');
   if (btn) btn.style.display = 'none';
 });
+
 if (window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true) {
   document.addEventListener('DOMContentLoaded', () => {
@@ -1442,6 +1713,15 @@ function triggerPwaInstall() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/ass-subset/sw.js', { scope: '/ass-subset/' }).catch(() => {});
 }
+
+
+if (typeof opentype === 'undefined') {
+  document.querySelector('.main').innerHTML =
+    '<div style="padding:2rem;background:rgba(181,42,28,.1);border-radius:3px;font-family:monospace;color:#b52a1c;">' +
+    '⚠ opentype.js 加载失败，请检查网络连接后刷新页面。<br>' +
+    'Failed to load opentype.js — please check your connection and reload.</div>';
+}
 </script>
+
 </body>
 </html>
