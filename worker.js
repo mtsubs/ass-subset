@@ -641,57 +641,33 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
 }
 function rewriteASS(rawContent, opts, id) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts } = opts;
-  const updatingFonts = new Set();
-  if (drawTTF) updatingFonts.add(drawFontFamily.toLowerCase());
-  if (embeddedFonts) embeddedFonts.forEach(f => updatingFonts.add(f.name.toLowerCase()));
-  const lines = rawContent.split(/\r?\n/);
+  let text = rawContent.replace(/\[Fonts\][\s\S]*?(?=\r?\n\[|$)/gi, '');
+  const lines = text.split(/\r?\n/);
   const totalLines = lines.length;
   const outputLines = [];
-  let inFontsSection = false;
-  let currentFontName = null;
-  let skipCurrentFont = false;
   for (let i = 0; i < totalLines; i++) {
     if (i % PROGRESS_INTERVAL === 0) emitProgress(id, 'rewrite', i, totalLines);
     const line = lines[i];
     const trimmed = line.trim();
-    if (trimmed.startsWith('[')) {
-      const secLower = trimmed.toLowerCase();
-      inFontsSection = (secLower === '[fonts]');
-      currentFontName = null;
-      skipCurrentFont = false;
-    }
-    if (inFontsSection) {
-      const match = trimmed.match(/^fontname:\s*(.+)_0\.ttf$/i);
-      if (match) {
-        currentFontName = match[1].toLowerCase();
-        skipCurrentFont = updatingFonts.has(currentFontName);
-      }
-      if (skipCurrentFont) continue;
-    }
     if (drawingDataToChar && drawingDataToChar.length > 0 && /^dialogue\s*:/i.test(trimmed)) {
       outputLines.push(replaceDrawingsInLine(line, drawingDataToChar, drawFontFamily));
     } else {
       outputLines.push(line);
     }
   }
-  if (updatingFonts.size > 0) {
-    let fontsIndex = outputLines.findIndex(l => l.trim().toLowerCase() === '[fonts]');
-    if (fontsIndex === -1) {
-      outputLines.push('', '[Fonts]');
-      fontsIndex = outputLines.length - 1;
-    }
-    const newContent = [];
+  if (drawTTF || (embeddedFonts && embeddedFonts.length > 0)) {
+    if (!outputLines[outputLines.length - 1].trim()) outputLines.push('');
+    outputLines.push('[Fonts]');
     const encodeAndAppend = (fontName, ttfData) => {
-      newContent.push(`fontname: ${fontName}_0.ttf`);
+      outputLines.push(`fontname: ${fontName}_0.ttf`);
       const enc = assUUEncode(ttfData);
-      for (let j = 0; j < enc.length; j += 80) newContent.push(enc.slice(j, j + 80));
-      newContent.push('');
+      for (let j = 0; j < enc.length; j += 80) outputLines.push(enc.slice(j, j + 80));
+      outputLines.push('');
     };
     if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
     if (embeddedFonts) {
       for (const ef of embeddedFonts) encodeAndAppend(ef.name, ef.ttf);
     }
-    outputLines.splice(fontsIndex + 1, 0, ...newContent);
   }
   emitProgress(id, 'rewrite', totalLines, totalLines);
   return outputLines.join('\n');
@@ -747,70 +723,49 @@ function doConvert(data, id) {
     }
     for (const fontName of fontNames) {
       const charInfo = extFonts[fontName];
-      const weights = [];
-      if (charInfo.normal.length > 0) weights.push('normal');
-      if (charInfo.bold.length > 0) weights.push('bold');
-      for (const w of weights) {
-        const chars = w === 'normal' ? charInfo.normal : charInfo.bold;
-        const match = fonts.find(f =>
-          f.matchedFor.toLowerCase() === fontName.toLowerCase() &&
-          ((w === 'bold' && f.weight >= 600) || (w === 'normal' && f.weight < 600))
-        );
-        const fallback = fonts.find(f =>
-          f.matchedFor.toLowerCase() === fontName.toLowerCase()
-        );
-        const fontFile = match || fallback;
-        if (!fontFile) {
-          emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: w });
-          continue;
-        }
-        if (!match && fallback && w === 'bold') {
-          emitLog(id, 'log.font.weight_fallback', 'warn', { name: fontName });
-        }
-        emitLog(id, 'log.font.subsetting', 'info', {
-          name: fontName, weight: w, chars: chars.length
+      const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
+      const chars = Array.from(allChars);
+      const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
+      if (!fontFile) {
+        emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: '...' });
+        continue;
+      }
+      emitLog(id, 'log.font.subsetting', 'info', {
+        name: fontName, weight: 'Regular', chars: chars.length
+      });
+      try {
+        const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id);
+        embeddedFonts.push({ name: fontName, ttf: result.ttf });
+        const origKB = (result.origSize / 1024).toFixed(0);
+        const newKB = (result.ttf.length / 1024).toFixed(0);
+        const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
+        emitLog(id, 'log.font.subset_done', 'ok', {
+          name: fontName, weight: 'Merged', origKB, newKB, pct,
+          skipped: result.skipped
         });
-        try {
-          const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, w, fontFile.ttcIndex, id);
-          embeddedFonts.push({ name: fontName, ttf: result.ttf, weight: w });
-          const origKB = (result.origSize / 1024).toFixed(0);
-          const newKB = (result.ttf.length / 1024).toFixed(0);
-          const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
-          emitLog(id, 'log.font.subset_done', 'ok', {
-            name: fontName, weight: w, origKB, newKB, pct,
-            skipped: result.skipped
-          });
-        } catch (e) {
-          emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
-        }
+      } catch (e) {
+        emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
       }
     }
     if (options.wantSystemFont && parsed.systemFontsReferenced) {
       for (const fontName of Object.keys(parsed.systemFontsReferenced)) {
         const charInfo = parsed.systemFontsReferenced[fontName];
-        const weights = [];
-        if (charInfo.normal.length > 0) weights.push('normal');
-        if (charInfo.bold.length > 0) weights.push('bold');
-        for (const w of weights) {
-          const chars = w === 'normal' ? charInfo.normal : charInfo.bold;
-          const fontFile = fonts.find(f =>
-            f.matchedFor.toLowerCase() === fontName.toLowerCase() &&
-            ((w === 'bold' && f.weight >= 600) || (w === 'normal' && f.weight < 600))
-          );
-          if (!fontFile) continue;
-          try {
-            const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, w, fontFile.ttcIndex, id);
-            embeddedFonts.push({ name: fontName, ttf: result.ttf, weight: w });
-            emitLog(id, 'log.font.subset_done', 'ok', {
-              name: fontName, weight: w,
-              origKB: (result.origSize / 1024).toFixed(0),
-              newKB: (result.ttf.length / 1024).toFixed(0),
-              pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0),
-              skipped: result.skipped
-            });
-          } catch (e) {
-            emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
-          }
+        const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
+        const chars = Array.from(allChars);
+        const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
+        if (!fontFile) continue;
+        try {
+          const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id);
+          embeddedFonts.push({ name: fontName, ttf: result.ttf });
+          emitLog(id, 'log.font.subset_done', 'ok', {
+            name: fontName, weight: 'Merged',
+            origKB: (result.origSize / 1024).toFixed(0),
+            newKB: (result.ttf.length / 1024).toFixed(0),
+            pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0),
+            skipped: result.skipped
+          });
+        } catch (e) {
+          emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
         }
       }
     }
