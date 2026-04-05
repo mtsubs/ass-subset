@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.9">
+  <meta name="version" content="2.1.10">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -31,6 +31,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="ASS子集化">
   <script src="vendor/opentype.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -1492,6 +1493,7 @@
         'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
         'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
         'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
+        'log.draw.summary': '[draw] 绘图指令关系分析完成，共计 {count} 个独立字形映射：',
         'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
         'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
@@ -1582,6 +1584,7 @@
         'log.draw.none': '[draw] No \\p1 drawing instructions found, skipping.',
         'log.draw.kept_existing': '[draw] Kept {count} chars from existing drawing subset',
         'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing drawing font, regenerating',
+        'log.draw.summary': '[draw] Drawing relationship analysis complete, {count} unique glyph mappings:',
         'log.draw.item': '  - Character: {char} | Count: {count} | Timeline: [{start} -> {end}]',
         'log.font.none_external': '[font] No external fonts to embed.',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) not uploaded, skipping.',
@@ -1787,10 +1790,13 @@
       const assEntries = [];
       for (const f of Array.from(files)) {
         if (f.name.toLowerCase().endsWith('.zip')) {
-          const extracted = await processZipFile(f, 'ass');
-          assEntries.push(...extracted);
+          try {
+            const extracted = await processZipFile(f, 'ass');
+            assEntries.push(...extracted);
+          } catch (e) { }
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
-          const text = await f.text();
+          const buf = await f.arrayBuffer();
+          const text = await decodeText(buf);
           const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
           assEntries.push({ file: f, content });
         }

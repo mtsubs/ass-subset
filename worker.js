@@ -321,8 +321,8 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
 }
 function getVisibleChar(index) {
   const skip = new Set([
-    44, 123, 125, 92, 58, 59, // , { } \ : ;
-    32, 45, // space, -
+    44, 123, 125, 92, 58, 59,
+    32, 45,
   ]);
   const priority = [];
   for (let i = 65; i <= 90; i++) priority.push(i);
@@ -458,12 +458,12 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
         const glyph = existingFont.charToGlyph(ch);
         if (glyph && glyph.index !== 0) {
           const path = existingFont.getPath(ch, 0, 0, existingFont.unitsPerEm);
-          const drawStr = path.toPathData(); 
+          const drawStr = path.toPathData();
           charToData.set(ch, drawStr);
           dataToChar.set(drawStr, ch);
         }
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const drawingDataToChar = {};
@@ -475,13 +475,13 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     }
   };
 
-  const sortedSubsets = Array.from(uniqueDrawingsArray).sort((a,b) => a.data.localeCompare(b.data));
+  const sortedSubsets = Array.from(uniqueDrawingsArray).sort((a, b) => a.data.localeCompare(b.data));
   for (const item of sortedSubsets) {
     const data = item.data;
     const tempGlyph = buildDrawGlyph(data, 0);
     const normalizedData = tempGlyph.path.toPathData();
-    
-    let char = dataToChar.get(normalizedData); 
+
+    let char = dataToChar.get(normalizedData);
     if (!char) {
       char = getNextSafeChar();
     }
@@ -498,8 +498,8 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     descender: -(EM - TARGET),
     glyphs: glyphs
   });
-  return { 
-    ttf: new Uint8Array(font.toArrayBuffer()), 
+  return {
+    ttf: new Uint8Array(font.toArrayBuffer()),
     dataToCharArr: Object.entries(drawingDataToChar).map(([d, c]) => ({ data: d, char: c }))
   };
 }
