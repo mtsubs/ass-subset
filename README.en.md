@@ -57,7 +57,7 @@ The output file will be named `original_filename_optimized.ass`.
 | Dependency | Version | License | Purpose |
 |------------|---------|---------|---------|
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | Font parsing and construction |
-| [JSZip](https://github.com/Stuk/jszip) | 3.x | MIT / Dual licensed | Batch output packaging |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | Batch output packaging |
 
 Both dependencies are bundled as local copies in the `vendor/` directory of this repository. Their original copyright notices are preserved in accordance with their respective licenses.
 
@@ -83,7 +83,7 @@ ass-subset/
 
 ## Localization
 
-This tool currently provides a Chinese-language interface only. If you would like to use it in another language, or if you are interested in contributing a localization, please open a thread in [Issues](https://github.com/MontageSubs/ass-subset/issues) or [Discussions](https://github.com/MontageSubs/ass-subset/discussions). Multi-language support is on our future roadmap, and community input is very welcome.
+This tool currently supports **Chinese and English** interfaces. If you would like to use it in another language or are interested in contributing a localization, please open a thread in [Issues](https://github.com/MontageSubs/ass-subset/issues) or [Discussions](https://github.com/MontageSubs/ass-subset/discussions). Multi-language support is on our roadmap, and we welcome community contributions.
 
 ## Contributing
 

@@ -57,7 +57,7 @@ ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独
 | 依赖 | 版本 | 许可证 | 用途 |
 |------|------|--------|------|
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
-| [JSZip](https://github.com/Stuk/jszip) | 3.x | MIT / 双许可证 | 批处理输出打包 |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | 批处理输出打包 |
 
 上述依赖以副本形式托管于本仓库 `vendor/` 目录下，保留其原始版权声明，符合各自许可证要求。
 
@@ -83,7 +83,7 @@ ass-subset/
 
 ## 本地化
 
-本工具目前仅提供中文界面。如果你希望使用其他语言版本，或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们未来有计划考虑添加多语言支持。
+本工具目前仅提供**中文和英文**界面。如果你希望使用其他语言版本或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们正在规划添加更多语言支持，欢迎社区贡献。
 
 ## 参与贡献
 
