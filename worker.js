@@ -422,7 +422,7 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
     name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path()
   });
   const glyphs = [notdef];
-  const drawingEntries = Array.from(uniqueDrawingsMap.entries());
+  const drawingEntries = uniqueDrawingsMap;
   if (existingFontBuffer && referencedChars && referencedChars.size > 0) {
     try {
       const existingFont = opentype.parse(existingFontBuffer);
@@ -452,10 +452,10 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
     }
   }
   const dataToCharArr = [];
-  for (const [data, meta] of drawingEntries) {
-    const cp = meta.char.codePointAt(0);
-    glyphs.push(buildDrawGlyph(data, cp));
-    dataToCharArr.push({ data, char: meta.char });
+  for (const item of drawingEntries) {
+    const cp = item.char.codePointAt(0);
+    glyphs.push(buildDrawGlyph(item.data, cp));
+    dataToCharArr.push({ data: item.data, char: item.char });
   }
   const font = new opentype.Font({
     familyName: DRAW_FONT_NAME, styleName: 'Regular',
