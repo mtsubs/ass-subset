@@ -1048,12 +1048,12 @@ function doConvert(data, id) {
       drawingCount: parsed.drawings,
       uniqueDrawings: parsed.uniqueDrawings.length,
     },
-    detailedDrawings: Array.from(parsed.uniqueDrawings.values()).map(d => ({
+    detailedDrawings: options.wantDraw ? Array.from(parsed.uniqueDrawings.values()).map(d => ({
       char: drawMap.get(d.data) || d.char,
       count: d.count,
       firstStart: d.firstStart, firstEnd: d.firstEnd,
       lastStart: d.lastStart, lastEnd: d.lastEnd
-    }))
+    })) : []
   };
 }
 self.onmessage = function (e) {
