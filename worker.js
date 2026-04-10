@@ -95,13 +95,14 @@ function extractTTFFromTTC(buffer, index) {
   const tables = [];
   for (let i = 0; i < numTables; i++) {
     const recordPos = offsetTablePos + 12 + i * 16;
-    const tag = view.getUint32(recordPos, false);
-    const checksum = view.getUint32(recordPos + 4, false);
-    const offset = view.getUint32(recordPos + 8, false);
-    const length = view.getUint32(recordPos + 12, false);
-    const paddedLength = (length + 3) & ~3;
-    tables.push({ tag, checksum, offset, length, newOffset: 0 });
-    totalDataSize += paddedLength;
+    const t = {
+      tag: view.getUint32(recordPos, false),
+      checksum: view.getUint32(recordPos + 4, false),
+      offset: view.getUint32(recordPos + 8, false),
+      length: view.getUint32(recordPos + 12, false)
+    };
+    tables.push(t);
+    totalDataSize += (t.length + 3) & ~3;
   }
   const newBuffer = new ArrayBuffer(headerSize + totalDataSize);
   const newView = new DataView(newBuffer);
@@ -544,23 +545,39 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
   };
 }
 
+function decodeFontName(v, key) {
+  if (typeof v === 'string') return v.trim();
+  if (v && (Array.isArray(v) || (typeof Uint8Array !== 'undefined' && v instanceof Uint8Array))) {
+    if (key && (key.includes('p3e1') || key === 'zh' || key.startsWith('zh-'))) {
+      let str = '';
+      for (let i = 0; i < v.length; i += 2) {
+        if (i + 1 < v.length) str += String.fromCharCode((v[i] << 8) | v[i + 1]);
+      }
+      return str.trim();
+    }
+  }
+  return '';
+}
 
 function extractFontNames(fontObj) {
   const names = new Set();
-  const raw = fontObj.tables?.name?.names;
-  if (raw) {
-    for (const [nid, platforms] of Object.entries(raw)) {
-      if (['1', '4', '6', '16'].includes(String(nid))) {
-        for (const v of Object.values(platforms)) {
-          if (typeof v === 'string' && v.trim()) names.add(v.trim());
+  const nameTable = fontObj.tables?.name;
+  if (nameTable) {
+    for (const [prop, val] of Object.entries(nameTable)) {
+      if (val && typeof val === 'object') {
+        for (const [lang, v] of Object.entries(val)) {
+          const res = decodeFontName(v, lang);
+          if (res) names.add(res);
         }
       }
     }
   }
-  for (const [, val] of Object.entries(fontObj.names || {})) {
+  const nObj = fontObj.names || {};
+  for (const [prop, val] of Object.entries(nObj)) {
     if (val && typeof val === 'object') {
-      for (const v of Object.values(val)) {
-        if (typeof v === 'string') names.add(v.trim());
+      for (const [lang, v] of Object.entries(val)) {
+        const res = decodeFontName(v, lang);
+        if (res) names.add(res);
       }
     }
   }
@@ -568,28 +585,28 @@ function extractFontNames(fontObj) {
 }
 function extractFamilyNames(fontObj) {
   const names = new Set();
-  const raw = fontObj.tables?.name?.names;
-  if (raw) {
-    for (const nid of ['1', '16']) {
-      const platforms = raw[nid];
-      if (platforms) {
-        for (const v of Object.values(platforms)) {
-          if (typeof v === 'string' && v.trim()) names.add(v.trim());
+  const nameTable = fontObj.tables?.name;
+  if (nameTable) {
+    ['fontFamily', 'fullName', 'preferredFamily'].forEach(prop => {
+      const val = nameTable[prop];
+      if (val && typeof val === 'object') {
+        for (const [lang, v] of Object.entries(val)) {
+          const res = decodeFontName(v, lang);
+          if (res) names.add(res);
         }
       }
-    }
+    });
   }
   const nObj = fontObj.names || {};
-  if (nObj.fontFamily) {
-    for (const v of Object.values(nObj.fontFamily)) {
-      if (typeof v === 'string') names.add(v.trim());
+  ['fontFamily', 'preferredFamily'].forEach(field => {
+    const val = nObj[field];
+    if (val && typeof val === 'object') {
+      for (const [lang, v] of Object.entries(val)) {
+        const res = decodeFontName(v, lang);
+        if (res) names.add(res);
+      }
     }
-  }
-  if (nObj.preferredFamily) {
-    for (const v of Object.values(nObj.preferredFamily)) {
-      if (typeof v === 'string') names.add(v.trim());
-    }
-  }
+  });
   return names;
 }
 function getFontWeight(fontObj) {
