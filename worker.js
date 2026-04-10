@@ -138,7 +138,7 @@ function parseASSText(text, id) {
   let playResX = 0, playResY = 0;
   const embeddedFonts = {};
   let currentEmbedFont = null;
-  const hasExistingDrawSubset = false;
+  let hasExistingDrawSubset = false;
   const subsetReferencedChars = new Map();
   for (let li = 0; li < totalLines; li++) {
     if (li % PROGRESS_INTERVAL === 0) emitProgress(id, 'parse', li, totalLines);
