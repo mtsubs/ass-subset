@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.14">
+  <meta name="version" content="2.1.15">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1358,7 +1358,9 @@
         <h3 id="preview-title" data-i18n="preview.title">字体预览</h3>
         <button class="modal-close" id="modal-close-btn" onclick="closePreview()">✕</button>
       </div>
-      <canvas class="preview-canvas" id="preview-canvas" width="640" height="400"></canvas>
+      <div id="preview-list"
+        style="max-height:70vh; overflow-y:auto; overflow-x:hidden; background:var(--card); display:flex; flex-direction:column; gap:1rem; padding: 0.5rem">
+      </div>
       <input type="range" class="preview-slider hidden" id="preview-slider" min="0" max="100" value="0">
       <div id="preview-info" style="margin-top:0.5rem;font-size:0.78rem;color:var(--ink2);font-family:var(--mono);">
       </div>
@@ -2243,48 +2245,108 @@
     function openPreview(fileIdx) {
       lastActiveElement = document.activeElement;
       const modal = document.getElementById('preview-modal');
-      const canvas = document.getElementById('preview-canvas');
-      const ctx = canvas.getContext('2d');
+      const listContainer = document.getElementById('preview-list');
       modal.classList.add('open');
       const closeBtn = document.getElementById('modal-close-btn');
       if (closeBtn) closeBtn.focus();
 
+      if (!listContainer) return;
+      listContainer.innerHTML = '';
       const buffers = S.fontBuffers;
       if (!buffers || buffers.length === 0) return;
 
-      const fb = buffers[0];
-      try {
-        const font = opentype.parse(fb.buffer instanceof ArrayBuffer ? fb.buffer : fb.buffer.slice(0).buffer);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const dpr = window.devicePixelRatio || 1;
+      const rect = listContainer.getBoundingClientRect();
+      const listW = rect.width > 0 ? rect.width - 16 : 624;
 
-        const glyphs = [];
-        for (let i = 0; i < font.glyphs.length; i++) {
-          const g = font.glyphs.get(i);
-          if (g && g.unicode && g.unicode > 0) glyphs.push(g);
-        }
-        const cols = Math.ceil(Math.sqrt(glyphs.length));
-        const cellSize = Math.floor(Math.min(canvas.width, canvas.height) / Math.max(cols, 1));
-        const fontSize = cellSize * 0.7;
+      buffers.forEach(fb => {
+        const wrapper = document.createElement('div');
+        wrapper.style.marginBottom = '0.5rem';
 
-        glyphs.forEach((g, idx) => {
-          const col = idx % cols;
-          const row = Math.floor(idx / cols);
-          const x = col * cellSize + cellSize * 0.15;
-          const y = row * cellSize + cellSize * 0.8;
-          if (y <= canvas.height) {
-            const path = font.getPath(String.fromCodePoint(g.unicode), x, y, fontSize);
-            path.fill = '#333333';
-            path.draw(ctx);
+        const title = document.createElement('div');
+        title.style.fontWeight = '600';
+        title.style.marginBottom = '0.5rem';
+        title.style.fontFamily = 'var(--mono)';
+        title.style.fontSize = '0.85rem';
+
+        const canvas = document.createElement('canvas');
+        canvas.style.display = 'block';
+        canvas.style.width = '100%';
+        canvas.style.maxWidth = '640px';
+        canvas.style.backgroundColor = '#ffffff';
+        canvas.style.border = '1px solid var(--rule)';
+        canvas.style.borderRadius = 'var(--r)';
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(canvas);
+        listContainer.appendChild(wrapper);
+
+        const cssWidth = listW > 640 ? 640 : listW;
+        const cssHeight = 320;
+
+        canvas.width = cssWidth * dpr;
+        canvas.height = cssHeight * dpr;
+        canvas.style.height = cssHeight + 'px';
+
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        const logicalW = cssWidth;
+        const logicalH = cssHeight;
+
+        try {
+          const font = opentype.parse(fb.buffer instanceof ArrayBuffer ? fb.buffer : fb.buffer.slice(0).buffer);
+          const allGlyphs = [];
+          for (let i = 0; i < font.glyphs.length; i++) {
+            const g = font.glyphs.get(i);
+            if (g && g.unicode && g.unicode > 0) allGlyphs.push(g);
           }
-        });
-      } catch (e) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#666';
-        ctx.font = '14px sans-serif';
-        ctx.fillText('Preview error: ' + e.message, 20, 30);
-      }
+
+          let glyphs = allGlyphs;
+          let limitMsg = '';
+          if (glyphs.length > 80) {
+            glyphs = glyphs.slice(0, 80);
+            limitMsg = ' (展示前 80 / ' + allGlyphs.length + ')';
+          } else {
+            limitMsg = ' (共 ' + allGlyphs.length + ' 字符)';
+          }
+
+          title.textContent = fb.name + (fb.weight && fb.weight !== 400 && fb.weight !== 'Merged' ? ' - ' + fb.weight : '') + limitMsg;
+
+          ctx.clearRect(0, 0, logicalW, logicalH);
+
+          const cols = Math.ceil(Math.sqrt(glyphs.length * (logicalW / logicalH)));
+          const rows = Math.ceil(glyphs.length / Math.max(cols, 1));
+
+          let cellSize = Math.floor(Math.min(logicalW / Math.max(cols, 1), logicalH / Math.max(rows, 1)));
+          if (cellSize > 120) cellSize = 120;
+          if (cellSize < 10) cellSize = 10;
+
+          const fontSize = cellSize * 0.7;
+
+          const gridW = cols * cellSize;
+          const gridH = rows * cellSize;
+
+          const offsetX = Math.max(0, (logicalW - gridW) / 2);
+          const offsetY = Math.max(0, (logicalH - gridH) / 2);
+
+          glyphs.forEach((g, gidx) => {
+            const col = gidx % cols;
+            const row = Math.floor(gidx / cols);
+            const x = offsetX + col * cellSize + cellSize * 0.15;
+            const y = offsetY + row * cellSize + cellSize * 0.8;
+            if (y <= logicalH + cellSize) {
+              const path = font.getPath(String.fromCodePoint(g.unicode), x, y, fontSize);
+              path.fill = '#333333';
+              path.draw(ctx);
+            }
+          });
+        } catch (e) {
+          title.textContent = fb.name + ' - 预览错误';
+          ctx.fillStyle = '#b52a1c';
+          ctx.font = '14px sans-serif';
+          ctx.fillText('解析/绘制错误: ' + e.message, 20, 30);
+        }
+      });
     }
 
     function closePreview() {
