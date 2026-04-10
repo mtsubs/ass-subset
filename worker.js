@@ -120,6 +120,11 @@ function extractTTFFromTTC(buffer, index) {
   }
   return newBuffer;
 }
+function assTimeToMs(s) {
+  const m = s.match(/(\d+):(\d+):(\d+(?:\.\d+)?)/);
+  if (!m) return 0;
+  return (parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3])) * 1000;
+}
 function normFont(name) { return name.replace(/^@/, '').trim(); }
 function parseASSText(text, id) {
   const lines = text.split(/\r?\n/);
@@ -133,8 +138,8 @@ function parseASSText(text, id) {
   let playResX = 0, playResY = 0;
   const embeddedFonts = {};
   let currentEmbedFont = null;
-  let hasExistingDrawSubset = false;
-  const subsetReferencedChars = new Set();
+  const hasExistingDrawSubset = false;
+  const subsetReferencedChars = new Map();
   for (let li = 0; li < totalLines; li++) {
     if (li % PROGRESS_INTERVAL === 0) emitProgress(id, 'parse', li, totalLines);
     const t = lines[li].trim();
@@ -196,7 +201,8 @@ function parseASSText(text, id) {
         const textPart = parts.slice(evtFmt.textIdx).join(',');
         const tStart = parts[evtFmt.startIdx]?.trim() || '';
         const tEnd = parts[evtFmt.endIdx]?.trim() || '';
-        parseDialogueText(textPart, styleInfo, tStart, tEnd,
+        const tMs = assTimeToMs(tStart);
+        parseDialogueText(textPart, styleInfo, tStart, tEnd, tMs,
           fontChars, drawings, subsetReferencedChars, styles);
       }
     }
@@ -248,9 +254,9 @@ function parseASSText(text, id) {
           const g = existingFont.glyphs.get(i);
           if (g && g.unicode && g.unicode > 0) existingChars.add(String.fromCodePoint(g.unicode));
         }
-        const refSet = subsetReferencedChars;
-        subsetNeedsUpdate = existingChars.size !== refSet.size ||
-          ![...refSet].every(ch => existingChars.has(ch));
+        const refChars = Array.from(subsetReferencedChars.keys());
+        subsetNeedsUpdate = existingChars.size !== refChars.length ||
+          !refChars.every(ch => existingChars.has(ch));
       } catch (_) {
         subsetNeedsUpdate = true;
       }
@@ -269,17 +275,17 @@ function parseASSText(text, id) {
     hasExistingDrawSubset,
     subsetNeedsUpdate,
     existingSubsetFontBuffer,
-    subsetReferencedChars: Array.from(subsetReferencedChars),
+    subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
     embeddedFontNames: Object.keys(embeddedFonts),
   };
 }
-function parseDialogueText(text, styleInfo, tStart, tEnd,
+function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
   fontChars, drawings, subsetReferencedChars, styles) {
   const segs = text.split(/(\{[^}]*\})/);
   let font = styleInfo.font;
   let bold = styleInfo.bold;
   let drawing = false, drawData = '', drawTag = '';
-  let isDrawSubsetFont = false;
+  let isDrawSubsetFont = (font.toLowerCase() === DRAW_FONT_NAME.toLowerCase());
   for (const seg of segs) {
     if (seg.startsWith('{')) {
       const inner = seg.slice(1, -1);
@@ -290,32 +296,21 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
         else if (lvl === 0 && drawing) {
           drawing = false;
           const clean = drawData.trim().replace(/\s+/g, ' ');
-          if (clean) drawings.push({ tagBlock: drawTag, data: clean, tStart, tEnd });
+          if (clean) drawings.push({ tagBlock: drawTag, data: clean, tStart, tEnd, tMs });
         }
       }
       if (!drawing) {
         const rm = inner.match(/\\r([^\\}]*)/);
         if (rm) {
           const sn = rm[1].trim();
-          if (sn && styles && styles[sn]) {
-            font = styles[sn].font;
-            bold = styles[sn].bold;
-          } else {
-            font = styleInfo.font;
-            bold = styleInfo.bold;
-          }
+          const s = (sn && styles && styles[sn]) ? styles[sn] : styleInfo;
+          font = s.font; bold = s.bold;
         }
         const fm = inner.match(/\\fn([^\\}]*)/);
-        if (fm) {
-          const v = fm[1].trim();
-          font = v ? normFont(v) : styleInfo.font;
-          isDrawSubsetFont = (font.toLowerCase() === DRAW_FONT_NAME.toLowerCase());
-        }
+        if (fm) font = normFont(fm[1].trim()) || styleInfo.font;
         const bm = inner.match(/\\b(\d+)/);
-        if (bm) {
-          const bval = parseInt(bm[1]);
-          bold = (bval >= 1);
-        }
+        if (bm) bold = parseInt(bm[1]) !== 0;
+        isDrawSubsetFont = (font.toLowerCase() === DRAW_FONT_NAME.toLowerCase());
       }
     } else if (seg) {
       if (drawing) {
@@ -323,23 +318,23 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
       } else if (isDrawSubsetFont) {
         for (const ch of seg) {
           if (ch !== '\n' && ch !== '\r' && ch.trim() !== '') {
-            subsetReferencedChars.add(ch);
+            if (!subsetReferencedChars.has(ch)) subsetReferencedChars.set(ch, tMs);
           }
         }
       } else {
-        const wKey = bold ? 'bold' : 'normal';
+        const weight = bold ? 'bold' : 'normal';
         if (!fontChars[font]) fontChars[font] = { normal: new Set(), bold: new Set() };
         const clean = seg.replace(/\\[Nn]/g, '').replace(/\\h/g, ' ').replace(/\\([{}\\])/g, '$1');
         for (const ch of clean) {
           if (ch !== '\n' && ch !== '\r' && (ch.trim() !== '' || ch === ' ')) {
-            fontChars[font][wKey].add(ch);
+            fontChars[font][weight].add(ch);
           }
         }
       }
     }
   }
   if (drawing && drawData.trim()) {
-    drawings.push({ tagBlock: drawTag, data: drawData.trim().replace(/\s+/g, ' '), tStart, tEnd });
+    drawings.push({ tagBlock: drawTag, data: drawData.trim().replace(/\s+/g, ' '), tStart, tEnd, tMs });
   }
 }
 function getVisibleChar(index) {
@@ -369,22 +364,20 @@ function buildUniqueDrawings(drawings) {
   const meta = new Map();
   for (const d of drawings) {
     if (!meta.has(d.data)) {
-      meta.set(d.data, { count: 0, firstStart: d.tStart, firstEnd: d.tEnd, lastStart: d.tStart, lastEnd: d.tEnd });
+      meta.set(d.data, { count: 0, firstStart: d.tStart, firstEnd: d.tEnd, firstMs: d.tMs, lastStart: d.tStart, lastEnd: d.tEnd });
     }
     const m = meta.get(d.data);
     m.count++;
     m.lastStart = d.tStart;
     m.lastEnd = d.tEnd;
   }
-  const uniqueDatas = Array.from(meta.keys()).sort();
+  const sortedByTime = Array.from(meta.entries()).sort((a, b) => a[1].firstMs - b[1].firstMs);
   const seen = new Map();
-  for (let i = 0; i < uniqueDatas.length; i++) {
-    const data = uniqueDatas[i];
-    const m = meta.get(data);
+  for (let i = 0; i < sortedByTime.length; i++) {
+    const [data, m] = sortedByTime[i];
     seen.set(data, {
-      char: getVisibleChar(i),
       count: m.count,
-      firstStart: m.firstStart, firstEnd: m.firstEnd,
+      firstStart: m.firstStart, firstEnd: m.firstEnd, firstMs: m.firstMs,
       lastStart: m.lastStart, lastEnd: m.lastEnd
     });
   }
@@ -465,7 +458,8 @@ function buildDrawGlyph(drawStr, charCode) {
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
 function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id) {
-  const referencedCharsSet = new Set(referencedCharsArray);
+  const referencedCharsMap = new Map();
+  referencedCharsArray.forEach(item => referencedCharsMap.set(item.char, item.firstSeenMs));
 
   if (uniqueDrawingsArray.length === 0 && existingFontBuffer && existingFontBuffer.byteLength > 0) {
     try {
@@ -475,8 +469,8 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
         const g = existingFont.glyphs.get(i);
         if (g && g.unicode && g.unicode > 0) existingChars.add(String.fromCodePoint(g.unicode));
       }
-      const sameChars = existingChars.size === referencedCharsSet.size &&
-        [...referencedCharsSet].every(ch => existingChars.has(ch));
+      const sameChars = existingChars.size === referencedCharsMap.size &&
+        Array.from(referencedCharsMap.keys()).every(ch => existingChars.has(ch));
       if (sameChars) {
         return {
           ttf: new Uint8Array(existingFontBuffer),
@@ -487,7 +481,7 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     } catch (_) { }
   }
 
-  const existingGlyphsToKeep = [];
+  const allItems = [];
   if (existingFontBuffer && existingFontBuffer.byteLength > 0) {
     try {
       const existingFont = opentype.parse(existingFontBuffer);
@@ -495,18 +489,20 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
         const g = existingFont.glyphs.get(i);
         if (!g || !g.unicode || g.unicode === 0) continue;
         const ch = String.fromCodePoint(g.unicode);
-        if (!referencedCharsSet.has(ch)) continue;
-        existingGlyphsToKeep.push({ oldChar: ch, g });
+        if (!referencedCharsMap.has(ch)) continue;
+        allItems.push({ type: 'existing', oldChar: ch, g, t: referencedCharsMap.get(ch) });
       }
-      existingGlyphsToKeep.sort((a, b) => a.g.unicode - b.g.unicode);
     } catch (_) { }
   }
+  uniqueDrawingsArray.forEach(d => allItems.push({ type: 'new', data: d.data, t: d.firstMs }));
+  allItems.sort((a, b) => a.t - b.t);
 
   const notdef = new opentype.Glyph({
     name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path()
   });
   const glyphs = [notdef];
   const charRemap = new Map();
+  const drawingDataToChar = {};
   const usedCodepoints = new Set([0]);
   let safeIdx = 0;
   const getNextSafeChar = () => {
@@ -516,28 +512,20 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     }
   };
 
-  for (const { oldChar, g } of existingGlyphsToKeep) {
-    const newChar = getNextSafeChar();
-    const newCp = newChar.codePointAt(0);
-    usedCodepoints.add(newCp);
-    if (oldChar !== newChar) charRemap.set(oldChar, newChar);
-    glyphs.push(new opentype.Glyph({
-      name: g.name || `draw_${newCp}`,
-      unicode: newCp,
-      advanceWidth: g.advanceWidth || EM,
-      path: g.path
-    }));
-  }
-
-  const drawingDataToChar = {};
-  const sortedSubsets = Array.from(uniqueDrawingsArray).sort((a, b) => a.data.localeCompare(b.data));
-  for (const item of sortedSubsets) {
-    const data = item.data;
-    const assignedChar = getNextSafeChar();
-    drawingDataToChar[data] = assignedChar;
-    const cp = assignedChar.codePointAt(0);
+  for (const item of allItems) {
+    const char = getNextSafeChar();
+    const cp = char.codePointAt(0);
     usedCodepoints.add(cp);
-    glyphs.push(buildDrawGlyph(data, cp));
+    if (item.type === 'existing') {
+      if (item.oldChar !== char) charRemap.set(item.oldChar, char);
+      glyphs.push(new opentype.Glyph({
+        name: item.g.name || `draw_${cp}`,
+        unicode: cp, advanceWidth: EM, path: item.g.path
+      }));
+    } else {
+      drawingDataToChar[item.data] = char;
+      glyphs.push(buildDrawGlyph(item.data, cp));
+    }
   }
 
   const font = new opentype.Font({
@@ -785,10 +773,11 @@ function rewriteASS(rawContent, opts, id) {
           const sName = parts[eventFmt.styleIdx]?.trim();
           const initialIsSubset = subsetStyles.has(sName);
 
-          let processed = replaceDrawingsInLine(l, drawingDataToChar, drawFontFamily);
+          let processed = l;
           if (opts.drawCharRemap && opts.drawCharRemap.size > 0) {
             processed = renameSubsetCharsInLine(processed, opts.drawCharRemap, drawFontFamily, initialIsSubset);
           }
+          processed = replaceDrawingsInLine(processed, drawingDataToChar, drawFontFamily);
           return processed;
         }
         return l;
