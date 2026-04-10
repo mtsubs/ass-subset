@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.17">
+  <meta name="version" content="2.1.18">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1924,7 +1924,7 @@
         }
         if (p.drawings > 0 || p.hasExistingDrawSubset) hasDrawings = true;
         if (extKeys.length > 0) hasFonts = true;
-        if (p.hasExistingDrawSubset) hasResubset = true;
+        if (p.subsetNeedsUpdate) hasResubset = true;
       }
 
       area.innerHTML = '<div class="stats-bar">' +
@@ -1963,8 +1963,9 @@
       const rowFont = document.getElementById('opt-row-font');
 
       cbDraw.disabled = !hasDrawings;
-      cbDraw.checked = hasDrawings;
-      rowDraw.classList.toggle('selected', hasDrawings);
+      const shouldDraw = (totalUnique > 0 || hasResubset);
+      cbDraw.checked = shouldDraw;
+      rowDraw.classList.toggle('selected', shouldDraw);
       rowDraw.classList.toggle('disabled', !hasDrawings);
       rowDraw.classList.toggle('hidden', !hasDrawings);
 
