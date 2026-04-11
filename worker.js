@@ -220,8 +220,7 @@ function parseASSText(text, id) {
   const uniqueDrawings = buildUniqueDrawings(drawings);
   const externalFonts = {};
   for (const [name, weights] of Object.entries(fontChars)) {
-    if (!SYSTEM_FONTS.has(name.toLowerCase()) &&
-      name.toLowerCase() !== DRAW_FONT_NAME.toLowerCase()) {
+    if (!SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
       externalFonts[name] = {
         normal: Array.from(weights.normal || []),
         bold: Array.from(weights.bold || []),
@@ -230,8 +229,7 @@ function parseASSText(text, id) {
   }
   const systemFontsReferenced = {};
   for (const [name, weights] of Object.entries(fontChars)) {
-    if (SYSTEM_FONTS.has(name.toLowerCase()) &&
-      name.toLowerCase() !== DRAW_FONT_NAME.toLowerCase()) {
+    if (SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
       const totalChars = (weights.normal?.size || 0) + (weights.bold?.size || 0);
       if (totalChars > 0) {
         systemFontsReferenced[name] = {
@@ -465,7 +463,7 @@ function buildDrawGlyph(drawStr, charCode) {
   if (hasContent) path.close();
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
-function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id) {
+function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id, familyName) {
   const referencedCharsMap = new Map();
   referencedCharsArray.forEach(item => referencedCharsMap.set(item.char, item.firstSeenMs));
 
@@ -537,7 +535,7 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
   }
 
   const font = new opentype.Font({
-    familyName: DRAW_FONT_NAME,
+    familyName: familyName || DRAW_FONT_NAME,
     styleName: 'Regular',
     unitsPerEm: EM,
     ascender: TARGET,
@@ -962,7 +960,8 @@ function doConvert(data, id) {
         newDrawings,
         parsed.existingSubsetFontBuffer,
         parsed.subsetReferencedChars,
-        id
+        id,
+        drawFontFamily
       );
       drawTTF = result.ttf;
       drawingDataToChar = result.dataToCharArr;
@@ -1081,7 +1080,7 @@ function doConvert(data, id) {
     origSize, newSize,
     fontBuffers,
     stats: {
-      embeddedCount: embeddedFonts.length + (drawTTF ? 1 : 0),
+      embeddedCount: finalEmbeddedFonts.length + (drawTTF ? 1 : 0),
       drawingCount: parsed.drawings,
       uniqueDrawings: parsed.uniqueDrawings.length,
     },
