@@ -142,6 +142,7 @@ function parseASSText(text, id) {
   const drawings = [];
   let playResX = 0, playResY = 0;
   const embeddedFonts = {};
+  let currentEmbedFont = null;
   let originalDrawFontName = DRAW_FONT_NAME;
   let hasExistingDrawSubset = false;
   const subsetReferencedChars = new Map();
