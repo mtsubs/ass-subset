@@ -38,8 +38,7 @@ const SYSTEM_FONTS = new Set([
   'assdrawsubset_montagesubs', 'assdrawsubset',
 ]);
 const isAnyDrawFont = (n) => {
-  const ln = n.toLowerCase();
-  return ln.startsWith('assdrawsubset') || ln.startsWith(DRAW_FONT_NAME.toLowerCase());
+  return n.toLowerCase().startsWith('assdrawsubset');
 };
 function emitProgress(id, phase, current, total) {
   self.postMessage({ type: 'progress', id, phase, current, total });
@@ -284,8 +283,7 @@ function parseASSText(text, id) {
     subsetNeedsUpdate,
     existingSubsetFontBuffer,
     subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
-    embeddedFonts,
-    originalDrawFontName,
+    embeddedFontNames: Object.keys(embeddedFonts),
   };
 }
 function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
@@ -747,7 +745,7 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
 }
 function rewriteASS(rawContent, opts, id) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap } = opts;
-  const blockRegex = /\r?\n(?=\[)/i;
+  const blockRegex = /\r?\n(?=\[(?:Script Info|v4\+\s+Styles|v4\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage))\])/i;
   const blocks = rawContent.split(blockRegex);
   const totalBlocks = blocks.length;
   const processedBlocks = [];
