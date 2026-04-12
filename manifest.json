@@ -1,5 +1,5 @@
 {
-  "name": "ASS在线子集化工具",
+  "name": "ASS 在线子集化工具",
   "short_name": "ASS子集化",
   "description": "基于浏览器端实现的 ASS/SSA 字幕优化工具，支持绘图指令子集化与字体子集嵌入，纯前端本地处理。",
   "start_url": "/ass-subset/",
