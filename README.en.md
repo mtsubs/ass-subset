@@ -46,7 +46,7 @@ This tool runs entirely in the browser. No installation is needed:
 2. Upload `.ass` or `.ssa` files, with batch processing and ZIP support
 3. Review the analysis results, which show detected drawing commands and external font references
 4. If font embedding is needed, upload the corresponding font files (TTF / OTF / TTC)
-5. Click "开始转换" (Start Conversion) and download the optimized subtitle file
+5. Click `Run Subsetter` and download the optimized subtitle file
 
 The output file will be named `original_filename_optimized.ass`.
 
