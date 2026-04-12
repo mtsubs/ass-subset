@@ -15,13 +15,13 @@
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
   <meta name="version" content="2.2">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
+  <meta property="og:title" content="ASS在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
   <meta property="og:url" content="https://subs.js.org/ass-subset/">
   <meta property="og:site_name" content="MontageSubs (蒙太奇字幕组)">
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="ASS 在线子集化工具 · MontageSubs">
+  <meta name="twitter:title" content="ASS在线子集化工具 · MontageSubs">
   <meta name="twitter:description" content="浏览器端 ASS/SSA 字幕优化：绘图指令子集化 + 字体子集嵌入，纯浏览器本地处理。">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
@@ -1239,7 +1239,7 @@
   <header class="site-header">
     <a href="https://subs.js.org/ass-subset/" class="brand-link">
       <span class="brand-org">蒙太奇字幕组 · MontageSubs</span>
-      <h1 class="brand-title" data-i18n="app.title">ASS 在线子集化工具</h1>
+      <h1 class="brand-title" data-i18n="app.title">ASS在线子集化工具</h1>
     </a>
     <span class="sub" data-i18n="app.subtitle">字幕绘图指令子集化 · 字幕字体子集嵌入</span>
     <div class="header-right">
@@ -1435,7 +1435,7 @@
         'analysis.font.none': '未发现外部字体（均为系统字体）',
         'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
         'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
-        'app.title': 'ASS 在线子集化工具',
+        'app.title': 'ASS在线子集化工具',
         'aria.dz_ass': '上传字幕文件，支持拖拽或点击选择',
         'aria.dz_font': '上传字体文件',
         'aria.lang_toggle': '切换语言',
@@ -1541,7 +1541,7 @@
         'analysis.font.none': '未發現外部字型（均為系統字型）',
         'analysis.resubset': '偵測到已子集化的繪圖指令，將進行增量更新。',
         'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
-        'app.title': 'ASS 線上子集化工具',
+        'app.title': 'ASS線上子集化工具',
         'aria.dz_ass': '上傳字幕檔，支援拖曳或點擊選擇',
         'aria.dz_font': '上傳字型檔',
         'aria.lang_toggle': '切換語言',
@@ -2095,7 +2095,7 @@
         document.getElementById('lang-' + l)?.classList.toggle('active', currentLang === l);
       });
 
-      const title = t('app.title') + ' · ' + t('footer.org');
+      const title = t('app.title');
       document.title = title;
       document.querySelector('meta[name="description"]').setAttribute('content',
         document.querySelector('meta[name="description"]').content);
