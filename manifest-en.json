@@ -1,5 +1,5 @@
 {
-  "name": "ASS Online Subset Tool",
+  "name": "ASS Online Subsetter",
   "short_name": "ASS Subset",
   "description": "Online font subsetting tool for ASS/SSA subtitles. Supports drawing subsetting and font embedding, processed locally in your browser.",
   "start_url": "/ass-subset/",
