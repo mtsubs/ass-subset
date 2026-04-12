@@ -476,7 +476,7 @@ function buildDrawGlyph(drawStr, charCode) {
   if (hasContent) path.close();
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
-function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id, familyName) {
+function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id, familyName, onProgress) {
   const referencedCharsMap = new Map();
   referencedCharsArray.forEach(item => referencedCharsMap.set(item.char, item.firstSeenMs));
 
@@ -531,7 +531,10 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     }
   };
 
-  for (const item of allItems) {
+  const totalItems = allItems.length;
+  for (let _i = 0; _i < totalItems; _i++) {
+    const item = allItems[_i];
+    if (onProgress && _i % 50 === 0) onProgress(_i, totalItems);
     const char = getNextSafeChar();
     const cp = char.codePointAt(0);
     usedCodepoints.add(cp);
@@ -546,6 +549,7 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
       glyphs.push(buildDrawGlyph(item.data, cp));
     }
   }
+  if (onProgress) onProgress(totalItems, totalItems);
 
   const font = new opentype.Font({
     familyName: familyName || DRAW_FONT_NAME,
@@ -979,7 +983,8 @@ function doConvert(data, id) {
         parsed.existingSubsetFontBuffer,
         parsed.subsetReferencedChars,
         id,
-        drawFontFamily
+        drawFontFamily,
+        (cur, total) => emitProgress(id, 'draw', cur, total)
       );
       drawTTF = result.ttf;
       drawingDataToChar = result.dataToCharArr;
