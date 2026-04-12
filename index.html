@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.37">
+  <meta name="version" content="2.1.38">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1249,10 +1249,14 @@
         ASS 绘图指令</a>
       <div class="lang-wrap" id="lang-wrap">
         <button class="btn-hdr" id="btn-lang-toggle" onclick="toggleLangMenu()" aria-label="Switch Language"
-          aria-haspopup="menu" aria-expanded="false">A/文</button>
+          aria-label="切换语言" aria-haspopup="menu" aria-expanded="false">A/文</button>
         <div class="lang-menu" id="lang-menu" role="menu">
-          <button onclick="setLang('zh')" id="lang-zh" class="active" role="menuitem">中文</button>
+          <button onclick="setLang('zh')" id="lang-zh" class="active" role="menuitem">简体中文</button>
+          <button onclick="setLang('zh-TW')" id="lang-zh-TW" role="menuitem">繁體中文</button>
           <button onclick="setLang('en')" id="lang-en" role="menuitem">English</button>
+          <button onclick="setLang('es')" id="lang-es" role="menuitem">Español</button>
+          <button onclick="setLang('ja')" id="lang-ja" role="menuitem">日本語</button>
+          <button onclick="setLang('ko')" id="lang-ko" role="menuitem">한국어</button>
         </div>
       </div>
     </div>
@@ -1263,10 +1267,10 @@
       <div class="step-head">
         <span class="step-num">1</span>
         <h2 class="step-title" data-i18n="step1.title">上传字幕文件</h2>
-        <span class="step-subtitle">Upload .ass / .ssa</span>
+        <span class="step-subtitle">.ass / .ssa</span>
       </div>
       <div class="step-body">
-        <label class="drop-zone" id="dz-ass" for="inp-ass" aria-label="上传字幕文件，支持拖拽或点击选择">
+        <label class="drop-zone" id="dz-ass" for="inp-ass" data-i18n-aria="aria.dz_ass" aria-label="上传字幕文件，支持拖拽或点击选择">
           <div class="dz-main" data-i18n="step1.drop">拖拽字幕文件到此，或点击选择</div>
           <div class="dz-hint" data-i18n="step1.hint">ASS / SSA 格式 (.ass / .ssa)，支持多选批量转换</div>
         </label>
@@ -1316,16 +1320,12 @@
             <span data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）</span>
           </div>
         </label>
-        <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">
-          <strong>⚠ 版权提示：</strong>分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。
-        </div>
-        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">
-          <strong>⚠ 注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
-        </div>
+        <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。</div>
+        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
           <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">上传字体文件</p>
-          <label class="font-upload-zone" id="dz-font" for="inp-font" aria-label="上传字体文件">
+          <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
             <span data-i18n="font.upload.drop">点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）</span>
           </label>
           <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden">
@@ -1357,7 +1357,7 @@
             <div class="progress-text" id="progress-text"></div>
           </div>
         </div>
-        <div class="log-box hidden" id="log-box" role="log" aria-label="处理日志" aria-live="polite" aria-atomic="false">
+        <div class="log-box hidden" id="log-box" role="log" data-i18n-aria="aria.log_box" aria-label="处理日志" aria-live="polite" aria-atomic="false">
         </div>
         <div id="result-area"></div>
       </div>
@@ -1368,7 +1368,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3 id="preview-title" data-i18n="preview.title">字体预览</h3>
-        <button class="modal-close" id="modal-close-btn" onclick="closePreview()">✕</button>
+        <button class="modal-close" id="modal-close-btn" onclick="closePreview()" data-i18n-aria="aria.modal_close" aria-label="关闭预览">✕</button>
       </div>
       <div id="preview-list"
         style="flex: 1; overflow-y:auto; overflow-x:hidden; background:var(--card); display:flex; flex-direction:column; gap:1rem; padding: 0.5rem">
@@ -1403,14 +1403,8 @@
       </div>
     </div>
     <div class="footer-right">
-      <div class="footer-line">
-        <span data-i18n="footer.license_prefix">以</span>
-        <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
-        <span data-i18n="footer.license_suffix">License 开源</span>
-        · <span data-i18n="footer.based_on">基于</span> <a href="https://opentype.js.org/" target="_blank"
-          rel="noopener">opentype.js</a>
-      </div>
-      <div class="footer-line"><span id="ver" data-i18n="footer.tool">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
+      <div class="footer-line" id="footer-license" data-i18n-html="footer.license_html">以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a></div>
+      <div class="footer-line"><span id="ver">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
         <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn"
           data-i18n="footer.feedback">反馈</a>
@@ -1431,211 +1425,641 @@
 
     const I18N = {
       zh: {
-        'app.title': 'ASS 在线子集化工具',
+        'analysis.draw.found': '发现 {unique} 个唯一形状，{total} 处引用',
+        'analysis.draw.label': '绘图指令（\\p1）',
+        'analysis.draw.none': '未发现绘图指令',
+        'analysis.font.found': '发现 {count} 个外部字体，共 {chars} 字符',
+        'analysis.font.label': '外部字体',
+        'analysis.font.none': '未发现外部字体（均为系统字体）',
+        'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
         'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
-        'btn.install': '安装',
-        'btn.discuss': '讨论',
-        'btn.svg': 'SVG 转 ASS 绘图指令',
+        'app.title': 'ASS 在线子集化工具',
+        'aria.dz_ass': '上传字幕文件，支持拖拽或点击选择',
+        'aria.dz_font': '上传字体文件',
+        'aria.lang_toggle': '切换语言',
+        'aria.log_box': '处理日志',
+        'aria.modal_close': '关闭预览',
         'btn.convert': '开始转换',
         'btn.converting': '处理中…',
+        'btn.discuss': '讨论',
+        'btn.dl_font': '下载字体',
         'btn.download': '下载优化后的字幕',
         'btn.download_zip': '下载全部 (ZIP)',
+        'btn.install': '安装',
         'btn.preview': '预览',
-        'btn.dl_font': '下载字体',
-        'step1.title': '上传字幕文件',
+        'btn.svg': 'SVG 转 ASS 绘图指令',
+        'change': '更换文件',
+        'discuss.header': '讨论 · Discussion',
+        'discuss.loading': '加载中…',
+        'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
+        'err.invalid': '⚠ 格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
+        'err.no_events': '⚠ 格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
+        'err.zip_depth': '⚠ ZIP 嵌套层数超过 10 层限制，已停止解压。',
+        'font.chars': '{n} 字符',
+        'font.local.btn': '从系统自动加载字体',
+        'font.match_fail': '{n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
+        'font.missing': '待上传',
+        'font.path.summary': '💡 常见字体安装路径',
+        'font.skipped': '缺失',
+        'font.system': '✓ 系统字体',
+        'font.system.missing': '[系统字体] 需提供',
+        'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
+        'font.upload.title': '上传字体文件',
+        'font.uploaded': '✓ {name}',
+        'font.weight.bold': '粗体',
+        'font.weight.normal': '常规',
+        'footer.feedback': '反馈',
+        'footer.home': '主页',
+        'footer.license_html': '以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
+        'footer.org': '蒙太奇字幕组 · MontageSubs',
+        'footer.slogan': '用爱发电 ❤️ Powered by Love',
+        'footer.source': '查看源代码',
+        'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset)',
+        'leave.confirm': '转换正在进行中，确定要离开吗？',
+        'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
+        'log.convert.start': '[convert] 开始转换…',
+        'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
+        'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
+        'log.draw.detail.expand': '[draw] {count} 个字形详情（点击展开）',
+        'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
+        'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
+        'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
+        'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
+        'log.draw.summary': '[draw] 绘图指令关系分析完成，共计 {count} 个独立字形映射：',
+        'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
+        'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
+        'log.font.parse_fail': '[font] 字体解析失败: {error}',
+        'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
+        'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
+        'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
+        'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗体字体，使用已有字体替代。',
+        'log.rewrite.start': '[ass] 重写字幕文件…',
+        'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
+        'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
+        'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
+        'opt.draw.title': '子集化绘图指令',
+        'opt.font.desc': '扫描字幕使用的字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
+        'opt.font.title': '嵌入引用字体',
+        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）',
+        'opt.sysfont.title': '嵌入系统字体',
+        'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
+        'path.mac': 'macOS：/Library/Fonts（建议先复制到桌面再上传）',
+        'path.win': 'Windows：C:\\Windows\\Fonts（建议先复制到桌面再上传）',
+        'preview.draw.error': '渲染错误：',
+        'preview.error': ' - 预览错误',
+        'preview.limit': '（展示前 {limit} / {total} 字符）',
+        'preview.title': '字体预览',
+        'preview.total': '（共 {total} 字符）',
+        'result.detail': '内嵌 {count} 个字体 · {origKB} KB → {newKB} KB',
+        'result.done': '转换完成',
+        'stat.chars': '待嵌入字符',
+        'stat.drawBlocks': '绘图块',
+        'stat.extFonts': '外部字体',
+        'stat.uniqueShapes': '唯一形状',
+        'status.analyzing': '正在分析… {current}/{total}',
+        'status.draw': '正在生成绘图字体…',
+        'status.parsing': '正在解析字幕…',
+        'status.rewrite': '正在重写字幕…',
+        'status.subset': '正在子集化…',
+        'step.active': '（正在进行）',
+        'step.done': '（已完成）',
         'step1.drop': '拖拽字幕文件到此，或点击选择',
-        'step1.hint': 'ASS / SSA 格式 (.ass / .ssa) 或 ZIP 压缩包，支持多选',
+        'step1.hint': 'ASS / SSA 格式（.ass / .ssa）或 ZIP 压缩包，支持多选',
+        'step1.title': '上传字幕文件',
         'step2.title': '分析结果',
         'step3.title': '选择操作',
         'step4.title': '转换 & 下载',
-        'opt.draw.title': '子集化绘图指令',
-        'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
-        'opt.font.title': '嵌入引用字体',
-        'opt.font.desc': '扫描字幕使用的字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
-        'opt.sysfont.title': '嵌入系统字体',
-        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入',
-        'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
-        'notice.drawing': '注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
-        'font.upload.title': '上传字体文件',
-        'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
-        'font.path.summary': '💡 常见字体安装路径',
-        'font.local.btn': '从系统自动加载字体',
-        'preview.title': '字体预览',
-        'preview.draw.error': '渲染错误：',
-        'discuss.header': '讨论 · Discussion',
-        'discuss.loading': '加载中…',
-        'footer.feedback': '反馈',
-        'footer.source': '查看源代码',
-        'footer.home': '主页',
-        'footer.org': '蒙太奇字幕组 · MontageSubs',
-        'footer.slogan': '用爱发电 ❤️ Powered by Love',
-        'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset)',
-        'footer.license_prefix': '以',
-        'footer.license_suffix': 'License 开源',
-        'footer.based_on': '基于',
-        'stat.drawBlocks': '绘图块',
-        'stat.uniqueShapes': '唯一形状',
-        'stat.extFonts': '外部字体',
-        'stat.chars': '待嵌入字符',
-        'analysis.draw.found': '发现 {unique} 个唯一形状，{total} 处引用',
-        'analysis.draw.none': '未发现绘图指令',
-        'analysis.font.found': '发现 {count} 个外部字体，共 {chars} 字符',
-        'analysis.font.none': '未发现外部字体（均为系统字体）',
-        'analysis.draw.label': '绘图指令（\\p1）',
-        'analysis.font.label': '外部字体',
-        'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
-        'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
-        'err.invalid': '⚠ 文件格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
-        'err.no_events': '⚠ 文件格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
-        'err.zip_depth': '⚠ ZIP 嵌套层数超过 10 层限制，已停止解压。',
-        'status.analyzing': '正在分析… {current}/{total}',
-        'status.parsing': '正在解析字幕…',
-        'status.subset': '正在子集化…',
-        'status.rewrite': '正在重写字幕…',
-        'status.draw': '正在生成绘图字体…',
-        'step.done': '（已完成）',
-        'step.active': '（正在进行）',
-        'result.done': '转换完成',
-        'result.detail': '内嵌 {count} 个字体 · {origKB} KB → {newKB} KB',
-        'change': '更换文件',
-        'font.missing': '待上传',
+      },
+      'zh-TW': {
+        'analysis.draw.found': '發現 {unique} 個唯一形狀，{total} 處引用',
+        'analysis.draw.label': '繪圖指令（\\p1）',
+        'analysis.draw.none': '未發現繪圖指令',
+        'analysis.font.found': '發現 {count} 個外部字型，共 {chars} 字元',
+        'analysis.font.label': '外部字型',
+        'analysis.font.none': '未發現外部字型（均為系統字型）',
+        'analysis.resubset': '偵測到已子集化的繪圖指令，將進行增量更新。',
+        'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
+        'app.title': 'ASS 線上子集化工具',
+        'aria.dz_ass': '上傳字幕檔，支援拖曳或點擊選擇',
+        'aria.dz_font': '上傳字型檔',
+        'aria.lang_toggle': '切換語言',
+        'aria.log_box': '處理日誌',
+        'aria.modal_close': '關閉預覽',
+        'btn.convert': '開始轉換',
+        'btn.converting': '處理中…',
+        'btn.discuss': '討論',
+        'btn.dl_font': '下載字型',
+        'btn.download': '下載優化後的字幕',
+        'btn.download_zip': '下載全部 (ZIP)',
+        'btn.install': '安裝',
+        'btn.preview': '預覽',
+        'btn.svg': 'SVG 轉 ASS 繪圖指令',
+        'change': '更換檔案',
+        'discuss.header': '討論 · Discussion',
+        'discuss.loading': '載入中…',
+        'err.format': '⚠ 請上傳 .ass 或 .ssa 格式的字幕檔。',
+        'err.invalid': '⚠ 格式驗證失敗：「{name}」不是有效的 ASS/SSA 字幕檔。',
+        'err.no_events': '⚠ 格式驗證失敗：「{name}」的 [Events] 區塊缺少 Format 或 Dialogue 行，無法解析。',
+        'err.zip_depth': '⚠ ZIP 嵌套層數超過 10 層限制，已停止解壓。',
+        'font.chars': '{n} 字元',
+        'font.local.btn': '從系統自動載入字型',
+        'font.match_fail': '{n} 個字型檔未能匹配到字幕中的引用字型名，請確認字型是否正確。',
+        'font.missing': '待上傳',
+        'font.path.summary': '💡 常見字型安裝路徑',
         'font.skipped': '缺失',
-        'font.system.missing': '[系统字体] 需提供',
+        'font.system': '✓ 系統字型',
+        'font.system.missing': '[系統字型] 需提供',
+        'font.upload.drop': '點擊選擇字型或 ZIP 壓縮包，或拖曳到此處（支援 TTF / OTF / TTC，可多選；不支援可變字型）',
+        'font.upload.title': '上傳字型檔',
         'font.uploaded': '✓ {name}',
-        'font.system': '✓ 系统字体',
-        'font.chars': '{n} 字符',
-        'font.weight.normal': '常规',
-        'font.weight.bold': '粗体',
-        'font.match_fail': '{n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
-        'path.win': 'Windows：C:\\Windows\\Fonts (建议先复制到桌面再上传)',
-        'path.mac': 'macOS：/Library/Fonts (建议先复制到桌面再上传)',
-        'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
-        'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
-        'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
-        'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
-        'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
-        'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
-        'log.draw.summary': '[draw] 绘图指令关系分析完成，共计 {count} 个独立字形映射：',
-        'log.draw.detail.expand': '[draw] {count} 个字形详情（点击展开）',
-        'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
-        'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
-        'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
-        'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗体字体，使用已有字体替代。',
-        'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
-        'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
-        'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
-        'log.font.parse_fail': '[font] 字体解析失败: {error}',
-        'log.rewrite.start': '[ass] 重写字幕文件…',
-        'log.convert.start': '[convert] 开始转换…',
+        'font.weight.bold': '粗體',
+        'font.weight.normal': '常規',
+        'footer.feedback': '回饋',
+        'footer.home': '主頁',
+        'footer.license_html': '以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 開源 · 基於 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
+        'footer.org': '蒙太奇字幕組 · MontageSubs',
+        'footer.slogan': '用愛發電 ❤️ Powered by Love',
+        'footer.source': '查看原始碼',
+        'footer.tool': '用愛打造 · ASS 線上子集化工具 (ass-subset)',
+        'leave.confirm': '轉換正在進行中，確定要離開嗎？',
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
-        'leave.confirm': '转换正在进行中，确定要离开吗？',
-        'preview.limit': ' (展示前 {limit} / {total} 字符)',
-        'preview.total': ' (共 {total} 字符)',
-        'preview.error': ' - 预览错误',
+        'log.convert.start': '[convert] 開始轉換…',
+        'log.draw.building': '[draw] 發現 {unique} 個唯一繪圖形狀，共 {total} 處引用，正在建構字型…',
+        'log.draw.decode_fail': '[draw] ⚠ 無法解碼已有繪圖字型，將重新生成',
+        'log.draw.detail.expand': '[draw] {count} 個字形詳情（點擊展開）',
+        'log.draw.done': '[draw] 繪圖字型生成完畢：{size} KB',
+        'log.draw.item': '  - 字元: {char} | 計數: {count} | 時間軸: [{start} -> {end}]',
+        'log.draw.kept_existing': '[draw] 保留已有繪圖子集中的 {count} 個字元',
+        'log.draw.none': '[draw] 未發現 \\p1 繪圖指令，跳過。',
+        'log.draw.summary': '[draw] 繪圖指令關係分析完成，共計 {count} 個獨立字形映射：',
+        'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上傳，跳過。',
+        'log.font.none_external': '[font] 未發現需嵌入的外部字型。',
+        'log.font.parse_fail': '[font] 字型解析失敗: {error}',
+        'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（縮減 {pct}%）{skippedText}',
+        'log.font.subset_fail': '[font] 「{name}」處理失敗: {error}',
+        'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字元)…',
+        'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗體字型，使用已有字型替代。',
+        'log.rewrite.start': '[ass] 重寫字幕檔…',
+        'notice.copyright': '⚠ 版權提示：分發未授權的字型檔可能構成侵權。請確保您擁有所嵌入字型的分發權利。',
+        'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
+        'opt.draw.desc': '將字幕中的 \\p1…\\p0 矢量繪圖數據提取為內嵌 TTF 字型，去除重複繪圖，減小檔案體積',
+        'opt.draw.title': '子集化繪圖指令',
+        'opt.font.desc': '掃描字幕使用的字型，子集化後嵌入字幕；僅保留實際使用的字元，大幅縮小字型體積',
+        'opt.font.title': '嵌入引用字型',
+        'opt.sysfont.desc': '將字幕引用的系統字型一併子集化嵌入（需手動上傳或從本機嘗試載入）',
+        'opt.sysfont.title': '嵌入系統字型',
+        'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
+        'path.mac': 'macOS：/Library/Fonts（建議先複製到桌面再上傳）',
+        'path.win': 'Windows：C:\\Windows\\Fonts（建議先複製到桌面再上傳）',
+        'preview.draw.error': '渲染錯誤：',
+        'preview.error': ' - 預覽錯誤',
+        'preview.limit': '（展示前 {limit} / {total} 字元）',
+        'preview.title': '字型預覽',
+        'preview.total': '（共 {total} 字元）',
+        'result.detail': '內嵌 {count} 個字型 · {origKB} KB → {newKB} KB',
+        'result.done': '轉換完成',
+        'stat.chars': '待嵌入字元',
+        'stat.drawBlocks': '繪圖塊',
+        'stat.extFonts': '外部字型',
+        'stat.uniqueShapes': '唯一形狀',
+        'status.analyzing': '正在分析… {current}/{total}',
+        'status.draw': '正在生成繪圖字型…',
+        'status.parsing': '正在解析字幕…',
+        'status.rewrite': '正在重寫字幕…',
+        'status.subset': '正在子集化…',
+        'step.active': '（進行中）',
+        'step.done': '（已完成）',
+        'step1.drop': '拖曳字幕檔到此，或點擊選擇',
+        'step1.hint': 'ASS / SSA 格式（.ass / .ssa）或 ZIP 壓縮包，支援多選',
+        'step1.title': '上傳字幕檔',
+        'step2.title': '分析結果',
+        'step3.title': '選擇操作',
+        'step4.title': '轉換 & 下載',
       },
       en: {
-        'app.title': 'ASS Subset Tool (Online)',
-        'app.subtitle': 'Drawing Subsetting · Font Subset Embedding',
-        'btn.install': 'Install',
-        'btn.discuss': 'Discuss',
-        'btn.svg': 'SVG to ASS Draw',
-        'btn.convert': 'Start Conversion',
+        'analysis.draw.found': '{unique} unique shapes found, {total} references',
+        'analysis.draw.label': 'Draw Commands (\\p1)',
+        'analysis.draw.none': 'No draw commands found',
+        'analysis.font.found': '{count} non-system font(s) found, {chars} characters to embed',
+        'analysis.font.label': 'Non-System Fonts',
+        'analysis.font.none': 'No non-system fonts (all fonts are system fonts)',
+        'analysis.resubset': 'Existing draw subset detected — incremental update will run.',
+        'app.subtitle': 'Draw Command Subsetting · Font Subset Embedding',
+        'app.title': 'ASS Online Subsetter',
+        'aria.dz_ass': 'Upload subtitle script — drag and drop or click to browse',
+        'aria.dz_font': 'Upload font files',
+        'aria.lang_toggle': 'Switch language',
+        'aria.log_box': 'Processing log',
+        'aria.modal_close': 'Close preview',
+        'btn.convert': 'Run Subsetter',
         'btn.converting': 'Processing…',
-        'btn.download': 'Download Optimized Subtitle',
-        'btn.download_zip': 'Download All (ZIP)',
-        'btn.preview': 'Preview',
+        'btn.discuss': 'Discussion',
         'btn.dl_font': 'Download Font',
-        'step1.title': 'Upload Subtitle File',
-        'step1.drop': 'Drag and drop subtitle file here, or click to select',
-        'step1.hint': 'ASS / SSA format (.ass / .ssa) or ZIP archives, multi-select supported',
-        'step2.title': 'Analysis Results',
-        'step3.title': 'Choose Operations',
-        'step4.title': 'Convert & Download',
-        'opt.draw.title': 'Subset Drawing Instructions',
-        'opt.draw.desc': 'Extract \\p1…\\p0 vector drawing data into embedded TTF font, deduplicate drawings, reduce file size',
-        'opt.font.title': 'Embed Referenced Fonts',
-        'opt.font.desc': 'Scan fonts used in subtitles, subset and embed; keeps only used characters',
-        'opt.sysfont.title': 'Embed System Fonts',
-        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in subtitles',
-        'notice.copyright': '⚠ Copyright Notice: Distributing unauthorized font files may constitute infringement. Ensure you have distribution rights for embedded fonts.',
-        'notice.drawing': 'Note: After converting drawing instructions, effects may shift slightly. Please check the final result manually.',
-        'font.upload.title': 'Upload Font Files',
-        'font.upload.drop': 'Click to select font or ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
-        'font.path.summary': '💡 Common font installation paths',
-        'font.local.btn': 'Load fonts from system automatically',
-        'preview.title': 'Font Preview',
-        'preview.draw.error': 'Render error: ',
-        'discuss.header': 'Discussion',
+        'btn.download': 'Download Output',
+        'btn.download_zip': 'Download All (ZIP)',
+        'btn.install': 'Install',
+        'btn.preview': 'Preview',
+        'btn.svg': 'SVG to ASS Draw',
+        'change': 'Change',
+        'discuss.header': 'Discussion · 讨论',
         'discuss.loading': 'Loading…',
-        'footer.feedback': 'Feedback',
-        'footer.source': 'Source Code',
-        'footer.home': 'Home',
-        'footer.org': 'MontageSubs · 蒙太奇字幕组',
-        'footer.slogan': 'Powered by Love ❤️ 用爱发电',
-        'footer.tool': 'ASS Subset Tool (Online) (ass-subset)',
-        'footer.license_prefix': 'Open source under',
-        'footer.license_suffix': 'License',
-        'footer.based_on': 'Built on',
-        'stat.drawBlocks': 'Draw Blocks',
-        'stat.uniqueShapes': 'Unique Shapes',
-        'stat.extFonts': 'External Fonts',
-        'stat.chars': 'Characters',
-        'analysis.draw.found': 'Found {unique} unique shapes, {total} references',
-        'analysis.draw.none': 'No drawing instructions found',
-        'analysis.font.found': 'Found {count} external fonts, {chars} characters total',
-        'analysis.font.none': 'No external fonts found (all system fonts)',
-        'analysis.draw.label': 'Drawing Instructions (\\p1)',
-        'analysis.font.label': 'External Fonts',
-        'analysis.resubset': 'Detected existing drawing subset; incremental update will be performed.',
-        'err.format': '⚠ Please upload .ass or .ssa subtitle files.',
-        'err.invalid': '⚠ Format validation failed: "{name}" is not a valid ASS/SSA file.',
-        'err.no_events': '⚠ Format validation failed: "{name}" is missing Format or Dialogue lines in [Events].',
-        'err.zip_depth': '⚠ ZIP nesting exceeds 10 levels, extraction stopped.',
-        'status.analyzing': 'Analyzing… {current}/{total}',
-        'status.parsing': 'Parsing subtitle…',
-        'status.subset': 'Subsetting…',
-        'status.rewrite': 'Rewriting subtitle…',
-        'status.draw': 'Building drawing font…',
-        'step.done': '(done)',
-        'step.active': '(in progress)',
-        'result.done': 'Conversion Complete',
-        'result.detail': 'Embedded {count} fonts · {origKB} KB → {newKB} KB',
-        'change': 'Change file',
-        'font.missing': 'Upload required',
-        'font.system.missing': '[System font] Upload required',
-        'font.skipped': 'missing',
-        'font.uploaded': '✓ {name}',
-        'font.system': '✓ System font',
+        'err.format': '⚠ Please upload a valid .ass or .ssa subtitle script.',
+        'err.invalid': '⚠ Validation failed: "{name}" is not a valid ASS/SSA script.',
+        'err.no_events': '⚠ Validation failed: "{name}" has no valid Format/Dialogue lines in [Events].',
+        'err.zip_depth': '⚠ ZIP nesting exceeds 10 levels — extraction stopped.',
         'font.chars': '{n} chars',
-        'font.weight.normal': 'Regular',
+        'font.local.btn': 'Load System Fonts',
+        'font.match_fail': '{n} font file(s) could not be matched to any referenced font name. Please verify font names.',
+        'font.missing': 'Upload required',
+        'font.path.summary': '💡 Common font directories',
+        'font.skipped': 'skipped',
+        'font.system': '✓ System font',
+        'font.system.missing': '[System font] Upload required',
+        'font.upload.drop': 'Click to select fonts or a ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
+        'font.upload.title': 'Font Files',
+        'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Bold',
-        'font.match_fail': '{n} font file(s) did not match any referenced font name. Please check.',
-        'path.win': 'Windows: C:\\Windows\\Fonts (Suggest copy to desktop before upload)',
-        'path.mac': 'macOS: /Library/Fonts (Suggest copy to desktop before upload)',
-        'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
-        'log.draw.building': '[draw] Found {unique} unique shapes, {total} references, building font…',
-        'log.draw.done': '[draw] Drawing font generated: {size} KB',
-        'log.draw.none': '[draw] No \\p1 drawing instructions found, skipping.',
-        'log.draw.kept_existing': '[draw] Kept {count} chars from existing drawing subset',
-        'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing drawing font, regenerating',
-        'log.draw.summary': '[draw] Drawing relationship analysis complete, {count} unique glyph mappings:',
+        'font.weight.normal': 'Regular',
+        'footer.feedback': 'Report Issue',
+        'footer.home': 'Home',
+        'footer.license_html': 'Open source under <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Built on <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
+        'footer.org': 'MontageSubs · 蒙太奇字幕组',
+        'footer.slogan': 'Powered by Love ❤️',
+        'footer.source': 'Source Code',
+        'footer.tool': 'ASS Online Subsetter (ass-subset)',
+        'leave.confirm': 'Subsetting is still running. Leave anyway?',
+        'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
+        'log.convert.start': '[convert] Starting…',
+        'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font…',
+        'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing draw font; rebuilding from scratch.',
         'log.draw.detail.expand': '[draw] {count} glyph mappings (click to expand)',
-        'log.draw.item': '  - Character: {char} | Count: {count} | Timeline: [{start} -> {end}]',
-        'log.font.none_external': '[font] No external fonts to embed.',
-        'log.font.missing': '[font] ⚠ "{name}" ({weight}) not uploaded, skipping.',
-        'log.font.weight_fallback': '[font] ⚠ Bold variant not found for "{name}", using available font.',
-        'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
-        'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (-{pct}%){skippedText}',
+        'log.draw.done': '[draw] Draw font built: {size} KB',
+        'log.draw.item': '  - Char: {char} | Count: {count} | Timeline: [{start} → {end}]',
+        'log.draw.kept_existing': '[draw] Kept {count} chars from existing draw subset',
+        'log.draw.none': '[draw] No \\p1 draw commands found, skipping.',
+        'log.draw.summary': '[draw] Draw analysis complete — {count} unique glyph mappings:',
+        'log.font.missing': '[font] ⚠ "{name}" ({weight}) not provided, skipping.',
+        'log.font.none_external': '[font] No non-system fonts to embed.',
+        'log.font.parse_fail': '[font] Failed to parse font: {error}',
+        'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" failed: {error}',
-        'log.font.parse_fail': '[font] Font parse error: {error}',
-        'log.rewrite.start': '[ass] Rewriting subtitle file…',
-        'log.convert.start': '[convert] Starting conversion…',
-        'log.convert.done': '[done] Complete. {origKB} KB → {newKB} KB ({delta} KB)',
-        'leave.confirm': 'Conversion in progress. Are you sure you want to leave?',
-        'preview.limit': ' (Showing {limit} / {total} chars)',
+        'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
+        'log.font.weight_fallback': '[font] ⚠ Bold variant not found for "{name}"; falling back to available weight.',
+        'log.rewrite.start': '[ass] Rewriting script…',
+        'notice.copyright': '⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.',
+        'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
+        'opt.draw.desc': 'Extract \\p1…\\p0 vector draws into an embedded TTF, deduplicating identical shapes to reduce script size.',
+        'opt.draw.title': 'Subset Draw Commands',
+        'opt.font.desc': 'Scan fonts referenced in the script, subset to used characters only, and embed them directly into the output.',
+        'opt.font.title': 'Embed Referenced Fonts',
+        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in the script (requires manual upload or local font access).',
+        'opt.sysfont.title': 'Embed System Fonts',
+        'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
+        'path.mac': 'macOS: /Library/Fonts (copy to Desktop before uploading)',
+        'path.win': 'Windows: C:\\Windows\\Fonts (copy to Desktop before uploading)',
+        'preview.draw.error': 'Render error: ',
+        'preview.error': ' — Preview error',
+        'preview.limit': ' (showing first {limit} of {total} chars)',
+        'preview.title': 'Font Preview',
         'preview.total': ' ({total} chars)',
-        'preview.error': ' - Preview Error',
-      }
+        'result.detail': '{count} font(s) embedded · {origKB} KB → {newKB} KB',
+        'result.done': 'Subsetting Complete',
+        'stat.chars': 'Chars to Embed',
+        'stat.drawBlocks': 'Draw Blocks',
+        'stat.extFonts': 'Ext. Fonts',
+        'stat.uniqueShapes': 'Unique Shapes',
+        'status.analyzing': 'Analyzing… {current}/{total}',
+        'status.draw': 'Building draw font…',
+        'status.parsing': 'Parsing script…',
+        'status.rewrite': 'Rewriting script…',
+        'status.subset': 'Subsetting…',
+        'step.active': '(in progress)',
+        'step.done': '(done)',
+        'step1.drop': 'Drop your script here, or click to browse',
+        'step1.hint': '.ass / .ssa scripts or ZIP archives — multi-select supported',
+        'step1.title': 'Upload Script',
+        'step2.title': 'Analysis',
+        'step3.title': 'Options',
+        'step4.title': 'Run & Download',
+      },
+      ja: {
+        'analysis.draw.found': '{unique} 個のユニーク形状、{total} 件の参照が見つかりました',
+        'analysis.draw.label': '描画コマンド（\\p1）',
+        'analysis.draw.none': '描画コマンドが見つかりません',
+        'analysis.font.found': '{count} 個の外部フォント、{chars} 文字を検出',
+        'analysis.font.label': '外部フォント',
+        'analysis.font.none': '外部フォントなし（すべてシステムフォント）',
+        'analysis.resubset': '既存の描画サブセットを検出しました。増分更新を実行します。',
+        'app.subtitle': '描画コマンドのサブセット化・フォントサブセット埋め込み',
+        'app.title': 'ASSオンラインサブセットツール',
+        'aria.dz_ass': '字幕ファイルをアップロード（ドラッグ＆ドロップまたはクリック）',
+        'aria.dz_font': 'フォントファイルをアップロード',
+        'aria.lang_toggle': '言語を切り替える',
+        'aria.log_box': '処理ログ',
+        'aria.modal_close': 'プレビューを閉じる',
+        'btn.convert': '変換開始',
+        'btn.converting': '処理中…',
+        'btn.discuss': 'ディスカッション',
+        'btn.dl_font': 'フォントをダウンロード',
+        'btn.download': '最適化済み字幕をダウンロード',
+        'btn.download_zip': 'すべてダウンロード (ZIP)',
+        'btn.install': 'インストール',
+        'btn.preview': 'プレビュー',
+        'btn.svg': 'SVG → ASS描画コマンド',
+        'change': 'ファイルを変更',
+        'discuss.header': 'ディスカッション · Discussion',
+        'discuss.loading': '読み込み中…',
+        'err.format': '⚠ .ass または .ssa 形式の字幕ファイルをアップロードしてください。',
+        'err.invalid': '⚠ 検証エラー：「{name}」は有効な ASS/SSA ファイルではありません。',
+        'err.no_events': '⚠ 検証エラー：「{name}」の [Events] セクションに Format または Dialogue 行がありません。',
+        'err.zip_depth': '⚠ ZIP のネストが 10 層を超えました。解凍を停止しました。',
+        'font.chars': '{n} 文字',
+        'font.local.btn': 'システムフォントを自動読み込み',
+        'font.match_fail': '{n} 個のフォントファイルが字幕内の参照フォント名と一致しませんでした。フォント名を確認してください。',
+        'font.missing': 'アップロード待ち',
+        'font.path.summary': '💡 よく使われるフォントディレクトリ',
+        'font.skipped': 'スキップ',
+        'font.system': '✓ システムフォント',
+        'font.system.missing': '[システムフォント] アップロードが必要',
+        'font.upload.drop': 'フォントまたは ZIP ファイルを選択、またはここにドラッグ（TTF / OTF / TTC 対応；可変フォント非対応）',
+        'font.upload.title': 'フォントファイル',
+        'font.uploaded': '✓ {name}',
+        'font.weight.bold': 'ボールド',
+        'font.weight.normal': 'レギュラー',
+        'footer.feedback': '問題を報告',
+        'footer.home': 'ホーム',
+        'footer.license_html': '<a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> のもとオープンソース · <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a> を使用',
+        'footer.org': 'MontageSubs · 蒙太奇字幕组',
+        'footer.slogan': '愛を込めて ❤️',
+        'footer.source': 'ソースコードを見る',
+        'footer.tool': 'ASSオンラインサブセットツール (ass-subset)',
+        'leave.confirm': '変換中です。本当に離れますか？',
+        'log.convert.done': '[done] 完了。{origKB} KB → {newKB} KB ({delta} KB)',
+        'log.convert.start': '[convert] 変換を開始…',
+        'log.draw.building': '[draw] {unique} 個のユニーク形状、{total} 件の参照を検出 — フォントを構築中…',
+        'log.draw.decode_fail': '[draw] ⚠ 既存の描画フォントのデコードに失敗しました。再生成します。',
+        'log.draw.detail.expand': '[draw] {count} 件のグリフマッピング（クリックで展開）',
+        'log.draw.done': '[draw] 描画フォントを生成しました：{size} KB',
+        'log.draw.item': '  - 文字: {char} | 数: {count} | タイムライン: [{start} → {end}]',
+        'log.draw.kept_existing': '[draw] 既存の描画サブセットから {count} 文字を保持',
+        'log.draw.none': '[draw] \\p1 描画コマンドが見つかりません。スキップします。',
+        'log.draw.summary': '[draw] 描画分析完了 — {count} 件のユニークグリフマッピング：',
+        'log.font.missing': '[font] ⚠ 「{name}」({weight}) がアップロードされていません。スキップします。',
+        'log.font.none_external': '[font] 埋め込む外部フォントがありません。',
+        'log.font.parse_fail': '[font] フォントのパースに失敗しました: {error}',
+        'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
+        'log.font.subset_fail': '[font] 「{name}」の処理に失敗しました: {error}',
+        'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) をサブセット化中…',
+        'log.font.weight_fallback': '[font] ⚠ 「{name}」のボールドが見つかりません。利用可能なフォントで代替します。',
+        'log.rewrite.start': '[ass] スクリプトを書き換え中…',
+        'notice.copyright': '⚠ 著作権注意：未許諾フォントの配布は権利侵害となる場合があります。埋め込むフォントの配布権利をご確認ください。',
+        'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
+        'opt.draw.desc': 'スクリプトの \\p1…\\p0 ベクター描画データを内蔵 TTF フォントに変換し、重複する描画を削除してファイルサイズを削減します。',
+        'opt.draw.title': '描画コマンドのサブセット化',
+        'opt.font.desc': 'スクリプトで参照されているフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
+        'opt.font.title': '参照フォントの埋め込み',
+        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントもサブセット化して埋め込みます（手動アップロードまたはローカルアクセスが必要）。',
+        'opt.sysfont.title': 'システムフォントの埋め込み',
+        'path.linux': 'Linux：~/.fonts または /usr/share/fonts',
+        'path.mac': 'macOS：/Library/Fonts（アップロード前にデスクトップにコピーを推奨）',
+        'path.win': 'Windows：C:\\Windows\\Fonts（アップロード前にデスクトップにコピーを推奨）',
+        'preview.draw.error': 'レンダリングエラー：',
+        'preview.error': ' — プレビューエラー',
+        'preview.limit': '（先頭 {limit} / {total} 文字を表示）',
+        'preview.title': 'フォントプレビュー',
+        'preview.total': '（全 {total} 文字）',
+        'result.detail': '{count} 個のフォントを埋め込み · {origKB} KB → {newKB} KB',
+        'result.done': '変換完了',
+        'stat.chars': '埋め込み文字数',
+        'stat.drawBlocks': '描画ブロック',
+        'stat.extFonts': '外部フォント',
+        'stat.uniqueShapes': 'ユニーク形状',
+        'status.analyzing': '分析中… {current}/{total}',
+        'status.draw': '描画フォントを構築中…',
+        'status.parsing': 'スクリプトを解析中…',
+        'status.rewrite': 'スクリプトを書き換え中…',
+        'status.subset': 'サブセット化中…',
+        'step.active': '（進行中）',
+        'step.done': '（完了）',
+        'step1.drop': 'スクリプトをここにドロップ、またはクリックして選択',
+        'step1.hint': '.ass / .ssa スクリプトまたは ZIP アーカイブ — 複数選択可',
+        'step1.title': 'スクリプトをアップロード',
+        'step2.title': '解析結果',
+        'step3.title': 'オプション',
+        'step4.title': '変換 & ダウンロード',
+      },
+      ko: {
+        'analysis.draw.found': '{unique}개의 고유 도형, {total}개의 참조가 발견되었습니다',
+        'analysis.draw.label': '드로우 명령어 (\\p1)',
+        'analysis.draw.none': '드로우 명령어가 없습니다',
+        'analysis.font.found': '{count}개의 외부 폰트, {chars}개의 문자 발견',
+        'analysis.font.label': '외부 폰트',
+        'analysis.font.none': '외부 폰트 없음 (모두 시스템 폰트)',
+        'analysis.resubset': '기존 드로우 서브셋이 감지되었습니다. 증분 업데이트를 수행합니다.',
+        'app.subtitle': '드로우 명령어 서브셋화 · 폰트 서브셋 삽입',
+        'app.title': 'ASS 온라인 서브셋 도구',
+        'aria.dz_ass': '자막 파일 업로드 — 드래그 앤 드롭 또는 클릭',
+        'aria.dz_font': '폰트 파일 업로드',
+        'aria.lang_toggle': '언어 변경',
+        'aria.log_box': '처리 로그',
+        'aria.modal_close': '미리보기 닫기',
+        'btn.convert': '변환 시작',
+        'btn.converting': '처리 중…',
+        'btn.discuss': '토론',
+        'btn.dl_font': '폰트 다운로드',
+        'btn.download': '최적화된 자막 다운로드',
+        'btn.download_zip': '전체 다운로드 (ZIP)',
+        'btn.install': '설치',
+        'btn.preview': '미리보기',
+        'btn.svg': 'SVG → ASS 드로우',
+        'change': '파일 변경',
+        'discuss.header': '토론 · Discussion',
+        'discuss.loading': '로딩 중…',
+        'err.format': '⚠ .ass 또는 .ssa 형식의 자막 파일을 업로드해 주세요.',
+        'err.invalid': '⚠ 검증 실패: "{name}"은(는) 유효한 ASS/SSA 파일이 아닙니다.',
+        'err.no_events': '⚠ 검증 실패: "{name}"의 [Events] 섹션에 Format 또는 Dialogue 줄이 없습니다.',
+        'err.zip_depth': '⚠ ZIP 중첩이 10단계를 초과했습니다 — 압축 해제를 중단했습니다.',
+        'font.chars': '{n}자',
+        'font.local.btn': '시스템 폰트 자동 로드',
+        'font.match_fail': '{n}개의 폰트 파일이 참조된 폰트 이름과 일치하지 않습니다. 폰트 이름을 확인하세요.',
+        'font.missing': '업로드 필요',
+        'font.path.summary': '💡 주요 폰트 디렉터리',
+        'font.skipped': '건너뜀',
+        'font.system': '✓ 시스템 폰트',
+        'font.system.missing': '[시스템 폰트] 업로드 필요',
+        'font.upload.drop': '폰트 또는 ZIP 파일을 선택하거나 여기에 드래그하세요 (TTF / OTF / TTC; 가변 폰트 미지원)',
+        'font.upload.title': '폰트 파일',
+        'font.uploaded': '✓ {name}',
+        'font.weight.bold': '굵게',
+        'font.weight.normal': '보통',
+        'footer.feedback': '이슈 보고',
+        'footer.home': '홈',
+        'footer.license_html': '<a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 오픈소스 · <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a> 기반',
+        'footer.org': 'MontageSubs · 蒙太奇字幕组',
+        'footer.slogan': '사랑으로 만들었습니다 ❤️',
+        'footer.source': '소스 코드 보기',
+        'footer.tool': 'ASS 온라인 서브셋 도구 (ass-subset)',
+        'leave.confirm': '변환이 진행 중입니다. 정말 떠나시겠습니까?',
+        'log.convert.done': '[done] 완료. {origKB} KB → {newKB} KB ({delta} KB)',
+        'log.convert.start': '[convert] 변환 시작…',
+        'log.draw.building': '[draw] {unique}개의 고유 도형, {total}개의 참조 발견 — 폰트 구축 중…',
+        'log.draw.decode_fail': '[draw] ⚠ 기존 드로우 폰트 디코딩 실패. 재생성합니다.',
+        'log.draw.detail.expand': '[draw] {count}개의 글리프 매핑 (클릭하여 펼치기)',
+        'log.draw.done': '[draw] 드로우 폰트 생성 완료: {size} KB',
+        'log.draw.item': '  - 문자: {char} | 횟수: {count} | 타임라인: [{start} → {end}]',
+        'log.draw.kept_existing': '[draw] 기존 드로우 서브셋에서 {count}개의 문자를 유지',
+        'log.draw.none': '[draw] \\p1 드로우 명령어가 없습니다. 건너뜁니다.',
+        'log.draw.summary': '[draw] 드로우 분석 완료 — {count}개의 고유 글리프 매핑:',
+        'log.font.missing': '[font] ⚠ "{name}" ({weight}) 업로드되지 않음, 건너뜁니다.',
+        'log.font.none_external': '[font] 삽입할 외부 폰트가 없습니다.',
+        'log.font.parse_fail': '[font] 폰트 파싱 실패: {error}',
+        'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
+        'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
+        'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 서브셋화 중…',
+        'log.font.weight_fallback': '[font] ⚠ "{name}"의 굵은 글씨체를 찾을 수 없어 사용 가능한 폰트로 대체합니다.',
+        'log.rewrite.start': '[ass] 자막 스크립트 재작성 중…',
+        'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
+        'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
+        'opt.draw.desc': '자막의 \\p1…\\p0 벡터 드로우 데이터를 내장 TTF 폰트로 추출하고 중복 도형을 제거하여 파일 크기를 줄입니다.',
+        'opt.draw.title': '드로우 명령어 서브셋화',
+        'opt.font.desc': '스크립트에서 참조된 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 직접 삽입합니다.',
+        'opt.font.title': '참조 폰트 삽입',
+        'opt.sysfont.desc': '스크립트에서 참조된 시스템 폰트도 서브셋화하여 삽입합니다 (수동 업로드 또는 로컬 폰트 접근 필요).',
+        'opt.sysfont.title': '시스템 폰트 삽입',
+        'path.linux': 'Linux: ~/.fonts 또는 /usr/share/fonts',
+        'path.mac': 'macOS: /Library/Fonts (업로드 전 바탕화면에 복사 권장)',
+        'path.win': 'Windows: C:\\Windows\\Fonts (업로드 전 바탕화면에 복사 권장)',
+        'preview.draw.error': '렌더링 오류: ',
+        'preview.error': ' — 미리보기 오류',
+        'preview.limit': ' ({total}자 중 앞 {limit}자 표시)',
+        'preview.title': '폰트 미리보기',
+        'preview.total': ' (총 {total}자)',
+        'result.detail': '{count}개 폰트 삽입 · {origKB} KB → {newKB} KB',
+        'result.done': '변환 완료',
+        'stat.chars': '삽입 문자',
+        'stat.drawBlocks': '드로우 블록',
+        'stat.extFonts': '외부 폰트',
+        'stat.uniqueShapes': '고유 도형',
+        'status.analyzing': '분석 중… {current}/{total}',
+        'status.draw': '드로우 폰트 구축 중…',
+        'status.parsing': '스크립트 파싱 중…',
+        'status.rewrite': '스크립트 재작성 중…',
+        'status.subset': '서브셋화 중…',
+        'step.active': '(진행 중)',
+        'step.done': '(완료)',
+        'step1.drop': '스크립트를 여기에 드래그하거나 클릭하여 선택',
+        'step1.hint': '.ass / .ssa 스크립트 또는 ZIP 아카이브 — 다중 선택 지원',
+        'step1.title': '자막 스크립트 업로드',
+        'step2.title': '분석 결과',
+        'step3.title': '옵션',
+        'step4.title': '변환 & 다운로드',
+      },
+      es: {
+        'analysis.draw.found': 'Se encontraron {unique} formas únicas, {total} referencias',
+        'analysis.draw.label': 'Comandos de dibujo (\\p1)',
+        'analysis.draw.none': 'No se encontraron comandos de dibujo',
+        'analysis.font.found': 'Se encontraron {count} fuentes externas, {chars} caracteres en total',
+        'analysis.font.label': 'Fuentes externas',
+        'analysis.font.none': 'No hay fuentes externas (todas son del sistema)',
+        'analysis.resubset': 'Se detectó un subconjunto de dibujo existente; se realizará una actualización incremental.',
+        'app.subtitle': 'Subconjunto de comandos de dibujo · Incrustación de fuentes',
+        'app.title': 'Herramienta ASS de subconjunto',
+        'aria.dz_ass': 'Subir archivo de subtítulos — arrastra o haz clic para seleccionar',
+        'aria.dz_font': 'Subir archivos de fuentes',
+        'aria.lang_toggle': 'Cambiar idioma',
+        'aria.log_box': 'Registro de procesamiento',
+        'aria.modal_close': 'Cerrar vista previa',
+        'btn.convert': 'Iniciar conversión',
+        'btn.converting': 'Procesando…',
+        'btn.discuss': 'Discusión',
+        'btn.dl_font': 'Descargar fuente',
+        'btn.download': 'Descargar subtítulo optimizado',
+        'btn.download_zip': 'Descargar todo (ZIP)',
+        'btn.install': 'Instalar',
+        'btn.preview': 'Vista previa',
+        'btn.svg': 'SVG a ASS Draw',
+        'change': 'Cambiar archivo',
+        'discuss.header': 'Discusión · Discussion',
+        'discuss.loading': 'Cargando…',
+        'err.format': '⚠ Por favor subí un archivo de subtítulos .ass o .ssa.',
+        'err.invalid': '⚠ Validación fallida: "{name}" no es un archivo ASS/SSA válido.',
+        'err.no_events': '⚠ Validación fallida: "{name}" no tiene líneas Format/Dialogue en [Events].',
+        'err.zip_depth': '⚠ El ZIP tiene más de 10 niveles de anidación — extracción detenida.',
+        'font.chars': '{n} caracteres',
+        'font.local.btn': 'Cargar fuentes del sistema',
+        'font.match_fail': '{n} archivo(s) de fuente no pudieron coincidir con ninguna fuente referenciada. Verificá los nombres.',
+        'font.missing': 'Pendiente de subir',
+        'font.path.summary': '💡 Directorios de fuentes comunes',
+        'font.skipped': 'omitida',
+        'font.system': '✓ Fuente del sistema',
+        'font.system.missing': '[Fuente del sistema] Requiere subir',
+        'font.upload.drop': 'Hacé clic para seleccionar fuentes o un ZIP, o arrastrá aquí (TTF / OTF / TTC; fuentes variables no compatibles)',
+        'font.upload.title': 'Archivos de fuentes',
+        'font.uploaded': '✓ {name}',
+        'font.weight.bold': 'Negrita',
+        'font.weight.normal': 'Regular',
+        'footer.feedback': 'Reportar problema',
+        'footer.home': 'Inicio',
+        'footer.license_html': 'Código abierto bajo <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Basado en <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
+        'footer.org': 'MontageSubs · 蒙太奇字幕组',
+        'footer.slogan': 'Hecho con amor ❤️',
+        'footer.source': 'Ver código fuente',
+        'footer.tool': 'Herramienta ASS de subconjunto (ass-subset)',
+        'leave.confirm': 'La conversión está en progreso. ¿Seguro que querés salir?',
+        'log.convert.done': '[done] Completado. {origKB} KB → {newKB} KB ({delta} KB)',
+        'log.convert.start': '[convert] Iniciando…',
+        'log.draw.building': '[draw] {unique} formas únicas, {total} referencias — construyendo fuente…',
+        'log.draw.decode_fail': '[draw] ⚠ No se pudo decodificar la fuente de dibujo existente; regenerando.',
+        'log.draw.detail.expand': '[draw] {count} mapeos de glifos (clic para expandir)',
+        'log.draw.done': '[draw] Fuente de dibujo generada: {size} KB',
+        'log.draw.item': '  - Carácter: {char} | Conteo: {count} | Línea de tiempo: [{start} → {end}]',
+        'log.draw.kept_existing': '[draw] Se conservaron {count} caracteres del subconjunto de dibujo existente',
+        'log.draw.none': '[draw] No se encontraron comandos de dibujo \\p1, omitiendo.',
+        'log.draw.summary': '[draw] Análisis completo — {count} mapeos de glifos únicos:',
+        'log.font.missing': '[font] ⚠ "{name}" ({weight}) no fue subida, omitiendo.',
+        'log.font.none_external': '[font] No hay fuentes externas para incrustar.',
+        'log.font.parse_fail': '[font] Error al parsear fuente: {error}',
+        'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
+        'log.font.subset_fail': '[font] "{name}" falló: {error}',
+        'log.font.subsetting': '[font] Creando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
+        'log.font.weight_fallback': '[font] ⚠ No se encontró variante negrita de "{name}"; usando peso disponible.',
+        'log.rewrite.start': '[ass] Reescribiendo el script…',
+        'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
+        'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
+        'opt.draw.desc': 'Extrae los vectores \\p1…\\p0 en una fuente TTF incrustada, eliminando formas duplicadas para reducir el tamaño del script.',
+        'opt.draw.title': 'Subconjunto de comandos de dibujo',
+        'opt.font.desc': 'Escanea las fuentes del script, crea subconjuntos con solo los caracteres usados y los incrusta en la salida.',
+        'opt.font.title': 'Incrustar fuentes referenciadas',
+        'opt.sysfont.desc': 'También crea subconjunto e incrusta las fuentes del sistema referenciadas (requiere subirlas o acceso local).',
+        'opt.sysfont.title': 'Incrustar fuentes del sistema',
+        'path.linux': 'Linux: ~/.fonts o /usr/share/fonts',
+        'path.mac': 'macOS: /Library/Fonts (copiá al Escritorio antes de subir)',
+        'path.win': 'Windows: C:\\Windows\\Fonts (copiá al Escritorio antes de subir)',
+        'preview.draw.error': 'Error de renderizado: ',
+        'preview.error': ' — Error de vista previa',
+        'preview.limit': ' (mostrando {limit} de {total} caracteres)',
+        'preview.title': 'Vista previa de fuente',
+        'preview.total': ' ({total} caracteres)',
+        'result.detail': '{count} fuente(s) incrustada(s) · {origKB} KB → {newKB} KB',
+        'result.done': 'Conversión completada',
+        'stat.chars': 'Caracteres',
+        'stat.drawBlocks': 'Bloques de dibujo',
+        'stat.extFonts': 'Fuentes ext.',
+        'stat.uniqueShapes': 'Formas únicas',
+        'status.analyzing': 'Analizando… {current}/{total}',
+        'status.draw': 'Construyendo fuente de dibujo…',
+        'status.parsing': 'Parseando el script…',
+        'status.rewrite': 'Reescribiendo el script…',
+        'status.subset': 'Creando subconjunto…',
+        'step.active': '(en progreso)',
+        'step.done': '(completado)',
+        'step1.drop': 'Arrastrá tu script aquí, o hacé clic para seleccionar',
+        'step1.hint': 'Scripts .ass / .ssa o archivos ZIP — selección múltiple disponible',
+        'step1.title': 'Subir script de subtítulos',
+        'step2.title': 'Análisis',
+        'step3.title': 'Opciones',
+        'step4.title': 'Convertir y descargar',
+      },
     };
 
     function normFont(name) { return name.replace(/^@/, '').trim(); }
@@ -1656,28 +2080,45 @@
         if (el.tagName === 'INPUT' && el.type !== 'checkbox') el.placeholder = val;
         else el.textContent = val;
       });
-      document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
-      document.getElementById('lang-zh').classList.toggle('active', currentLang === 'zh');
-      document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        el.innerHTML = t(el.getAttribute('data-i18n-html'));
+      });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+      });
+
+      const langAttrMap = { zh: 'zh-CN', 'zh-TW': 'zh-TW', en: 'en-US', ja: 'ja', ko: 'ko', es: 'es-419' };
+      document.documentElement.lang = langAttrMap[currentLang] || currentLang;
+      ['zh', 'zh-TW', 'en', 'ja', 'ko', 'es'].forEach(l => {
+        document.getElementById('lang-' + l)?.classList.toggle('active', currentLang === l);
+      });
 
       const title = t('app.title') + ' · ' + t('footer.org');
       document.title = title;
-      const desc = t('app.desc') || document.querySelector('meta[name="description"]').content;
-      document.querySelector('meta[name="description"]').setAttribute('content', desc);
+      document.querySelector('meta[name="description"]').setAttribute('content',
+        document.querySelector('meta[name="description"]').content);
       document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
       document.querySelector('meta[property="og:description"]')?.setAttribute('content', t('app.subtitle'));
       const manifest = document.getElementById('pwa-manifest');
       if (manifest) manifest.setAttribute('href', currentLang === 'en' ? 'manifest-en.json' : 'manifest.json');
+
+      const v = document.querySelector('meta[name="version"]');
+      const verEl = document.getElementById('ver');
+      if (verEl) verEl.textContent = t('footer.tool') + (v ? ' v' + v.content : '');
     }
 
     function setLang(lang) {
       currentLang = lang;
       try { localStorage.setItem('ass-subset-lang', lang); } catch (_) { }
       applyI18n();
-      const wrap = document.getElementById('lang-wrap');
-      const btn = document.getElementById('btn-lang-toggle');
-      wrap.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
+      renderFontPaths();
+      if (S.assFiles.length > 0) {
+        renderAnalysis();
+        if (document.getElementById('opt-font').checked) renderFontList();
+      }
+      updateStepStatus();
+      document.getElementById('lang-wrap').classList.remove('open');
+      document.getElementById('btn-lang-toggle').setAttribute('aria-expanded', 'false');
     }
 
     function toggleLangMenu() {
@@ -1870,8 +2311,8 @@
       else if (ua.includes('mac')) items.push(t('path.mac'), t('path.win'), t('path.linux'));
       else items.push(t('path.linux'), t('path.win'), t('path.mac'));
       paths.innerHTML = items.map(p => {
-        const [label, ...rest] = p.split('：');
-        return '<strong>' + label + '：</strong>' + rest.join('：');
+        const m = p.match(/^([^:：]+)([：:])/);
+        return m ? '<strong>' + m[1] + m[2] + '</strong>' + p.slice(m[0].length) : p;
       }).join('<br>');
     }
 
@@ -1922,14 +2363,15 @@
           try {
             const extracted = await processZipFile(f, 'ass');
             assEntries.push(...extracted);
-          } catch (e) {
+        } catch (e) {
             const errMsg = t(e.message) || e.message;
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step1').classList.add('done');
-            document.getElementById('step2').style.display = '';
-            document.getElementById('step2').classList.add('active');
+            const badge = document.getElementById('ass-badge');
+            badge.classList.remove('hidden');
+            badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
+              '<span class="fb-name">' + f.name + '</span>' +
+              '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
+              '</div><div class="upload-error">' + errMsg + '</div>';
             document.getElementById('dz-ass').style.display = 'none';
-            document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + errMsg + '</div>';
             return;
           }
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
@@ -1942,12 +2384,13 @@
         }
       }
       if (assEntries.length === 0) {
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step1').classList.add('done');
-        document.getElementById('step2').style.display = '';
-        document.getElementById('step2').classList.add('active');
+        const badge = document.getElementById('ass-badge');
+        badge.classList.remove('hidden');
+        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
+          '<span class="fb-name">' + Array.from(files).map(f => f.name).join(', ') + '</span>' +
+          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
+          '</div><div class="upload-error">' + t('err.format') + '</div>';
         document.getElementById('dz-ass').style.display = 'none';
-        document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + t('err.format') + '</div>';
         return;
       }
       S.assFiles = [];
@@ -2588,13 +3031,19 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      try { const saved = localStorage.getItem('ass-subset-lang'); if (saved) currentLang = saved; }
-      catch (_) { }
-      if (!localStorage.getItem('ass-subset-lang') && navigator.language && navigator.language.startsWith('en')) currentLang = 'en';
+      try {
+        const saved = localStorage.getItem('ass-subset-lang');
+        if (saved && I18N[saved]) currentLang = saved;
+      } catch (_) { }
+      if (!I18N[currentLang] || currentLang === 'zh') {
+        const nav = (navigator.language || '').toLowerCase();
+        if (nav.startsWith('zh-tw') || nav.startsWith('zh-hk') || nav.startsWith('zh-mo')) currentLang = 'zh-TW';
+        else if (nav.startsWith('en')) currentLang = 'en';
+        else if (nav.startsWith('ja')) currentLang = 'ja';
+        else if (nav.startsWith('ko')) currentLang = 'ko';
+        else if (nav.startsWith('es')) currentLang = 'es';
+      }
       applyI18n();
-      const v = document.querySelector('meta[name="version"]');
-      if (v) document.getElementById('ver').textContent += ' v' + v.content;
-
       updateStepStatus();
       renderFontPaths();
 
