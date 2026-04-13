@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.14">
+  <meta name="version" content="2.3">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1328,13 +1328,20 @@
             <strong data-i18n="opt.font.title">嵌入引用字体</strong>
             <span id="opt-font-desc" data-i18n="opt.font.desc">扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积</span>
           </div>
-          <span class="opt-tag">TTF / OTF / TTC</span>
+          <span class="opt-tag">TTF / OTF / TTC / WOFF / WOFF2</span>
         </label>
         <label class="opt-row" id="opt-row-sysfont">
           <input type="checkbox" id="opt-sysfont" aria-describedby="opt-sysfont-desc">
           <div class="opt-label">
             <strong data-i18n="opt.sysfont.title">嵌入系统字体</strong>
-            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）</span>
+            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入</span>
+          </div>
+        </label>
+        <label class="opt-row disabled" id="opt-row-strip">
+          <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
+          <div class="opt-label">
+            <strong data-i18n="opt.strip.title">去除内嵌字体</strong>
+            <span id="opt-strip-desc" data-i18n="opt.strip.desc">仅保留绘图相关的字体（如有），移除其他已存在的非标准内嵌字体，减小文件体积。</span>
           </div>
         </label>
         <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠
@@ -1345,7 +1352,7 @@
           <hr class="divider">
           <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">上传字体文件</p>
           <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
-            <span data-i18n="font.upload.drop">点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）</span>
+            <span data-i18n="font.upload.drop">点击选择字体或 .zip 压缩包，或拖拽文件/文件夹到此处（支持 TTF / OTF / TTC…，可多选；不支持可变字体）</span>
           </label>
           <div id="font-loading-notice" class="font-loading-notice hidden" role="status" aria-live="polite">
             <div id="fln-text" class="fln-text"></div>
@@ -1355,7 +1362,7 @@
               <div class="progress-text" id="fln-progress-text" aria-live="off"></div>
             </div>
           </div>
-          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden"
+          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.woff,.woff2,.zip" multiple class="file-input-hidden"
             data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
           <details class="font-path-hint">
             <summary data-i18n="font.path.summary">💡 常见字体安装路径</summary>
@@ -1374,9 +1381,13 @@
         <span class="step-subtitle">Convert &amp; Download</span>
       </div>
       <div class="step-body">
-        <div class="flex-gap">
+        <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
           <button class="btn btn-primary" id="btn-convert" data-i18n="btn.convert">开始转换</button>
           <button class="btn btn-success hidden" id="btn-download" data-i18n="btn.download">下载优化后的字幕</button>
+          <label class="btn btn-outline hidden" id="opt-optimize-wrap" style="gap: 0.4rem; cursor: pointer; user-select: none; display: inline-flex; align-items: center; padding: 0.8rem 1.25rem; line-height: 1; height: auto;">
+            <input type="checkbox" id="opt-append-optimize" checked aria-labelledby="opt-append-optimize-lbl" style="width:14px;height:14px;accent-color:var(--ink);cursor:pointer;flex-shrink:0;">
+            <span id="opt-append-optimize-lbl" data-i18n="opt.append_optimize">追加 _optimized 后缀</span>
+          </label>
         </div>
         <div id="progress-area" class="hidden">
           <div class="progress-wrap">
@@ -1470,12 +1481,14 @@
         'aria.lang_toggle': '切换语言',
         'aria.log_box': '处理日志',
         'aria.modal_close': '关闭预览',
+        'aria.preview_dl_font': '下载字体 {name}',
         'btn.convert': '开始转换',
         'btn.converting': '处理中…',
         'btn.discuss': '讨论',
 
         'btn.download': '下载优化后的字幕',
         'btn.download_zip': '下载全部 (ZIP)',
+        'btn.download_font': '下载',
         'btn.install': '安装',
         'btn.preview': '预览',
         'btn.svg': 'SVG 转 ASS 绘图指令',
@@ -1486,6 +1499,7 @@
         'err.invalid': '⚠ 格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
         'err.no_events': '⚠ 格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
         'err.zip_depth': '⚠ ZIP 嵌套层数超过 {limit} 层限制，已停止解压。',
+        'err.folder_depth': '⚠ 文件夹嵌套层数超过 {limit} 层限制，已停止遍历。',
         'err.zip_corrupt': '⚠ ZIP 文件已损坏或格式不受支持，无法读取。',
         'err.zip_too_large': '⚠ 文件过大，浏览器无法处理。请拆分后分批上传。',
         'err.file_too_large': '⚠ 单个文件超过 2 GB，浏览器内存限制无法处理，请拆分后上传。',
@@ -1502,7 +1516,7 @@
         'font.path.summary': '💡 常见字体安装路径',
         'font.skipped': '缺失',
         'font.system.missing': '[系统字体] 需提供',
-        'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
+        'font.upload.drop': '点击选择字体或 .zip 压缩包，或拖拽文件/文件夹到此处（支持 TTF / OTF / TTC…，可多选；不支持可变字体）',
         'font.upload.title': '上传字体文件',
         'font.loading.label': '正在读取字体文件，请稍候…',
         'font.loading.matching': '正在识别字体 {current} / {total}',
@@ -1539,8 +1553,11 @@
         'opt.draw.title': '子集化绘图指令',
         'opt.font.desc': '扫描字幕使用的字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
         'opt.font.title': '嵌入引用字体',
-        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）',
+        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入',
         'opt.sysfont.title': '嵌入系统字体',
+        'opt.strip.desc': '仅保留绘图相关的字体（如有），移除其他已存在的非标准内嵌字体，减小文件体积。',
+        'opt.strip.title': '去除内嵌字体',
+        'opt.append_optimize': '追加 _optimized 后缀',
         'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
         'path.mac': 'macOS：/Library/Fonts（建议先复制到桌面再上传）',
         'path.win': 'Windows：C:\\Windows\\Fonts（建议先复制到桌面再上传）',
@@ -1563,7 +1580,7 @@
         'step.active': '（正在进行）',
         'step.done': '（已完成）',
         'step1.drop': '拖拽字幕文件到此，或点击选择',
-        'step1.hint': '上传 .ass 或 .ssa 字幕文件，支持批量转换和 ZIP 格式上传',
+        'step1.hint': '支持 .ass、.ssa、zip 压缩包及文件夹拖拽上传 — 多选批量转换',
         'step1.title': '上传字幕文件',
         'step2.title': '分析结果',
         'step3.title': '选择操作',
@@ -1584,11 +1601,13 @@
         'aria.lang_toggle': '切換語言',
         'aria.log_box': '處理日誌',
         'aria.modal_close': '關閉預覽',
+        'aria.preview_dl_font': '下載字型 {name}',
         'btn.convert': '開始轉換',
         'btn.converting': '處理中…',
         'btn.discuss': '討論',
         'btn.download': '下載優化後的字幕',
         'btn.download_zip': '下載全部 (ZIP)',
+        'btn.download_font': '下載',
         'btn.install': '安裝',
         'btn.preview': '預覽',
         'btn.svg': 'SVG 轉 ASS 繪圖指令',
@@ -1599,6 +1618,7 @@
         'err.invalid': '⚠ 格式驗證失敗：「{name}」不是有效的 ASS/SSA 字幕檔。',
         'err.no_events': '⚠ 格式驗證失敗：「{name}」的 [Events] 區塊缺少 Format 或 Dialogue 行，無法解析。',
         'err.zip_depth': '⚠ ZIP 嵌套層數超過 {limit} 層限制，已停止解壓。',
+        'err.folder_depth': '⚠ 資料夾嵌套層數超過 {limit} 層限制，已停止遍歷。',
         'err.zip_corrupt': '⚠ ZIP 檔案已損毀或格式不受支援，無法讀取。',
         'err.zip_too_large': '⚠ 檔案過大，瀏覽器無法處理。請拆分後分批上傳。',
         'err.file_too_large': '⚠ 單一檔案超過 2 GB，瀏覽器記憶體限制無法處理，請拆分後上傳。',
@@ -1615,7 +1635,7 @@
         'font.path.summary': '💡 常見字型安裝路徑',
         'font.skipped': '缺失',
         'font.system.missing': '[系統字型] 需提供',
-        'font.upload.drop': '點擊選擇字型或 ZIP 壓縮包，或拖曳到此處（支援 TTF / OTF / TTC，可多選；不支援可變字型）',
+        'font.upload.drop': '點擊選擇字型或 .zip 壓縮包，或拖曳檔案/資料夾到此處（支援 TTF / OTF / TTC…，可多選；不支援可變字型）',
         'font.upload.title': '上傳字型檔',
         'font.loading.label': '正在讀取字型檔，請稍候…',
         'font.loading.matching': '正在識別字型 {current} / {total}',
@@ -1652,8 +1672,11 @@
         'opt.draw.title': '子集化繪圖指令',
         'opt.font.desc': '掃描字幕使用的字型，子集化後嵌入字幕；僅保留實際使用的字元，大幅縮小字型體積',
         'opt.font.title': '嵌入引用字型',
-        'opt.sysfont.desc': '將字幕引用的系統字型一併子集化嵌入（需手動上傳或從本機嘗試載入）',
+        'opt.sysfont.desc': '將字幕引用的系統字型一併子集化嵌入',
         'opt.sysfont.title': '嵌入系統字型',
+        'opt.strip.desc': '僅保留繪圖相關的字型（如有），移除其他已存在的非標準內嵌字型，減小檔案體積。',
+        'opt.strip.title': '去除內嵌字型',
+        'opt.append_optimize': '追加 _optimized 後綴',
         'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
         'path.mac': 'macOS：/Library/Fonts（建議先複製到桌面再上傳）',
         'path.win': 'Windows：C:\\Windows\\Fonts（建議先複製到桌面再上傳）',
@@ -1675,7 +1698,7 @@
         'step.active': '（進行中）',
         'step.done': '（已完成）',
         'step1.drop': '拖曳字幕檔到此，或點擊選擇',
-        'step1.hint': '上傳 .ass 或 .ssa 字幕檔，支援批量轉換和 ZIP 格式上傳',
+        'step1.hint': '	支援 .ass、.ssa 、zip 壓縮包及資料夾拖曳上傳 — 多選批量轉換',
         'step1.title': '上傳字幕檔',
         'step2.title': '分析結果',
         'step3.title': '選擇操作',
@@ -1696,12 +1719,14 @@
         'aria.lang_toggle': 'Switch language',
         'aria.log_box': 'Processing log',
         'aria.modal_close': 'Close preview',
+        'aria.preview_dl_font': 'Download font {name}',
         'btn.convert': 'Run Subsetter',
         'btn.converting': 'Processing…',
         'btn.discuss': 'Discussion',
 
         'btn.download': 'Download Output',
         'btn.download_zip': 'Download All (ZIP)',
+        'btn.download_font': 'Download',
         'btn.install': 'Install',
         'btn.preview': 'Preview',
         'btn.svg': 'SVG to ASS Draw',
@@ -1712,6 +1737,7 @@
         'err.invalid': '⚠ Validation failed: "{name}" is not a valid ASS/SSA script.',
         'err.no_events': '⚠ Validation failed: "{name}" has no valid Format/Dialogue lines in [Events].',
         'err.zip_depth': '⚠ ZIP nesting exceeds {limit} levels — extraction stopped.',
+        'err.folder_depth': '⚠ Folder nesting exceeds {limit} levels — traversal stopped.',
         'err.zip_corrupt': '⚠ The ZIP file is corrupted or in an unsupported format and cannot be read.',
         'err.zip_too_large': '⚠ The file is too large for the browser to handle. Please split it into smaller parts.',
         'err.file_too_large': '⚠ This file exceeds 2 GB — the browser cannot process files this large. Please split it before uploading.',
@@ -1728,7 +1754,7 @@
         'font.path.summary': '💡 Common font directories',
         'font.skipped': 'skipped',
         'font.system.missing': '[System font] Upload required',
-        'font.upload.drop': 'Click to select fonts or a ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
+        'font.upload.drop': 'Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC…, multi-select; variable fonts not supported)',
         'font.upload.title': 'Font Files',
         'font.loading.label': 'Reading font files, please wait…',
         'font.loading.matching': 'Identifying font {current} / {total}',
@@ -1765,8 +1791,11 @@
         'opt.draw.title': 'Subset Draw Commands',
         'opt.font.desc': 'Scan fonts referenced in the script, subset to used characters only, and embed them directly into the output.',
         'opt.font.title': 'Embed Referenced Fonts',
-        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in the script (requires manual upload or local font access).',
+        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in the script.',
         'opt.sysfont.title': 'Embed System Fonts',
+        'opt.strip.desc': 'Remove existing non-standard embedded fonts to reduce file size (keeps drawing fonts).',
+        'opt.strip.title': 'Strip Embedded Fonts',
+        'opt.append_optimize': 'Add _optimized suffix',
         'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (copy to Desktop before uploading)',
         'path.win': 'Windows: C:\\Windows\\Fonts (copy to Desktop before uploading)',
@@ -1788,7 +1817,7 @@
         'step.active': '(in progress)',
         'step.done': '(done)',
         'step1.drop': 'Drop your script here, or click to browse',
-        'step1.hint': 'Upload .ass or .ssa subtitle files — batch processing and ZIP upload supported',
+        'step1.hint': '.ass and .ssa files, ZIP archives, and folder drag-and-drop supported — multi-select for batch conversion',
         'step1.title': 'Upload Script',
         'step2.title': 'Analysis',
         'step3.title': 'Options',
@@ -1809,12 +1838,14 @@
         'aria.lang_toggle': '言語を切り替える',
         'aria.log_box': '処理ログ',
         'aria.modal_close': 'プレビューを閉じる',
+        'aria.preview_dl_font': 'フォント {name} をダウンロード',
         'btn.convert': '変換開始',
         'btn.converting': '処理中…',
         'btn.discuss': 'ディスカッション',
 
         'btn.download': '最適化済み字幕をダウンロード',
         'btn.download_zip': 'すべてダウンロード (ZIP)',
+        'btn.download_font': 'ダウンロード',
         'btn.install': 'インストール',
         'btn.preview': 'プレビュー',
         'btn.svg': 'SVG → ASS描画コマンド',
@@ -1825,6 +1856,7 @@
         'err.invalid': '⚠ 検証エラー：「{name}」は有効な ASS/SSA ファイルではありません。',
         'err.no_events': '⚠ 検証エラー：「{name}」の [Events] セクションに Format または Dialogue 行がありません。',
         'err.zip_depth': '⚠ ZIP のネストが {limit} 層を超えました。解凍を停止しました。',
+        'err.folder_depth': '⚠ フォルダのネストが {limit} 層を超えました。トラバーサルを停止しました。',
         'err.zip_corrupt': '⚠ ZIP ファイルが破損しているか、サポートされていない形式です。',
         'err.zip_too_large': '⚠ ファイルが大きすぎてブラウザで処理できません。分割してからアップロードしてください。',
         'err.file_too_large': '⚠ ファイルが 2 GB を超えており、ブラウザのメモリ制限により処理できません。分割してアップロードしてください。',
@@ -1841,7 +1873,7 @@
         'font.path.summary': '💡 よく使われるフォントディレクトリ',
         'font.skipped': 'スキップ',
         'font.system.missing': '[システムフォント] アップロードが必要',
-        'font.upload.drop': 'フォントまたは ZIP ファイルを選択、またはここにドラッグ（TTF / OTF / TTC 対応；可変フォント非対応）',
+        'font.upload.drop': 'フォントまたは .zip ファイルを選択、またはここにファイル/フォルダをドラッグ（TTF / OTF / TTC…対応；可変フォント非対応）',
         'font.upload.title': 'フォントファイル',
         'font.loading.label': 'フォントファイルを読み込んでいます。しばらくお待ちください…',
         'font.loading.matching': 'フォントを識別中 {current} / {total}',
@@ -1878,8 +1910,11 @@
         'opt.draw.title': '描画コマンドのサブセット化',
         'opt.font.desc': 'スクリプトで参照されているフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
         'opt.font.title': '参照フォントの埋め込み',
-        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントもサブセット化して埋め込みます（手動アップロードまたはローカルアクセスが必要）。',
+        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントもサブセット化して埋め込みます。',
         'opt.sysfont.title': 'システムフォントの埋め込み',
+        'opt.strip.desc': '既存の非標準埋め込みフォントを削除し、ファイルサイズを削減します（描画用フォントは保持されます）。',
+        'opt.strip.title': '埋め込みフォントを削除',
+        'opt.append_optimize': '_optimized 接尾辞を追加',
         'path.linux': 'Linux：~/.fonts または /usr/share/fonts',
         'path.mac': 'macOS：/Library/Fonts（アップロード前にデスクトップにコピーを推奨）',
         'path.win': 'Windows：C:\\Windows\\Fonts（アップロード前にデスクトップにコピーを推奨）',
@@ -1901,7 +1936,7 @@
         'step.active': '（進行中）',
         'step.done': '（完了）',
         'step1.drop': 'スクリプトをここにドロップ、またはクリックして選択',
-        'step1.hint': '.ass または .ssa 字幕ファイルをアップロード — バッチ処理と ZIP 対応',
+        'step1.hint': '.ass、.ssa、.zip、フォルダのドラッグアンドドロップに対応 — 複数選択でバッチ変換',
         'step1.title': 'スクリプトをアップロード',
         'step2.title': '解析結果',
         'step3.title': 'オプション',
@@ -1922,12 +1957,14 @@
         'aria.lang_toggle': '언어 변경',
         'aria.log_box': '처리 로그',
         'aria.modal_close': '미리보기 닫기',
+        'aria.preview_dl_font': '폰트 {name} 다운로드',
         'btn.convert': '변환 시작',
         'btn.converting': '처리 중…',
         'btn.discuss': '토론',
 
         'btn.download': '최적화된 자막 다운로드',
         'btn.download_zip': '전체 다운로드 (ZIP)',
+        'btn.download_font': '다운로드',
         'btn.install': '설치',
         'btn.preview': '미리보기',
         'btn.svg': 'SVG → ASS 드로우',
@@ -1938,6 +1975,7 @@
         'err.invalid': '⚠ 검증 실패: "{name}"은(는) 유효한 ASS/SSA 파일이 아닙니다.',
         'err.no_events': '⚠ 검증 실패: "{name}"의 [Events] 섹션에 Format 또는 Dialogue 줄이 없습니다.',
         'err.zip_depth': '⚠ ZIP 중첩이 {limit}단계를 초과했습니다 — 압축 해제를 중단했습니다.',
+        'err.folder_depth': '⚠ 폴더 중첩이 {limit}단계를 초과했습니다 — 탐색을 중단했습니다.',
         'err.zip_corrupt': '⚠ ZIP 파일이 손상되었거나 지원되지 않는 형식입니다.',
         'err.zip_too_large': '⚠ 파일이 너무 커서 브라우저에서 처리할 수 없습니다. 분할 후 업로드해 주세요.',
         'err.file_too_large': '⚠ 파일이 2 GB를 초과하여 브라우저 메모리 한계로 처리할 수 없습니다. 분할 후 업로드해 주세요.',
@@ -1954,7 +1992,7 @@
         'font.path.summary': '💡 주요 폰트 디렉터리',
         'font.skipped': '건너뜀',
         'font.system.missing': '[시스템 폰트] 업로드 필요',
-        'font.upload.drop': '폰트 또는 ZIP 파일을 선택하거나 여기에 드래그하세요 (TTF / OTF / TTC; 가변 폰트 미지원)',
+        'font.upload.drop': '폰트 또는 .zip 파일을 선택하거나 여기에 파일/폴더를 드래그하세요 (TTF / OTF / TTC… 지원; 가변 폰트 미지원)',
         'font.upload.title': '폰트 파일',
         'font.loading.label': '폰트 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.loading.matching': '폰트 식별 중 {current} / {total}',
@@ -1991,8 +2029,11 @@
         'opt.draw.title': '드로우 명령어 서브셋화',
         'opt.font.desc': '스크립트에서 참조된 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 직접 삽입합니다.',
         'opt.font.title': '참조 폰트 삽입',
-        'opt.sysfont.desc': '스크립트에서 참조된 시스템 폰트도 서브셋화하여 삽입합니다 (수동 업로드 또는 로컬 폰트 접근 필요).',
+        'opt.sysfont.desc': '스크립트에서 참조된 시스템 폰트도 서브셋화하여 삽입합니다.',
         'opt.sysfont.title': '시스템 폰트 삽입',
+        'opt.strip.desc': '기존의 비표준 포함된 폰트를 제거하여 파일 크기를 줄입니다 (그리기용 폰트 유지).',
+        'opt.strip.title': '포함된 폰트 제거',
+        'opt.append_optimize': '_optimized 접미사 추가',
         'path.linux': 'Linux: ~/.fonts 또는 /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (업로드 전 바탕화면에 복사 권장)',
         'path.win': 'Windows: C:\\Windows\\Fonts (업로드 전 바탕화면에 복사 권장)',
@@ -2014,7 +2055,7 @@
         'step.active': '(진행 중)',
         'step.done': '(완료)',
         'step1.drop': '스크립트를 여기에 드래그하거나 클릭하여 선택',
-        'step1.hint': '.ass 또는 .ssa 자막 파일 업로드 — 배치 처리 및 ZIP 업로드 지원',
+        'step1.hint': '.ass, .ssa, .zip 및 폴더 드래그 앤 드롭 지원 — 다중 선택으로 일괄 변환',
         'step1.title': '자막 스크립트 업로드',
         'step2.title': '분석 결과',
         'step3.title': '옵션',
@@ -2035,12 +2076,14 @@
         'aria.lang_toggle': 'Cambiar idioma',
         'aria.log_box': 'Registro de procesamiento',
         'aria.modal_close': 'Cerrar vista previa',
+        'aria.preview_dl_font': 'Descargar fuente {name}',
         'btn.convert': 'Iniciar conversión',
         'btn.converting': 'Procesando…',
         'btn.discuss': 'Discusión',
 
         'btn.download': 'Descargar subtítulo optimizado',
         'btn.download_zip': 'Descargar todo (ZIP)',
+        'btn.download_font': 'Descargar',
         'btn.install': 'Instalar',
         'btn.preview': 'Vista previa',
         'btn.svg': 'SVG a ASS Draw',
@@ -2051,6 +2094,7 @@
         'err.invalid': '⚠ Validación fallida: "{name}" no es un archivo ASS/SSA válido.',
         'err.no_events': '⚠ Validación fallida: "{name}" no tiene líneas Format/Dialogue en [Events].',
         'err.zip_depth': '⚠ El ZIP tiene más de {limit} niveles de anidación — extracción detenida.',
+        'err.folder_depth': '⚠ La carpeta tiene más de {limit} niveles de anidación — recorrido detenido.',
         'err.zip_corrupt': '⚠ El archivo ZIP está dañado o en un formato no compatible.',
         'err.zip_too_large': '⚠ El archivo es demasiado grande para que el navegador lo procese. Por favor divisalo en partes más pequeñas.',
         'err.file_too_large': '⚠ Este archivo supera los 2 GB — el navegador no puede procesar archivos tan grandes. Por favor divisalo antes de subir.',
@@ -2067,7 +2111,7 @@
         'font.path.summary': '💡 Directorios de fuentes comunes',
         'font.skipped': 'omitida',
         'font.system.missing': '[Fuente del sistema] Requiere subir',
-        'font.upload.drop': 'Hacé clic para seleccionar fuentes o un ZIP, o arrastrá aquí (TTF / OTF / TTC; fuentes variables no compatibles)',
+        'font.upload.drop': 'Haz clic para seleccionar fuentes o un .zip, o arrastra archivos/carpetas aquí (TTF / OTF / TTC…; fuentes variables no compatibles)',
         'font.upload.title': 'Archivos de fuentes',
         'font.loading.label': 'Leyendo archivos de fuentes, por favor esperá…',
         'font.loading.matching': 'Identificando fuente {current} / {total}',
@@ -2104,8 +2148,11 @@
         'opt.draw.title': 'Subconjunto de comandos de dibujo',
         'opt.font.desc': 'Escanea las fuentes del script, crea subconjuntos con solo los caracteres usados y los incrusta en la salida.',
         'opt.font.title': 'Incrustar fuentes referenciadas',
-        'opt.sysfont.desc': 'También crea subconjunto e incrusta las fuentes del sistema referenciadas (requiere subirlas o acceso local).',
+        'opt.sysfont.desc': 'También crea subconjunto e incrusta las fuentes del sistema referenciadas.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
+        'opt.strip.desc': 'Elimina fuentes incrustadas no estándar existentes para reducir el tamaño del archivo (mantiene las fuentes de dibujo).',
+        'opt.strip.title': 'Eliminar fuentes incrustadas',
+        'opt.append_optimize': 'Añadir sufijo _optimized',
         'path.linux': 'Linux: ~/.fonts o /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (copiá al Escritorio antes de subir)',
         'path.win': 'Windows: C:\\Windows\\Fonts (copiá al Escritorio antes de subir)',
@@ -2127,7 +2174,7 @@
         'step.active': '(en progreso)',
         'step.done': '(completado)',
         'step1.drop': 'Arrastrá tu script aquí, o hacé clic para seleccionar',
-        'step1.hint': 'Carga archivos de subtítulos .ass o .ssa — procesamiento por lotes y carga de ZIP disponibles',
+        'step1.hint': 'Archivos .ass, .ssa, .zip y carpetas con arrastrar y soltar — múltiple selección para lotes',
         'step1.title': 'Subir script de subtítulos',
         'step2.title': 'Análisis',
         'step3.title': 'Opciones',
@@ -2148,12 +2195,14 @@
         'aria.lang_toggle': 'Сменить язык',
         'aria.log_box': 'Журнал обработки',
         'aria.modal_close': 'Закрыть предпросмотр',
+        'aria.preview_dl_font': 'Скачать шрифт {name}',
         'btn.convert': 'Запустить субсеттер',
         'btn.converting': 'Обработка…',
         'btn.discuss': 'Обсуждение',
 
         'btn.download': 'Скачать результат',
         'btn.download_zip': 'Скачать всё (ZIP)',
+        'btn.download_font': 'Скачать',
         'btn.install': 'Установить',
         'btn.preview': 'Предпросмотр',
         'btn.svg': 'SVG → ASS рисование',
@@ -2164,6 +2213,7 @@
         'err.invalid': '⚠ Ошибка проверки: «{name}» не является корректным файлом ASS/SSA.',
         'err.no_events': '⚠ Ошибка проверки: в секции [Events] файла «{name}» отсутствуют строки Format или Dialogue.',
         'err.zip_depth': '⚠ Вложенность ZIP превышает {limit} уровней — извлечение остановлено.',
+        'err.folder_depth': '⚠ Вложенность папки превышает {limit} уровней — обход остановлен.',
         'err.zip_corrupt': '⚠ ZIP-файл повреждён или имеет неподдерживаемый формат.',
         'err.zip_too_large': '⚠ Файл слишком большой для обработки в браузере. Пожалуйста, разделите его на части.',
         'err.file_too_large': '⚠ Файл превышает 2 ГБ — браузер не может его обработать. Пожалуйста, разделите его перед загрузкой.',
@@ -2180,7 +2230,7 @@
         'font.path.summary': '💡 Стандартные папки шрифтов',
         'font.skipped': 'пропущен',
         'font.system.missing': '[Системный шрифт] Требует загрузки',
-        'font.upload.drop': 'Нажмите для выбора шрифтов или ZIP-архива, или перетащите сюда (TTF / OTF / TTC; вариативные шрифты не поддерживаются)',
+        'font.upload.drop': 'Нажмите для выбора шрифтов или .zip-архива, или перетащите файлы/папки сюда (TTF / OTF / TTC…; вариативные шрифты не поддерживаются)',
         'font.upload.title': 'Файлы шрифтов',
         'font.loading.label': 'Чтение файлов шрифтов, пожалуйста подождите…',
         'font.loading.matching': 'Идентификация шрифта {current} / {total}',
@@ -2217,8 +2267,11 @@
         'opt.draw.title': 'Подмножество команд рисования',
         'opt.font.desc': 'Сканирует шрифты, используемые в скрипте, создаёт подмножество из реально применяемых символов и встраивает их в выходной файл.',
         'opt.font.title': 'Встроить используемые шрифты',
-        'opt.sysfont.desc': 'Также создаёт подмножество и встраивает системные шрифты, упоминаемые в скрипте (требует ручной загрузки или локального доступа).',
+        'opt.sysfont.desc': 'Также создаёт подмножество и встраивает системные шрифты, указанные в скрипте.',
         'opt.sysfont.title': 'Встроить системные шрифты',
+        'opt.strip.desc': 'Удаляет существующие нестандартные встроенные шрифты для уменьшения размера файла (сохраняет шрифты векторных рисунков).',
+        'opt.strip.title': 'Удалить встроенные шрифты',
+        'opt.append_optimize': 'Добавить суффикс _optimized',
         'path.linux': 'Linux: ~/.fonts или /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (скопируйте на рабочий стол перед загрузкой)',
         'path.win': 'Windows: C:\\Windows\\Fonts (скопируйте на рабочий стол перед загрузкой)',
@@ -2240,7 +2293,7 @@
         'step.active': '(в процессе)',
         'step.done': '(завершено)',
         'step1.drop': 'Перетащите скрипт сюда или нажмите для выбора',
-        'step1.hint': 'Загрузите файлы субтитров .ass или .ssa — поддерживается пакетная обработка и загрузка ZIP',
+        'step1.hint': 'Файлы .ass, .ssa, .zip и перетаскивание папок — мультивыбор для пакетной обработки',
         'step1.title': 'Загрузить скрипт',
         'step2.title': 'Результаты анализа',
         'step3.title': 'Параметры',
@@ -2261,12 +2314,14 @@
         'aria.lang_toggle': 'Alterar idioma',
         'aria.log_box': 'Log de processamento',
         'aria.modal_close': 'Fechar pré-visualização',
+        'aria.preview_dl_font': 'Baixar fonte {name}',
         'btn.convert': 'Executar Subsetter',
         'btn.converting': 'Processando…',
         'btn.discuss': 'Discussão',
 
         'btn.download': 'Baixar legenda otimizada',
         'btn.download_zip': 'Baixar tudo (ZIP)',
+        'btn.download_font': 'Baixar',
         'btn.install': 'Instalar',
         'btn.preview': 'Pré-visualizar',
         'btn.svg': 'SVG para ASS Draw',
@@ -2277,6 +2332,7 @@
         'err.invalid': '⚠ Validação falhou: "{name}" não é um arquivo ASS/SSA válido.',
         'err.no_events': '⚠ Validação falhou: "{name}" não possui linhas Format/Dialogue em [Events].',
         'err.zip_depth': '⚠ O ZIP possui mais de {limit} níveis de aninhamento — extração interrompida.',
+        'err.folder_depth': '⚠ A pasta possui mais de {limit} níveis de aninhamento — travessia interrompida.',
         'err.zip_corrupt': '⚠ O arquivo ZIP está corrompido ou em um formato não suportado.',
         'err.zip_too_large': '⚠ O arquivo é grande demais para o navegador processar. Por favor, divida-o em partes menores.',
         'err.file_too_large': '⚠ Este arquivo supera 2 GB — o navegador não consegue processá-lo. Por favor, divida-o antes de enviar.',
@@ -2293,7 +2349,7 @@
         'font.path.summary': '💡 Diretórios de fontes comuns',
         'font.skipped': 'ignorada',
         'font.system.missing': '[Fonte do sistema] Envio necessário',
-        'font.upload.drop': 'Clique para selecionar fontes ou um ZIP, ou arraste aqui (TTF / OTF / TTC; fontes variáveis não suportadas)',
+        'font.upload.drop': 'Clique para selecionar fontes ou um .zip, ou arraste arquivos/pastas aqui (TTF / OTF / TTC…; fontes variáveis não suportadas)',
         'font.upload.title': 'Arquivos de fonte',
         'font.loading.label': 'Lendo arquivos de fonte, aguarde…',
         'font.loading.matching': 'Identificando fonte {current} / {total}',
@@ -2330,8 +2386,11 @@
         'opt.draw.title': 'Subconjunto de comandos de desenho',
         'opt.font.desc': 'Escaneia as fontes referenciadas no script, cria subconjunto com apenas os caracteres usados e incorpora diretamente na saída.',
         'opt.font.title': 'Incorporar fontes referenciadas',
-        'opt.sysfont.desc': 'Também cria subconjunto e incorpora fontes do sistema referenciadas no script (requer envio manual ou acesso local).',
+        'opt.sysfont.desc': 'Também cria subconjunto e incorpora fontes do sistema referenciadas no script.',
         'opt.sysfont.title': 'Incorporar fontes do sistema',
+        'opt.strip.desc': 'Remove fontes embutidas não padronizadas existentes para reduzir o tamanho do arquivo (mantém fontes de desenho).',
+        'opt.strip.title': 'Remover Fontes Embutidas',
+        'opt.append_optimize': 'Adicionar sufixo _optimized',
         'path.linux': 'Linux: ~/.fonts ou /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (copie para a Área de Trabalho antes de enviar)',
         'path.win': 'Windows: C:\\Windows\\Fonts (copie para a Área de Trabalho antes de enviar)',
@@ -2353,7 +2412,7 @@
         'step.active': '(em andamento)',
         'step.done': '(concluído)',
         'step1.drop': 'Arraste seu script aqui ou clique para selecionar',
-        'step1.hint': 'Envie arquivos de legenda .ass ou .ssa — processamento em lote e upload ZIP suportados',
+        'step1.hint': 'Arquivos .ass, .ssa, .zip e arrastar pastas — seleção múltipla para lote',
         'step1.title': 'Enviar script',
         'step2.title': 'Análise',
         'step3.title': 'Opções',
@@ -2374,12 +2433,14 @@
         'aria.lang_toggle': 'تغيير اللغة',
         'aria.log_box': 'سجل المعالجة',
         'aria.modal_close': 'إغلاق المعاينة',
+        'aria.preview_dl_font': 'تنزيل خط {name}',
         'btn.convert': 'تشغيل المُقلِّص',
         'btn.converting': 'جارٍ المعالجة…',
         'btn.discuss': 'نقاش',
 
         'btn.download': 'تحميل الناتج',
         'btn.download_zip': 'تحميل الكل (ZIP)',
+        'btn.download_font': 'تنزيل',
         'btn.install': 'تثبيت',
         'btn.preview': 'معاينة',
         'btn.svg': 'SVG إلى ASS Draw',
@@ -2390,6 +2451,7 @@
         'err.invalid': '⚠ فشل التحقق: "{name}" ليس ملف ASS/SSA صحيحاً.',
         'err.no_events': '⚠ فشل التحقق: لا توجد أسطر Format/Dialogue في قسم [Events] بالملف "{name}".',
         'err.zip_depth': '⚠ يتجاوز تداخل ZIP {limit} مستويات — توقف الاستخراج.',
+        'err.folder_depth': '⚠ يتجاوز تداخل المجلد {limit} مستويات — توقف الاجتياز.',
         'err.zip_corrupt': '⚠ ملف ZIP تالف أو بتنسيق غير مدعوم.',
         'err.zip_too_large': '⚠ الملف كبير جداً ليعالجه المتصفح. يرجى تقسيمه إلى أجزاء أصغر.',
         'err.file_too_large': '⚠ يتجاوز هذا الملف 2 GB — لا يستطيع المتصفح معالجته. يرجى تقسيمه قبل الرفع.',
@@ -2406,7 +2468,7 @@
         'font.path.summary': '💡 مسارات الخطوط الشائعة',
         'font.skipped': 'تم التخطي',
         'font.system.missing': '[خط النظام] يلزم الرفع',
-        'font.upload.drop': 'انقر لاختيار الخطوط أو ملف ZIP، أو اسحب هنا (TTF / OTF / TTC؛ الخطوط المتغيرة غير مدعومة)',
+        'font.upload.drop': 'انقر لاختيار الخطوط أو ملف .zip، أو اسحب الملفات/المجلدات هنا (TTF / OTF / TTC…؛ الخطوط المتغيرة غير مدعومة)',
         'font.upload.title': 'ملفات الخطوط',
         'font.loading.label': 'جارٍ قراءة ملفات الخطوط، يرجى الانتظار…',
         'font.loading.matching': 'جارٍ التعرف على الخط {current} / {total}',
@@ -2443,8 +2505,11 @@
         'opt.draw.title': 'تقليص أوامر الرسم',
         'opt.font.desc': 'يفحص الخطوط المشار إليها في النص، ويُنشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها مباشرةً في الملف الناتج.',
         'opt.font.title': 'تضمين الخطوط المشار إليها',
-        'opt.sysfont.desc': 'يُضمّن أيضاً خطوط النظام المشار إليها في النص (يتطلب الرفع اليدوي أو الوصول المحلي).',
+        'opt.sysfont.desc': 'يُضمّن أيضاً خطوط النظام المشار إليها في النص .',
         'opt.sysfont.title': 'تضمين خطوط النظام',
+        'opt.strip.desc': 'يزيل الخطوط المضمنة غير القياسية الحالية لتقليل حجم الملف (يحتفظ بخطوط الرسم).',
+        'opt.strip.title': 'إزالة الخطوط المضمنة',
+        'opt.append_optimize': 'إضافة لاحقة _optimized',
         'path.linux': 'Linux: ~/.fonts أو /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (انسخ إلى سطح المكتب قبل الرفع)',
         'path.win': 'Windows: C:\\Windows\\Fonts (انسخ إلى سطح المكتب قبل الرفع)',
@@ -2466,7 +2531,7 @@
         'step.active': '(قيد التنفيذ)',
         'step.done': '(مكتمل)',
         'step1.drop': 'اسحب نصك هنا أو انقر للاختيار',
-        'step1.hint': 'ارفع ملفات ترجمة .ass أو .ssa — يدعم المعالجة الجماعية ورفع ZIP',
+        'step1.hint': 'ملفات .ass و.ssa و.zip وسحب المجلدات — متعدد الاختيار للمعالجة الجماعية',
         'step1.title': 'رفع النص',
         'step2.title': 'نتائج التحليل',
         'step3.title': 'الخيارات',
@@ -2493,6 +2558,7 @@
 
         'btn.download': 'Çıktıyı indir',
         'btn.download_zip': 'Tümünü indir (ZIP)',
+        'btn.download_font': 'İndir',
         'btn.install': 'Yükle',
         'btn.preview': 'Önizle',
         'btn.svg': "SVG'den ASS Draw'a",
@@ -2503,6 +2569,7 @@
         'err.invalid': '⚠ Doğrulama hatası: "{name}" geçerli bir ASS/SSA dosyası değil.',
         'err.no_events': '⚠ Doğrulama hatası: "{name}" dosyasının [Events] bölümünde Format veya Dialogue satırı yok.',
         'err.zip_depth': '⚠ ZIP iç içe geçme {limit} seviyeyi aşıyor — çıkarma durduruldu.',
+        'err.folder_depth': '⚠ Klasör iç içe geçme {limit} seviyeyi aşıyor — tarama durduruldu.',
         'err.zip_corrupt': '⚠ ZIP dosyası bozuk veya desteklenmeyen bir formatta.',
         'err.zip_too_large': '⚠ Dosya tarayıcının işleyemeyeceği kadar büyük. Lütfen daha küçük parçalara bölün.',
         'err.file_too_large': '⚠ Bu dosya 2 GB\'ı aşıyor — tarayıcı bu kadar büyük dosyaları işleyemiyor. Lütfen yüklemeden önce bölün.',
@@ -2519,7 +2586,7 @@
         'font.path.summary': '💡 Yaygın font dizinleri',
         'font.skipped': 'atlandı',
         'font.system.missing': '[Sistem fontu] Yükleme gerekli',
-        'font.upload.drop': 'Font veya ZIP seçmek için tıklayın ya da buraya sürükleyin (TTF / OTF / TTC; değişken fontlar desteklenmez)',
+        'font.upload.drop': 'Font veya .zip dosyası seçmek için tıklayın ya da dosya/klasör buraya sürükleyin (TTF / OTF / TTC… desteklenir; değişken fontlar desteklenmez)',
         'font.upload.title': 'Font dosyaları',
         'font.loading.label': 'Font dosyaları okunuyor, lütfen bekleyin…',
         'font.loading.matching': 'Font tanımlanıyor {current} / {total}',
@@ -2556,8 +2623,11 @@
         'opt.draw.title': 'Çizim komutlarını alt kümele',
         'opt.font.desc': 'Scriptte kullanılan fontları tarar, yalnızca kullanılan karakterleri alt kümeleyerek çıktıya gömer.',
         'opt.font.title': 'Kullanılan fontları göm',
-        'opt.sysfont.desc': 'Scriptte geçen sistem fontlarını da alt kümeleyerek gömer (manuel yükleme veya yerel erişim gerekir).',
+        'opt.sysfont.desc': 'Scriptte geçen sistem fontlarını da alt kümeleyerek gömer',
         'opt.sysfont.title': 'Sistem fontlarını göm',
+        'opt.strip.desc': 'Dosya boyutunu küçültmek için mevcut standart dışı gömülü fontları kaldırır (çizim fontları korunur).',
+        'opt.strip.title': 'Gömülü Fontları Kaldır',
+        'opt.append_optimize': '_optimized son ekini ekle',
         'path.linux': 'Linux: ~/.fonts veya /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (yüklemeden önce masaüstüne kopyalayın)',
         'path.win': 'Windows: C:\\Windows\\Fonts (yüklemeden önce masaüstüne kopyalayın)',
@@ -2579,7 +2649,7 @@
         'step.active': '(devam ediyor)',
         'step.done': '(tamamlandı)',
         'step1.drop': 'Scripti buraya sürükle veya tıkla',
-        'step1.hint': '.ass veya .ssa altyazı dosyalarını yükleyin — toplu işlem ve ZIP yükleme desteklenir',
+        'step1.hint': '.ass, .ssa, .zip dosyaları ve klasör sürükle-bırak desteklenir — toplu dönüşüm için çoklu seçim',
         'step1.title': 'Script yükle',
         'step2.title': 'Analiz',
         'step3.title': 'Seçenekler',
@@ -2657,7 +2727,7 @@
       applyI18n();
       renderFontPaths();
       if (S.assFiles.length > 0) {
-        renderAnalysis();
+        renderAnalysis(true);
         if (document.getElementById('opt-font').checked) renderFontList();
       }
       updateStepStatus();
@@ -2665,6 +2735,14 @@
       if (btnConvert && !S.converting) btnConvert.textContent = t('btn.convert');
       const btnDownload = document.getElementById('btn-download');
       if (btnDownload && !btnDownload.classList.contains('hidden') && S.outputBlobs.length === 1) btnDownload.textContent = t('btn.download');
+      
+      if (typeof renderAssBadge === 'function') renderAssBadge();
+      if (typeof renderFontError === 'function') renderFontError();
+      if (typeof renderConvertResults === 'function') renderConvertResults();
+      if (document.getElementById('preview-modal').classList.contains('open')) {
+        document.querySelectorAll('.preview-dl-btn').forEach(btn => btn.textContent = t('btn.download_font'));
+      }
+
       const flnNotice = document.getElementById('font-loading-notice');
       if (flnNotice && !flnNotice.classList.contains('hidden')) {
         flnNotice.setAttribute('aria-label', t('font.loading.aria'));
@@ -2735,6 +2813,7 @@
       if (s.bar) { s.bar.style.width = '0%'; s.bar.setAttribute('aria-valuenow', 0); }
       if (s.txt) s.txt.textContent = '';
     }
+
     let _convHeartbeat = null;
     function startProgressHeartbeat() {
       stopProgressHeartbeat();
@@ -3073,7 +3152,7 @@
         }
       }
 
-      renderAnalysis();
+      renderAnalysis(false);
       updateStepStatus();
     }
 
@@ -3117,7 +3196,7 @@
       updateStepStatus();
     }
 
-    function renderAnalysis() {
+    function renderAnalysis(preserveState = false) {
       const area = document.getElementById('analysis-area');
       area.innerHTML = '';
 
@@ -3174,55 +3253,139 @@
       const rowFont = document.getElementById('opt-row-font');
 
       const shouldDraw = (totalUnique > 0 || hasResubset);
+      const rowStrip = document.getElementById('opt-row-strip');
+      const cbStrip = document.getElementById('opt-strip');
+
+      let hasStripFonts = false;
+      for (const entry of S.assFiles) {
+        if (entry.parsed.embeddedFonts) {
+          for (const efName of Object.keys(entry.parsed.embeddedFonts)) {
+            const baseName = efName.replace(/_\d+\.ttf$/i, '');
+            if (!baseName.toLowerCase().startsWith('assdrawsubset')) {
+              hasStripFonts = true;
+              break;
+            }
+          }
+        }
+        if (hasStripFonts) break;
+      }
+
+      cbStrip.dataset.hasStripFonts = hasStripFonts ? 'true' : 'false';
+      if (hasStripFonts) {
+        rowStrip.classList.remove('disabled');
+        cbStrip.disabled = false;
+        cbStrip.dataset.forceDisabled = 'false';
+      } else {
+        const hasAnyEmbedded = S.assFiles.some(e => {
+          if (!e.parsed.embeddedFonts) return false;
+          return Object.keys(e.parsed.embeddedFonts).length > 0;
+        });
+        rowStrip.classList.add('disabled');
+        cbStrip.disabled = true;
+        cbStrip.dataset.forceDisabled = 'true';
+        cbStrip.checked = false;
+      }
+
+      cbDraw.dataset.shouldEnable = hasDrawings && shouldDraw ? 'true' : 'false';
+      cbFont.dataset.shouldEnable = hasFonts ? 'true' : 'false';
+      cbDraw.dataset.wasChecked = 'false';
+      cbFont.dataset.wasChecked = 'false';
+
       cbDraw.disabled = !hasDrawings || !shouldDraw;
-      cbDraw.checked = hasDrawings && shouldDraw;
-      rowDraw.classList.toggle('selected', hasDrawings && shouldDraw);
+      if (!preserveState) cbDraw.checked = false; // Default unchecked
+      rowDraw.classList.toggle('selected', preserveState ? cbDraw.checked : false);
       rowDraw.classList.toggle('disabled', !hasDrawings || !shouldDraw);
       rowDraw.classList.remove('hidden');
 
       cbFont.disabled = !hasFonts;
-      cbFont.checked = hasFonts;
-      rowFont.classList.toggle('selected', hasFonts);
+      if (!preserveState) cbFont.checked = false; // Default unchecked
+      rowFont.classList.toggle('selected', preserveState ? cbFont.checked : false);
       rowFont.classList.toggle('disabled', !hasFonts);
 
-      document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
-      document.getElementById('copyright-notice').classList.toggle('hidden', !hasFonts);
-      document.getElementById('font-section').classList.toggle('hidden', !hasFonts);
-      document.getElementById('opt-row-sysfont').classList.toggle('hidden', !hasFonts);
+      if (hasStripFonts) {
+        rowStrip.classList.toggle('selected', cbStrip.checked);
+      }
+
+      document.getElementById('drawing-notice').classList.toggle('hidden', true);
+      document.getElementById('copyright-notice').classList.toggle('hidden', true);
+      document.getElementById('font-section').classList.toggle('hidden', true);
+      
+      const rowSys = document.getElementById('opt-row-sysfont');
+      const cbSys = document.getElementById('opt-sysfont');
+      rowSys.classList.remove('hidden'); // No longer hidden
+      if (!preserveState) cbSys.checked = false;
+      cbSys.dataset.shouldEnable = hasFonts ? 'true' : 'false';
+
       if (hasFonts) renderFontList();
 
-      if (shouldDraw || hasFonts) {
+      const hasAnyEmbeddedForStep3 = S.assFiles.some(e => e.parsed.embeddedFonts && Object.keys(e.parsed.embeddedFonts).length > 0);
+      if (shouldDraw || hasFonts || hasStripFonts || cbStrip.checked || hasAnyEmbeddedForStep3) {
         document.getElementById('step3').style.display = '';
         document.getElementById('step3').classList.add('active');
         updateStep4Visibility();
       }
 
-      let hasSysFonts = false;
-      for (const entry of S.assFiles) {
-        if (entry.parsed.systemFontsReferenced && Object.keys(entry.parsed.systemFontsReferenced).length > 0) {
-          hasSysFonts = true;
-          break;
-        }
-      }
+      enforceMutualExclusion();
+    }
+
+    function enforceMutualExclusion() {
+      const cbDraw = document.getElementById('opt-draw');
+      const cbFont = document.getElementById('opt-font');
+      const optSysFont = document.getElementById('opt-sysfont');
+      const cbStrip = document.getElementById('opt-strip');
       const btnLocal = document.getElementById('btn-local-font');
-      const optSys = document.getElementById('opt-sysfont');
-      if (!hasSysFonts) {
+
+      const anyEmbed = cbDraw.checked || cbFont.checked || optSysFont.checked;
+      const isStrip = cbStrip.checked;
+
+      if (isStrip) {
+        cbDraw.disabled = true;
+        cbFont.disabled = true;
+        optSysFont.disabled = true;
         btnLocal.disabled = true;
-        optSys.disabled = true;
-        optSys.checked = false;
+        
+        document.getElementById('opt-row-draw').classList.add('disabled');
+        document.getElementById('opt-row-font').classList.add('disabled');
         document.getElementById('opt-row-sysfont').classList.add('disabled');
       } else {
-        btnLocal.disabled = false;
-        optSys.disabled = false;
-        document.getElementById('opt-row-sysfont').classList.remove('disabled');
+        // Embed options enablement depends on analysis results
+        cbDraw.disabled = cbDraw.dataset.shouldEnable === 'false';
+        document.getElementById('opt-row-draw').classList.toggle('disabled', cbDraw.disabled);
+        
+        cbFont.disabled = cbFont.dataset.shouldEnable === 'false';
+        document.getElementById('opt-row-font').classList.toggle('disabled', cbFont.disabled);
+        
+        // System font depends on both analysis and cbFont.checked
+        if (!cbFont.checked || cbFont.disabled) {
+          optSysFont.disabled = true;
+          optSysFont.checked = false;
+          btnLocal.disabled = true;
+          document.getElementById('opt-row-sysfont').classList.add('disabled');
+        } else {
+          optSysFont.disabled = false;
+          btnLocal.disabled = false;
+          document.getElementById('opt-row-sysfont').classList.remove('disabled');
+        }
+
+        // Strip option enablement
+        const canStrip = cbStrip.dataset.hasStripFonts === 'true';
+        if (canStrip && cbStrip.dataset.forceDisabled !== 'true' && !anyEmbed) {
+          cbStrip.disabled = false;
+          document.getElementById('opt-row-strip').classList.remove('disabled');
+        } else {
+          cbStrip.disabled = true;
+          document.getElementById('opt-row-strip').classList.add('disabled');
+        }
       }
     }
 
     function updateStep4Visibility() {
       const wantDraw = document.getElementById('opt-draw').checked;
       const wantFont = document.getElementById('opt-font').checked;
+      const wantStrip = document.getElementById('opt-strip').checked;
       const step4 = document.getElementById('step4');
-      if (wantDraw || wantFont) {
+      const optOptimizeWrap = document.getElementById('opt-optimize-wrap');
+      if (wantDraw || wantFont || wantStrip) {
         step4.style.display = '';
         step4.classList.add('active');
       } else {
@@ -3494,10 +3657,12 @@
       S.converting = true;
       S.outputBlobs = [];
       S.fontBuffers = [];
+      _convertResultsState = [];
 
       const wantDraw = document.getElementById('opt-draw').checked;
       const wantFont = document.getElementById('opt-font').checked;
       const wantSystemFont = document.getElementById('opt-sysfont').checked;
+      const wantStrip = document.getElementById('opt-strip').checked;
 
       const fonts = [];
       for (const [, info] of S.uploadedFonts) {
@@ -3529,9 +3694,10 @@
           const p = entry.parsed;
           const needDraw = wantDraw && (p.subsetNeedsUpdate || (p.drawings > 0 && !p.hasExistingDrawSubset) || (p.drawings === 0 && p.hasExistingDrawSubset));
           const needFont = wantFont && ((p.systemFontsReferenced && p.systemFontsReferenced.length > 0) || (p.externalFonts && Object.keys(p.externalFonts).length > 0));
+          const needStrip = wantStrip;
 
           let result;
-          if (!needDraw && !needFont) {
+          if (!needDraw && !needFont && !needStrip) {
             result = {
               isDirect: true,
               finalBlob: new Blob([entry.rawBuffer]),
@@ -3545,13 +3711,11 @@
               text: entry.content,
               forceHasBOM: entry.hasBOM,
               fonts,
-              options: { wantDraw, wantFont, wantSystemFont },
+              options: { wantDraw, wantFont, wantSystemFont, wantStrip },
             });
           }
 
           const blob = result.isDirect ? result.finalBlob : (new Blob([result.finalText], { type: 'text/plain;charset=utf-8' }));
-          const outName = entry.file.name.replace(/\.(ass|ssa)$/i, '') + '_optimized.ass';
-          S.outputBlobs.push({ name: outName, blob });
           S.fileFontBuffers[i] = result.fontBuffers || [];
           if (result.fontBuffers) S.fontBuffers = S.fontBuffers.concat(result.fontBuffers);
 
@@ -3578,23 +3742,34 @@
             details.appendChild(inner);
             box.insertBefore(summaryDiv, doneLine);
             box.insertBefore(details, doneLine);
+            box.insertBefore(details, doneLine);
             box.scrollTop = box.scrollHeight;
           }
 
           const origKB = (result.origSize / 1024).toFixed(0);
           const newKB = (result.newSize / 1024).toFixed(0);
-          resultArea.innerHTML += '<div class="result-box">' +
-            '<div class="rb-info"><div class="rb-title">' + t('result.done') + (S.assFiles.length > 1 ? ' — ' + entry.file.name : '') + '</div>' +
-            '<div class="rb-detail">' + t('result.detail', { count: result.stats.embeddedCount, origKB, newKB }) + '</div></div>' +
-            '<div class="rb-actions">' +
-            (result.fontBuffers && result.fontBuffers.length > 0
-              ? '<button class="btn btn-outline" onclick="openPreview(' + i + ')">' + t('btn.preview') + '</button>' : '') +
-            '</div></div>';
+          _convertResultsState.push({
+            entryName: entry.file.name,
+            count: result.stats.embeddedCount,
+            origKB, newKB, fileIdx: i,
+            hasFonts: (result.fontBuffers && result.fontBuffers.length > 0)
+          });
+          S.outputBlobs.push({ name: entry.file.name, blob });
         }
 
+        renderConvertResults();
+        
+        const optWrap = document.getElementById('opt-optimize-wrap');
+        if (optWrap) optWrap.classList.remove('hidden');
         btnDownload.classList.remove('hidden');
+        
         if (S.outputBlobs.length === 1) {
-          btnDownload.onclick = () => downloadBlob(S.outputBlobs[0].blob, S.outputBlobs[0].name);
+          btnDownload.onclick = () => {
+             const wantOpt = document.getElementById('opt-append-optimize').checked;
+             const origName = S.outputBlobs[0].name;
+             const dlName = wantOpt ? origName.replace(/\.(ass|ssa)$/i, '_optimized.$1') : origName;
+             downloadBlob(S.outputBlobs[0].blob, dlName);
+          };
         } else {
           btnDownload.textContent = t('btn.download_zip');
           btnDownload.onclick = downloadAllZip;
@@ -3615,6 +3790,55 @@
       resetProgress('convert');
       updateStepStatus();
     }
+    
+    let _convertResultsState = [];
+    function renderConvertResults() {
+      const resultArea = document.getElementById('result-area');
+      if (!resultArea) return;
+      resultArea.innerHTML = '';
+      for (const st of _convertResultsState) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'result-box';
+        
+        const info = document.createElement('div');
+        info.className = 'rb-info';
+        
+        const title = document.createElement('div');
+        title.className = 'rb-title';
+        title.textContent = t('result.done') + (S.assFiles.length > 1 ? ' — ' + st.entryName : '');
+        
+        const detail = document.createElement('div');
+        detail.className = 'rb-detail';
+        detail.textContent = t('result.detail', { count: st.count, origKB: st.origKB, newKB: st.newKB });
+        
+        info.appendChild(title);
+        info.appendChild(detail);
+        
+        const actions = document.createElement('div');
+        actions.className = 'rb-actions';
+        
+        if (st.hasFonts) {
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-outline';
+          btn.textContent = t('btn.preview');
+          btn.onclick = () => openPreview(st.fileIdx);
+          actions.appendChild(btn);
+        }
+        
+        wrapper.appendChild(info);
+        wrapper.appendChild(actions);
+        resultArea.appendChild(wrapper);
+      }
+      
+      const btnDownload = document.getElementById('btn-download');
+      if (btnDownload && _convertResultsState.length > 0) {
+        if (S.outputBlobs.length > 1) {
+          btnDownload.textContent = t('btn.download_zip');
+        } else {
+          btnDownload.textContent = t('btn.download');
+        }
+      }
+    }
 
     function downloadBlob(blob, name) {
       S.downloaded = true;
@@ -3626,7 +3850,6 @@
     }
 
     async function downloadAllZip() {
-
       S.downloaded = true;
       if (!window.JSZip) {
         const s = document.createElement('script');
@@ -3635,9 +3858,13 @@
         await new Promise((r, j) => { s.onload = r; s.onerror = j; });
       }
       const zip = new JSZip();
-      for (const o of S.outputBlobs) zip.file(o.name, o.blob);
+      for (const o of S.outputBlobs) {
+        zip.file(o.name, o.blob);
+      }
       const content = await zip.generateAsync({ type: 'blob' });
-      downloadBlob(content, 'ass_subset_output.zip');
+      const wantOpt = document.getElementById('opt-append-optimize').checked;
+      const fn = wantOpt ? 'ass_subset_output_optimized.zip' : 'ass_subset_output.zip';
+      downloadBlob(content, fn);
     }
 
     let lastActiveElement = null;
@@ -3662,11 +3889,38 @@
         const wrapper = document.createElement('div');
         wrapper.style.marginBottom = '0.5rem';
 
+        const titleFlex = document.createElement('div');
+        titleFlex.style.display = 'flex';
+        titleFlex.style.justifyContent = 'space-between';
+        titleFlex.style.alignItems = 'center';
+        titleFlex.style.marginBottom = '0.5rem';
+
         const title = document.createElement('div');
         title.style.fontWeight = '600';
-        title.style.marginBottom = '0.5rem';
         title.style.fontFamily = 'var(--mono)';
         title.style.fontSize = '0.85rem';
+
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn btn-outline preview-dl-btn';
+        dlBtn.style.padding = '0.2rem 0.6rem';
+        dlBtn.style.fontSize = '0.75rem';
+        dlBtn.dataset.idx = String(S.fileFontBuffers[fileIdx].indexOf(fb));
+        dlBtn.setAttribute('aria-label', t('aria.preview_dl_font', { name: fb.name }));
+        dlBtn.textContent = typeof t === 'function' ? t('btn.download_font') : 'Download';
+        dlBtn.onclick = () => {
+          const fontIdx = parseInt(dlBtn.dataset.idx);
+          const fbItem = S.fileFontBuffers[fileIdx][fontIdx];
+          const rawBuf = (fbItem.buffer instanceof ArrayBuffer && fbItem.buffer.byteLength > 0)
+            ? fbItem.buffer.slice(0)
+            : (fbItem.buffer && fbItem.buffer.buffer instanceof ArrayBuffer ? fbItem.buffer.buffer.slice(0) : null);
+          if (!rawBuf) return;
+          const name = fbItem.name + '_0.ttf';
+          const blob = new Blob([rawBuf], { type: 'font/ttf' });
+          downloadBlob(blob, name);
+        };
+
+        titleFlex.appendChild(title);
+        titleFlex.appendChild(dlBtn);
 
         const canvas = document.createElement('canvas');
         canvas.style.display = 'block';
@@ -3676,7 +3930,7 @@
         canvas.style.border = '1px solid var(--rule)';
         canvas.style.borderRadius = 'var(--r)';
 
-        wrapper.appendChild(title);
+        wrapper.appendChild(titleFlex);
         wrapper.appendChild(canvas);
         listContainer.appendChild(wrapper);
 
@@ -3693,7 +3947,11 @@
         const logicalH = cssHeight;
 
         try {
-          const font = opentype.parse(fb.buffer instanceof ArrayBuffer ? fb.buffer : fb.buffer.slice(0).buffer);
+          const buf = (fb.buffer instanceof ArrayBuffer && fb.buffer.byteLength > 0)
+            ? fb.buffer.slice(0)
+            : (fb.buffer && fb.buffer.buffer instanceof ArrayBuffer ? fb.buffer.buffer.slice(0) : null);
+          if (!buf || buf.byteLength === 0) throw new Error('empty buffer');
+          const font = opentype.parse(buf);
           const allGlyphs = [];
           for (let i = 0; i < font.glyphs.length; i++) {
             const g = font.glyphs.get(i);
@@ -3784,6 +4042,50 @@
       });
     }
 
+    async function getFilesFromDataTransfer(items, maxDepth = 10, allowedExts = null) {
+      const files = [];
+      const queue = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file') {
+          const entry = item.webkitGetAsEntry();
+          if (entry) queue.push({ entry, depth: 0 });
+        }
+      }
+
+      while (queue.length > 0) {
+        const { entry, depth } = queue.shift();
+        if (depth > maxDepth) throw new Error('err.folder_depth');
+
+        if (entry.isFile) {
+          try {
+            const file = await new Promise((resolve, reject) => entry.file(resolve, reject));
+            if (allowedExts && !allowedExts.some(ext => file.name.toLowerCase().endsWith(ext))) continue;
+            files.push(file);
+          } catch (e) { }
+        } else if (entry.isDirectory) {
+          try {
+            const reader = entry.createReader();
+            const entries = await new Promise((resolve, reject) => {
+              const result = [];
+              const readEntries = () => {
+                reader.readEntries(batch => {
+                  if (!batch.length) resolve(result);
+                  else {
+                    result.push(...batch);
+                    readEntries();
+                  }
+                }, reject);
+              };
+              readEntries();
+            });
+            for (const e of entries) queue.push({ entry: e, depth: depth + 1 });
+          } catch (err) { }
+        }
+      }
+      return files;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       applyI18n();
       updateStepStatus();
@@ -3800,7 +4102,22 @@
       inpASS.addEventListener('change', () => inpASS.files.length && handleASSFiles(inpASS.files));
       dzASS.addEventListener('dragover', e => { e.preventDefault(); dzASS.classList.add('drag-over'); });
       dzASS.addEventListener('dragleave', () => dzASS.classList.remove('drag-over'));
-      dzASS.addEventListener('drop', e => { e.preventDefault(); dzASS.classList.remove('drag-over'); if (e.dataTransfer.files.length) handleASSFiles(e.dataTransfer.files); });
+      dzASS.addEventListener('drop', async e => {
+        e.preventDefault();
+        dzASS.classList.remove('drag-over');
+        try {
+          if (e.dataTransfer.items) {
+             const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ass','.ssa','.zip']);
+             if (files.length) handleASSFiles(files);
+          } else if (e.dataTransfer.files.length) {
+             handleASSFiles(e.dataTransfer.files);
+          }
+        } catch (err) {
+          if (err.message === 'err.folder_depth') {
+            alert(t('err.folder_depth', { limit: 10 }));
+          }
+        }
+      });
 
       const cbDraw = document.getElementById('opt-draw');
       const cbFont = document.getElementById('opt-font');
@@ -3809,21 +4126,31 @@
       const optSysFont = document.getElementById('opt-sysfont');
       const rowSysFont = document.getElementById('opt-row-sysfont');
 
+      const cbStrip = document.getElementById('opt-strip');
+      const rowStrip = document.getElementById('opt-row-strip');
+
       cbDraw.addEventListener('change', () => {
         rowDraw.classList.toggle('selected', cbDraw.checked);
         document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
+        enforceMutualExclusion();
         updateStep4Visibility();
       });
       cbFont.addEventListener('change', () => {
         rowFont.classList.toggle('selected', cbFont.checked);
         document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
-        rowSysFont.classList.toggle('hidden', !cbFont.checked);
         document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked);
+        enforceMutualExclusion();
         updateStep4Visibility();
       });
       optSysFont.addEventListener('change', () => {
         rowSysFont.classList.toggle('selected', optSysFont.checked);
+        enforceMutualExclusion();
         renderFontList();
+      });
+      cbStrip.addEventListener('change', () => {
+        rowStrip.classList.toggle('selected', cbStrip.checked);
+        enforceMutualExclusion();
+        updateStep4Visibility();
       });
 
       const dzFont = document.getElementById('dz-font');
@@ -3831,7 +4158,30 @@
       inpFont.addEventListener('change', () => handleFonts(Array.from(inpFont.files)));
       dzFont.addEventListener('dragover', e => { e.preventDefault(); dzFont.style.borderColor = 'var(--accent)'; });
       dzFont.addEventListener('dragleave', () => dzFont.style.borderColor = '');
-      dzFont.addEventListener('drop', e => { e.preventDefault(); dzFont.style.borderColor = ''; handleFonts(Array.from(e.dataTransfer.files)); });
+      dzFont.addEventListener('drop', async e => {
+        e.preventDefault();
+        dzFont.style.borderColor = '';
+        try {
+          if (e.dataTransfer.items) {
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf','.otf','.ttc','.woff','.woff2','.zip']);
+            if (files.length) handleFonts(files);
+          } else if (e.dataTransfer.files.length) {
+            handleFonts(Array.from(e.dataTransfer.files));
+          }
+        } catch (err) {
+          if (err.message === 'err.folder_depth') {
+            const dz = document.getElementById('dz-font');
+            const fontSection = document.getElementById('font-section');
+            const existing = fontSection.querySelector('.upload-error');
+            if (existing) existing.remove();
+            const errDiv = document.createElement('div');
+            errDiv.className = 'upload-error';
+            errDiv.style.marginBottom = '0.75rem';
+            errDiv.textContent = t('err.folder_depth', { limit: 10 });
+            dz.insertAdjacentElement('afterend', errDiv);
+          }
+        }
+      });
 
       document.getElementById('btn-local-font').addEventListener('click', loadLocalFonts);
 
@@ -3921,7 +4271,6 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(() => { });
     }
-
 
     if (typeof opentype === 'undefined') {
       document.querySelector('.main').innerHTML =

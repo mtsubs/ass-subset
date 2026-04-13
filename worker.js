@@ -844,9 +844,11 @@ function rewriteASS(rawContent, opts, id) {
       newFontLines.push('');
     };
     if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
-    if (embeddedFonts) embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
+    if (embeddedFonts && embeddedFonts.length > 0) {
+      embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
+    }
     finalSec = newFontLines.join(nl);
-  } else if (originalFontsBlock) {
+  } else if (originalFontsBlock && !opts.wantStrip) {
     finalSec = originalFontsBlock;
   }
 
@@ -1065,6 +1067,7 @@ function doConvert(data, id) {
       const baseNameLower = baseName.toLowerCase();
       if (isAnyDrawFont(baseNameLower)) continue;
       if (processedNames.has(baseNameLower)) continue;
+      if (options.wantStrip) continue;
       try {
         const buf = assUUDecode(lines);
         finalEmbeddedFonts.push({ name: baseName, ttf: buf });
@@ -1083,7 +1086,8 @@ function doConvert(data, id) {
     drawTTF,
     embeddedFonts: finalEmbeddedFonts,
     drawCharRemap: drawCharRemap,
-    targetNewline: parsed.detectedNewline
+    targetNewline: parsed.detectedNewline,
+    wantStrip: options.wantStrip
   }, id);
 
   const finalOutput = parsed.hasBOM ? '\uFEFF' + finalText : finalText;
