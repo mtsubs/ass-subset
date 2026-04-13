@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.12-debug">
+  <meta name="version" content="2.2.13">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1259,7 +1259,8 @@
       <a href="https://subs.js.org/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr" data-i18n="btn.svg">SVG 转
         ASS 绘图指令</a>
       <div class="lang-wrap" id="lang-wrap">
-        <button class="btn-hdr" id="btn-lang-toggle" onclick="toggleLangMenu()" data-i18n-aria="aria.lang_toggle" aria-label="切换语言" aria-haspopup="menu" aria-expanded="false">A/文</button>
+        <button class="btn-hdr" id="btn-lang-toggle" onclick="toggleLangMenu()" data-i18n-aria="aria.lang_toggle"
+          aria-label="切换语言" aria-haspopup="menu" aria-expanded="false">A/文</button>
         <div class="lang-menu" id="lang-menu" role="menu">
           <button onclick="setLang('ar')" id="lang-ar" role="menuitem">Arabic · العربية</button>
           <button onclick="setLang('zh')" id="lang-zh" class="active" role="menuitem">Chinese Simplified · 简体中文</button>
@@ -1272,8 +1273,8 @@
           <button onclick="setLang('es')" id="lang-es" role="menuitem">Spanish · Español</button>
           <button onclick="setLang('tr')" id="lang-tr" role="menuitem">Turkish · Türkçe</button>
         </div>
-        </div>
       </div>
+    </div>
     </div>
   </header>
 
@@ -1289,7 +1290,8 @@
           <div class="dz-main" data-i18n="step1.drop">拖拽字幕文件到此，或点击选择</div>
           <div class="dz-hint" data-i18n="step1.hint">ASS / SSA 格式 (.ass / .ssa)，支持多选批量转换</div>
         </label>
-        <input type="file" id="inp-ass" accept=".ass,.ssa,.zip" multiple class="file-input-hidden" data-i18n-aria="aria.dz_ass" aria-label="上传字幕文件，支持拖拽或点击选择">
+        <input type="file" id="inp-ass" accept=".ass,.ssa,.zip" multiple class="file-input-hidden"
+          data-i18n-aria="aria.dz_ass" aria-label="上传字幕文件，支持拖拽或点击选择">
         <div id="ass-badge" class="hidden mt2"></div>
       </div>
     </div>
@@ -1335,8 +1337,10 @@
             <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）</span>
           </div>
         </label>
-        <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。</div>
-        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。</div>
+        <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠
+          版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。</div>
+        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠
+          注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
           <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">上传字体文件</p>
@@ -1346,11 +1350,13 @@
           <div id="font-loading-notice" class="font-loading-notice hidden" role="status" aria-live="polite">
             <div id="fln-text" class="fln-text"></div>
             <div id="fln-progress-wrap" class="progress-wrap hidden" style="margin-top:0.75rem;">
-              <div class="progress-bar" id="fln-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-labelledby="fln-text"></div>
+              <div class="progress-bar" id="fln-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                aria-valuemax="100" aria-labelledby="fln-text"></div>
               <div class="progress-text" id="fln-progress-text" aria-live="off"></div>
             </div>
           </div>
-          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden" data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
+          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden"
+            data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
           <details class="font-path-hint">
             <summary data-i18n="font.path.summary">💡 常见字体安装路径</summary>
             <div class="paths" id="font-paths"></div>
@@ -1379,7 +1385,8 @@
             <div class="progress-text" id="progress-text" aria-live="off"></div>
           </div>
         </div>
-        <div class="log-box hidden" id="log-box" role="log" data-i18n-aria="aria.log_box" aria-label="处理日志" aria-live="polite" aria-atomic="false">
+        <div class="log-box hidden" id="log-box" role="log" data-i18n-aria="aria.log_box" aria-label="处理日志"
+          aria-live="polite" aria-atomic="false">
         </div>
         <div id="result-area"></div>
       </div>
@@ -1390,7 +1397,8 @@
     <div class="modal-box">
       <div class="modal-header">
         <h3 id="preview-title" data-i18n="preview.title">字体预览</h3>
-        <button class="modal-close" id="modal-close-btn" onclick="closePreview()" data-i18n-aria="aria.modal_close" aria-label="关闭预览">✕</button>
+        <button class="modal-close" id="modal-close-btn" onclick="closePreview()" data-i18n-aria="aria.modal_close"
+          aria-label="关闭预览">✕</button>
       </div>
       <div id="preview-list"
         style="flex: 1; overflow-y:auto; overflow-x:hidden; background:var(--card); display:flex; flex-direction:column; gap:1rem; padding: 0.5rem">
@@ -1424,7 +1432,9 @@
       </div>
     </div>
     <div class="footer-right">
-      <div class="footer-line" id="footer-license" data-i18n-html="footer.license_html">以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a></div>
+      <div class="footer-line" id="footer-license" data-i18n-html="footer.license_html">以 <a
+          href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT
+          License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a></div>
       <div class="footer-line"><span id="ver">ASS 在线子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
         <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn"
@@ -2671,6 +2681,10 @@
           }
         }
       }
+      // Re-render ass-badge (error messages, change button, loading label) in the new language
+      renderAssBadge();
+      // Re-render font-upload error in the new language
+      renderFontError();
       document.getElementById('lang-wrap').classList.remove('open');
       document.getElementById('btn-lang-toggle').setAttribute('aria-expanded', 'false');
     }
@@ -2752,6 +2766,49 @@
       converted: false,
       downloaded: false,
     };
+
+    // Tracks the current ass-badge UI state so it can be re-rendered on language switch
+    let _assBadgeState = null;
+
+    function renderAssBadge() {
+      const badge = document.getElementById('ass-badge');
+      const dzAss = document.getElementById('dz-ass');
+      if (!badge || !_assBadgeState) return;
+      if (_assBadgeState.type === 'error') {
+        badge.classList.remove('hidden');
+        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
+          '<span class="fb-name">' + _assBadgeState.fileName + '</span>' +
+          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
+          '</div><div class="upload-error">' + t(_assBadgeState.errKey, _assBadgeState.errParams) + '</div>';
+        if (dzAss) dzAss.style.display = 'none';
+      } else if (_assBadgeState.type === 'loading') {
+        badge.classList.remove('hidden');
+        badge.innerHTML = '<div class="file-badge" style="border-color:var(--rule)">' +
+          '<span class="fb-name">' + _assBadgeState.fileName + '</span>' +
+          '<span class="fb-size">' + t('ass.loading') + '</span>' +
+          '</div>';
+        if (dzAss) dzAss.style.display = 'none';
+      } else if (_assBadgeState.type === 'success') {
+        badge.classList.remove('hidden');
+        badge.innerHTML = _assBadgeState.entries.map(e =>
+          '<div class="file-badge"><span class="fb-name">' + e.name + '</span>' +
+          '<span class="fb-size">' + e.sizeKB + ' KB</span>' +
+          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span></div>'
+        ).join('');
+        if (dzAss) dzAss.style.display = 'none';
+      }
+    }
+
+    // Tracks the current font-upload error so it can be re-rendered on language switch
+    let _fontErrState = null;
+
+    function renderFontError() {
+      if (!_fontErrState) return;
+      const fontSection = document.getElementById('font-section');
+      if (!fontSection) return;
+      const existing = fontSection.querySelector('.upload-error');
+      if (existing) existing.textContent = t(_fontErrState.errKey, _fontErrState.errParams);
+    }
 
     let batchFileIdx = 0;
     let batchTotal = 0;
@@ -2920,41 +2977,34 @@
     }
 
     async function handleASSFiles(files) {
-      const FILE_SIZE_LIMIT = 4 * 1024 * 1024 * 1024;
+      const FILE_SIZE_LIMIT = 2 * 1024 * 1024 * 1024;
       const assEntries = [];
       const dzAss = document.getElementById('dz-ass');
       const badge = document.getElementById('ass-badge');
-      const showAssError = (fileName, errMsg) => {
-        badge.classList.remove('hidden');
-        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
-          '<span class="fb-name">' + fileName + '</span>' +
-          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
-          '</div><div class="upload-error">' + errMsg + '</div>';
-        dzAss.style.display = 'none';
+      const showAssError = (fileName, errKey, errParams) => {
+        _assBadgeState = { type: 'error', fileName, errKey, errParams: errParams || null };
+        renderAssBadge();
       };
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT) {
-          showAssError(f.name, t('err.file_too_large'));
+          showAssError(f.name, 'err.file_too_large');
           return;
         }
         if (f.name.toLowerCase().endsWith('.zip')) {
-          dzAss.style.display = 'none';
-          badge.classList.remove('hidden');
-          badge.innerHTML = '<div class="file-badge" style="border-color:var(--rule)">' +
-            '<span class="fb-name">' + f.name + '</span>' +
-            '<span class="fb-size" id="ass-loading-label">' + t('ass.loading') + '</span>' +
-            '</div>';
+          _assBadgeState = { type: 'loading', fileName: f.name };
+          renderAssBadge();
           try {
             const extracted = await processZipFile(f, 'ass');
             assEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
-            const errMsg = key === 'err.zip_depth'
-              ? t('err.zip_depth', { limit: ZIP_MAX_DEPTH })
-              : (I18N[currentLang] && I18N[currentLang][key] ? t(key) : t('err.zip_corrupt'));
-            showAssError(f.name, errMsg);
+            showAssError(f.name,
+              key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt',
+              key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
+            );
             return;
           }
+          _assBadgeState = null;
           badge.innerHTML = '';
           badge.classList.add('hidden');
           dzAss.style.display = '';
@@ -2968,7 +3018,7 @@
         }
       }
       if (assEntries.length === 0) {
-        showAssError(Array.from(files).map(f => f.name).join(', '), t('err.format'));
+        showAssError(Array.from(files).map(f => f.name).join(', '), 'err.format');
         return;
       }
       S.assFiles = [];
@@ -2977,12 +3027,11 @@
       S.fontBuffers = [];
 
       dzAss.style.display = 'none';
-      badge.classList.remove('hidden');
-      badge.innerHTML = assEntries.map(e =>
-        '<div class="file-badge"><span class="fb-name">' + e.file.name + '</span>' +
-        '<span class="fb-size">' + (e.file.size / 1024).toFixed(0) + ' KB</span>' +
-        '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span></div>'
-      ).join('');
+      _assBadgeState = {
+        type: 'success',
+        entries: assEntries.map(e => ({ name: e.file.name, sizeKB: (e.file.size / 1024).toFixed(0) }))
+      };
+      renderAssBadge();
 
       document.getElementById('step1').classList.remove('active');
       document.getElementById('step1').classList.add('done');
@@ -2994,11 +3043,11 @@
 
       const area = document.getElementById('analysis-area');
       area.innerHTML = `
-        <div id="analysis-progress-area" class="progress-container hidden" style="margin-bottom:1rem;">
-          <div class="progress-info">
-            <span id="analysis-progress-text" class="progress-text"></span>
+        <div id="analysis-progress-area" class="hidden" style="margin-bottom:1rem;">
+          <div class="progress-wrap">
+            <div id="analysis-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-labelledby="analysis-progress-text"></div>
+            <div id="analysis-progress-text" class="progress-text" aria-live="off"></div>
           </div>
-          <div class="progress-track"><div id="analysis-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>
         </div>
         <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
       `;
@@ -3067,6 +3116,7 @@
       S.converting = false;
       S.converted = false;
       S.downloaded = false;
+      _assBadgeState = null;
 
       updateStepStatus();
     }
@@ -3253,12 +3303,13 @@
         }
       }
       const reqArr = Array.from(requiredFonts);
-      const FILE_SIZE_LIMIT_FONT = 4 * 1024 * 1024 * 1024;
+      const FILE_SIZE_LIMIT_FONT = 2 * 1024 * 1024 * 1024;
       const fontEntries = [];
-      let fontLoadError = null;
+      let fontLoadErrKey = null;
+      let fontLoadErrParams = null;
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT_FONT) {
-          fontLoadError = t('err.file_too_large');
+          fontLoadErrKey = 'err.file_too_large';
           break;
         }
         if (f.name.toLowerCase().endsWith('.zip')) {
@@ -3267,9 +3318,8 @@
             fontEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
-            fontLoadError = key === 'err.zip_depth'
-              ? t('err.zip_depth', { limit: ZIP_MAX_DEPTH })
-              : (I18N[currentLang] && I18N[currentLang][key] ? t(key) : t('err.zip_corrupt'));
+            fontLoadErrKey = key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt';
+            fontLoadErrParams = key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null;
             break;
           }
         } else {
@@ -3279,16 +3329,17 @@
           } catch (_) { }
         }
       }
-      if (fontLoadError) {
+      if (fontLoadErrKey) {
         notice.classList.add('hidden');
         dz.style.display = '';
-        const errDiv = document.createElement('div');
-        errDiv.className = 'upload-error';
-        errDiv.style.marginBottom = '0.75rem';
-        errDiv.textContent = fontLoadError;
+        _fontErrState = { errKey: fontLoadErrKey, errParams: fontLoadErrParams };
         const fontSection = document.getElementById('font-section');
         const existing = fontSection.querySelector('.upload-error');
         if (existing) existing.remove();
+        const errDiv = document.createElement('div');
+        errDiv.className = 'upload-error';
+        errDiv.style.marginBottom = '0.75rem';
+        errDiv.textContent = t(fontLoadErrKey, fontLoadErrParams);
         dz.insertAdjacentElement('afterend', errDiv);
         return;
       }
@@ -3827,7 +3878,7 @@
       script.setAttribute('data-reactions-enabled', '0');
       script.setAttribute('data-emit-metadata', '0');
       script.setAttribute('data-theme', theme);
-      const langMap = {'ar': 'ar', 'zh': 'zh-CN', 'zh-TW': 'zh-TW', 'en': 'en', 'ja': 'ja', 'ko': 'ko', 'pt-BR': 'pt-BR', 'ru': 'ru', 'es': 'es', 'tr': 'tr'};
+      const langMap = { 'ar': 'ar', 'zh': 'zh-CN', 'zh-TW': 'zh-TW', 'en': 'en', 'ja': 'ja', 'ko': 'ko', 'pt-BR': 'pt-BR', 'ru': 'ru', 'es': 'es', 'tr': 'tr' };
       script.setAttribute('data-lang', langMap[currentLang] || 'zh-CN');
       script.crossOrigin = 'anonymous';
       script.async = true;
