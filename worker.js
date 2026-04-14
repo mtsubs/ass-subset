@@ -1057,6 +1057,7 @@ function doConvert(data, id) {
   }
   const finalEmbeddedFonts = [];
   const processedNames = new Set();
+  const strippedNames = [];
   embeddedFonts.forEach(ef => {
     finalEmbeddedFonts.push(ef);
     processedNames.add(ef.name.toLowerCase());
@@ -1067,7 +1068,10 @@ function doConvert(data, id) {
       const baseNameLower = baseName.toLowerCase();
       if (isAnyDrawFont(baseNameLower)) continue;
       if (processedNames.has(baseNameLower)) continue;
-      if (options.wantStrip) continue;
+      if (options.wantStrip) {
+        if (!strippedNames.includes(baseName)) strippedNames.push(baseName);
+        continue;
+      }
       try {
         const buf = assUUDecode(lines);
         finalEmbeddedFonts.push({ name: baseName, ttf: buf });
@@ -1075,6 +1079,7 @@ function doConvert(data, id) {
       } catch (_) { }
     }
   }
+
   if (!drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
@@ -1116,6 +1121,7 @@ function doConvert(data, id) {
       embeddedCount: finalEmbeddedFonts.length + (drawTTF ? 1 : 0),
       drawingCount: parsed.drawings,
       uniqueDrawings: parsed.uniqueDrawings.length,
+      strippedNames,
     },
     detailedDrawings: options.wantDraw ? Array.from(parsed.uniqueDrawings.values()).map(d => ({
       char: drawMap.get(d.data) || d.char,

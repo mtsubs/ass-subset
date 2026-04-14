@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.3">
+  <meta name="version" content="2.3.1">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1384,8 +1384,10 @@
         <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
           <button class="btn btn-primary" id="btn-convert" data-i18n="btn.convert">开始转换</button>
           <button class="btn btn-success hidden" id="btn-download" data-i18n="btn.download">下载优化后的字幕</button>
-          <label class="btn btn-outline hidden" id="opt-optimize-wrap" style="gap: 0.4rem; cursor: pointer; user-select: none; display: inline-flex; align-items: center; padding: 0.8rem 1.25rem; line-height: 1; height: auto;">
-            <input type="checkbox" id="opt-append-optimize" checked aria-labelledby="opt-append-optimize-lbl" style="width:14px;height:14px;accent-color:var(--ink);cursor:pointer;flex-shrink:0;">
+          <label class="btn btn-outline hidden" id="opt-optimize-wrap"
+            style="gap: 0.4rem; cursor: pointer; user-select: none; display: inline-flex; align-items: center; padding: 0.8rem 1.25rem; line-height: 1; height: auto;">
+            <input type="checkbox" id="opt-append-optimize" checked aria-labelledby="opt-append-optimize-lbl"
+              style="width:14px;height:14px;accent-color:var(--ink);cursor:pointer;flex-shrink:0;">
             <span id="opt-append-optimize-lbl" data-i18n="opt.append_optimize">追加 _optimized 后缀</span>
           </label>
         </div>
@@ -1490,7 +1492,7 @@
         'btn.download_zip': '下载全部 (ZIP)',
         'btn.download_font': '下载',
         'btn.install': '安装',
-        'btn.preview': '预览',
+        'btn.preview': '字体预览 / 下载',
         'btn.svg': 'SVG 转 ASS 绘图指令',
         'change': '更换文件',
         'discuss.header': '讨论 · Discussion',
@@ -1501,7 +1503,6 @@
         'err.zip_depth': '⚠ ZIP 嵌套层数超过 {limit} 层限制，已停止解压。',
         'err.folder_depth': '⚠ 文件夹嵌套层数超过 {limit} 层限制，已停止遍历。',
         'err.zip_corrupt': '⚠ ZIP 文件已损坏或格式不受支持，无法读取。',
-        'err.zip_too_large': '⚠ 文件过大，浏览器无法处理。请拆分后分批上传。',
         'err.file_too_large': '⚠ 单个文件超过 2 GB，浏览器内存限制无法处理，请拆分后上传。',
         'ass.loading': '正在读取字幕文件，请稍候…',
         'font.chars': '{n} 字符',
@@ -1543,6 +1544,8 @@
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
         'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
         'log.font.parse_fail': '[font] 字体解析失败: {error}',
+        'log.font.strip.expand': '[font] 已移除 {count} 个内嵌字体（点击展开）',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
         'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
@@ -1555,8 +1558,8 @@
         'opt.font.title': '嵌入引用字体',
         'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入',
         'opt.sysfont.title': '嵌入系统字体',
-        'opt.strip.desc': '仅保留绘图相关的字体（如有），移除其他已存在的非标准内嵌字体，减小文件体积。',
-        'opt.strip.title': '去除内嵌字体',
+        'opt.strip.desc': '移除字幕中已有的内嵌字体，但保留子集化绘图指令所用的字型。',
+        'opt.strip.title': '移除内嵌字体',
         'opt.append_optimize': '追加 _optimized 后缀',
         'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
         'path.mac': 'macOS：/Library/Fonts（建议先复制到桌面再上传）',
@@ -1564,9 +1567,10 @@
         'preview.draw.error': '渲染错误：',
         'preview.error': ' - 预览错误',
         'preview.limit': '（展示前 {limit} / {total} 字符）',
-        'preview.title': '字体预览',
+        'preview.title': '字体预览 / 下载',
         'preview.total': '（共 {total} 字符）',
         'result.detail': '内嵌 {count} 个字体 · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '移除了 {count} 个内嵌字体 · {origKB} KB → {newKB} KB',
         'result.done': '转换完成',
         'stat.chars': '待嵌入字符',
         'stat.drawBlocks': '绘图块',
@@ -1609,7 +1613,7 @@
         'btn.download_zip': '下載全部 (ZIP)',
         'btn.download_font': '下載',
         'btn.install': '安裝',
-        'btn.preview': '預覽',
+        'btn.preview': '字型預覽 / 下載',
         'btn.svg': 'SVG 轉 ASS 繪圖指令',
         'change': '更換檔案',
         'discuss.header': '討論 · Discussion',
@@ -1620,7 +1624,6 @@
         'err.zip_depth': '⚠ ZIP 嵌套層數超過 {limit} 層限制，已停止解壓。',
         'err.folder_depth': '⚠ 資料夾嵌套層數超過 {limit} 層限制，已停止遍歷。',
         'err.zip_corrupt': '⚠ ZIP 檔案已損毀或格式不受支援，無法讀取。',
-        'err.zip_too_large': '⚠ 檔案過大，瀏覽器無法處理。請拆分後分批上傳。',
         'err.file_too_large': '⚠ 單一檔案超過 2 GB，瀏覽器記憶體限制無法處理，請拆分後上傳。',
         'ass.loading': '正在讀取字幕檔，請稍候…',
         'font.chars': '{n} 字元',
@@ -1662,6 +1665,8 @@
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上傳，跳過。',
         'log.font.none_external': '[font] 未發現需嵌入的外部字型。',
         'log.font.parse_fail': '[font] 字型解析失敗: {error}',
+        'log.font.strip.expand': '[font] 已移除 {count} 個內嵌字型（點擊展開）',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（縮減 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」處理失敗: {error}',
         'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字元)…',
@@ -1674,8 +1679,8 @@
         'opt.font.title': '嵌入引用字型',
         'opt.sysfont.desc': '將字幕引用的系統字型一併子集化嵌入',
         'opt.sysfont.title': '嵌入系統字型',
-        'opt.strip.desc': '僅保留繪圖相關的字型（如有），移除其他已存在的非標準內嵌字型，減小檔案體積。',
-        'opt.strip.title': '去除內嵌字型',
+        'opt.strip.desc': '移除字幕中已有的內嵌字型，但保留子集化繪圖指令所用的字型。',
+        'opt.strip.title': '移除內嵌字型',
         'opt.append_optimize': '追加 _optimized 後綴',
         'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
         'path.mac': 'macOS：/Library/Fonts（建議先複製到桌面再上傳）',
@@ -1683,9 +1688,10 @@
         'preview.draw.error': '渲染錯誤：',
         'preview.error': ' - 預覽錯誤',
         'preview.limit': '（展示前 {limit} / {total} 字元）',
-        'preview.title': '字型預覽',
+        'preview.title': '字型預覽 / 下載',
         'preview.total': '（共 {total} 字元）',
         'result.detail': '內嵌 {count} 個字型 · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '移除了 {count} 個內嵌字型 · {origKB} KB → {newKB} KB',
         'result.done': '轉換完成',
         'stat.chars': '待嵌入字元',
         'stat.drawBlocks': '繪圖塊',
@@ -1728,7 +1734,7 @@
         'btn.download_zip': 'Download All (ZIP)',
         'btn.download_font': 'Download',
         'btn.install': 'Install',
-        'btn.preview': 'Preview',
+        'btn.preview': 'Font Preview / Download',
         'btn.svg': 'SVG to ASS Draw',
         'change': 'Change',
         'discuss.header': 'Discussion',
@@ -1739,7 +1745,6 @@
         'err.zip_depth': '⚠ ZIP nesting exceeds {limit} levels — extraction stopped.',
         'err.folder_depth': '⚠ Folder nesting exceeds {limit} levels — traversal stopped.',
         'err.zip_corrupt': '⚠ The ZIP file is corrupted or in an unsupported format and cannot be read.',
-        'err.zip_too_large': '⚠ The file is too large for the browser to handle. Please split it into smaller parts.',
         'err.file_too_large': '⚠ This file exceeds 2 GB — the browser cannot process files this large. Please split it before uploading.',
         'ass.loading': 'Reading subtitle files, please wait…',
         'font.chars': '{n} chars',
@@ -1781,6 +1786,8 @@
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) not provided, skipping.',
         'log.font.none_external': '[font] No non-system fonts to embed.',
         'log.font.parse_fail': '[font] Failed to parse font: {error}',
+        'log.font.strip.expand': '[font] {count} embedded font(s) removed (click to expand)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" failed: {error}',
         'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
@@ -1793,7 +1800,7 @@
         'opt.font.title': 'Embed Referenced Fonts',
         'opt.sysfont.desc': 'Also subset and embed system fonts referenced in the script.',
         'opt.sysfont.title': 'Embed System Fonts',
-        'opt.strip.desc': 'Remove existing non-standard embedded fonts to reduce file size (keeps drawing fonts).',
+        'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Strip Embedded Fonts',
         'opt.append_optimize': 'Add _optimized suffix',
         'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
@@ -1802,9 +1809,10 @@
         'preview.draw.error': 'Render error: ',
         'preview.error': ' — Preview error',
         'preview.limit': ' (showing first {limit} of {total} chars)',
-        'preview.title': 'Font Preview',
+        'preview.title': 'Font Preview / Download',
         'preview.total': ' ({total} chars)',
         'result.detail': '{count} font(s) embedded · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '{count} embedded font(s) removed · {origKB} KB → {newKB} KB',
         'result.done': 'Subsetting Complete',
         'stat.chars': 'Chars to Embed',
         'stat.drawBlocks': 'Draw Blocks',
@@ -1847,7 +1855,7 @@
         'btn.download_zip': 'すべてダウンロード (ZIP)',
         'btn.download_font': 'ダウンロード',
         'btn.install': 'インストール',
-        'btn.preview': 'プレビュー',
+        'btn.preview': 'フォントプレビュー / ダウンロード',
         'btn.svg': 'SVG → ASS描画コマンド',
         'change': 'ファイルを変更',
         'discuss.header': 'ディスカッション · Discussion',
@@ -1858,7 +1866,6 @@
         'err.zip_depth': '⚠ ZIP のネストが {limit} 層を超えました。解凍を停止しました。',
         'err.folder_depth': '⚠ フォルダのネストが {limit} 層を超えました。トラバーサルを停止しました。',
         'err.zip_corrupt': '⚠ ZIP ファイルが破損しているか、サポートされていない形式です。',
-        'err.zip_too_large': '⚠ ファイルが大きすぎてブラウザで処理できません。分割してからアップロードしてください。',
         'err.file_too_large': '⚠ ファイルが 2 GB を超えており、ブラウザのメモリ制限により処理できません。分割してアップロードしてください。',
         'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
         'font.chars': '{n} 文字',
@@ -1900,6 +1907,8 @@
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) がアップロードされていません。スキップします。',
         'log.font.none_external': '[font] 埋め込む外部フォントがありません。',
         'log.font.parse_fail': '[font] フォントのパースに失敗しました: {error}',
+        'log.font.strip.expand': '[font] {count} 個の埋め込みフォントを削除しました（クリックで展開）',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] 「{name}」の処理に失敗しました: {error}',
         'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) をサブセット化中…',
@@ -1912,7 +1921,7 @@
         'opt.font.title': '参照フォントの埋め込み',
         'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントもサブセット化して埋め込みます。',
         'opt.sysfont.title': 'システムフォントの埋め込み',
-        'opt.strip.desc': '既存の非標準埋め込みフォントを削除し、ファイルサイズを削減します（描画用フォントは保持されます）。',
+        'opt.strip.desc': 'スクリプト内の既存の埋め込みフォントを削除します（描画サブセット字型は保持）。',
         'opt.strip.title': '埋め込みフォントを削除',
         'opt.append_optimize': '_optimized 接尾辞を追加',
         'path.linux': 'Linux：~/.fonts または /usr/share/fonts',
@@ -1921,9 +1930,10 @@
         'preview.draw.error': 'レンダリングエラー：',
         'preview.error': ' — プレビューエラー',
         'preview.limit': '（先頭 {limit} / {total} 文字を表示）',
-        'preview.title': 'フォントプレビュー',
+        'preview.title': 'フォントプレビュー / ダウンロード',
         'preview.total': '（全 {total} 文字）',
         'result.detail': '{count} 個のフォントを埋め込み · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '{count} 個の埋め込みフォントを削除 · {origKB} KB → {newKB} KB',
         'result.done': '変換完了',
         'stat.chars': '埋め込み文字数',
         'stat.drawBlocks': '描画ブロック',
@@ -1966,7 +1976,7 @@
         'btn.download_zip': '전체 다운로드 (ZIP)',
         'btn.download_font': '다운로드',
         'btn.install': '설치',
-        'btn.preview': '미리보기',
+        'btn.preview': '폰트 미리보기 / 다운로드',
         'btn.svg': 'SVG → ASS 드로우',
         'change': '파일 변경',
         'discuss.header': '토론 · Discussion',
@@ -1977,7 +1987,6 @@
         'err.zip_depth': '⚠ ZIP 중첩이 {limit}단계를 초과했습니다 — 압축 해제를 중단했습니다.',
         'err.folder_depth': '⚠ 폴더 중첩이 {limit}단계를 초과했습니다 — 탐색을 중단했습니다.',
         'err.zip_corrupt': '⚠ ZIP 파일이 손상되었거나 지원되지 않는 형식입니다.',
-        'err.zip_too_large': '⚠ 파일이 너무 커서 브라우저에서 처리할 수 없습니다. 분할 후 업로드해 주세요.',
         'err.file_too_large': '⚠ 파일이 2 GB를 초과하여 브라우저 메모리 한계로 처리할 수 없습니다. 분할 후 업로드해 주세요.',
         'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.chars': '{n}자',
@@ -2019,6 +2028,8 @@
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) 업로드되지 않음, 건너뜁니다.',
         'log.font.none_external': '[font] 삽입할 외부 폰트가 없습니다.',
         'log.font.parse_fail': '[font] 폰트 파싱 실패: {error}',
+        'log.font.strip.expand': '[font] {count}개 내장 폰트 제거됨 (클릭하여 펼치기)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
         'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 서브셋화 중…',
@@ -2031,8 +2042,8 @@
         'opt.font.title': '참조 폰트 삽입',
         'opt.sysfont.desc': '스크립트에서 참조된 시스템 폰트도 서브셋화하여 삽입합니다.',
         'opt.sysfont.title': '시스템 폰트 삽입',
-        'opt.strip.desc': '기존의 비표준 포함된 폰트를 제거하여 파일 크기를 줄입니다 (그리기용 폰트 유지).',
-        'opt.strip.title': '포함된 폰트 제거',
+        'opt.strip.desc': '자막에 내장된 기존 폰트를 제거합니다(드로우 서브셋 폰트는 유지).',
+        'opt.strip.title': '내장 폰트 제거',
         'opt.append_optimize': '_optimized 접미사 추가',
         'path.linux': 'Linux: ~/.fonts 또는 /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (업로드 전 바탕화면에 복사 권장)',
@@ -2040,9 +2051,10 @@
         'preview.draw.error': '렌더링 오류: ',
         'preview.error': ' — 미리보기 오류',
         'preview.limit': ' ({total}자 중 앞 {limit}자 표시)',
-        'preview.title': '폰트 미리보기',
+        'preview.title': '폰트 미리보기 / 다운로드',
         'preview.total': ' (총 {total}자)',
         'result.detail': '{count}개 폰트 삽입 · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '내장 폰트 {count}개 제거됨 · {origKB} KB → {newKB} KB',
         'result.done': '변환 완료',
         'stat.chars': '삽입 문자',
         'stat.drawBlocks': '드로우 블록',
@@ -2085,7 +2097,7 @@
         'btn.download_zip': 'Descargar todo (ZIP)',
         'btn.download_font': 'Descargar',
         'btn.install': 'Instalar',
-        'btn.preview': 'Vista previa',
+        'btn.preview': 'Vista previa / Descargar fuentes',
         'btn.svg': 'SVG a ASS Draw',
         'change': 'Cambiar archivo',
         'discuss.header': 'Discusión · Discussion',
@@ -2096,7 +2108,6 @@
         'err.zip_depth': '⚠ El ZIP tiene más de {limit} niveles de anidación — extracción detenida.',
         'err.folder_depth': '⚠ La carpeta tiene más de {limit} niveles de anidación — recorrido detenido.',
         'err.zip_corrupt': '⚠ El archivo ZIP está dañado o en un formato no compatible.',
-        'err.zip_too_large': '⚠ El archivo es demasiado grande para que el navegador lo procese. Por favor divisalo en partes más pequeñas.',
         'err.file_too_large': '⚠ Este archivo supera los 2 GB — el navegador no puede procesar archivos tan grandes. Por favor divisalo antes de subir.',
         'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
         'font.chars': '{n} caracteres',
@@ -2141,6 +2152,8 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
         'log.font.subsetting': '[font] Creando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
+        'log.font.strip.expand': '[font] {count} fuentes incrustadas eliminadas (clic para expandir)',
+        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Reescribiendo el script…',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
@@ -2150,7 +2163,7 @@
         'opt.font.title': 'Incrustar fuentes referenciadas',
         'opt.sysfont.desc': 'También crea subconjunto e incrusta las fuentes del sistema referenciadas.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
-        'opt.strip.desc': 'Elimina fuentes incrustadas no estándar existentes para reducir el tamaño del archivo (mantiene las fuentes de dibujo).',
+        'opt.strip.desc': 'Elimina las fuentes incrustadas existentes en el guion (conserva las fuentes de dibujo).',
         'opt.strip.title': 'Eliminar fuentes incrustadas',
         'opt.append_optimize': 'Añadir sufijo _optimized',
         'path.linux': 'Linux: ~/.fonts o /usr/share/fonts',
@@ -2159,9 +2172,10 @@
         'preview.draw.error': 'Error de renderizado: ',
         'preview.error': ' — Error de vista previa',
         'preview.limit': ' (mostrando {limit} de {total} caracteres)',
-        'preview.title': 'Vista previa de fuente',
+        'preview.title': 'Vista previa / Descargar fuentes',
         'preview.total': ' ({total} caracteres)',
         'result.detail': '{count} fuente(s) incrustada(s) · {origKB} KB → {newKB} KB',
+        'result.detail.strip': 'Se eliminaron {count} fuentes incrustadas · {origKB} KB → {newKB} KB',
         'result.done': 'Conversión completada',
         'stat.chars': 'Caracteres',
         'stat.drawBlocks': 'Bloques de dibujo',
@@ -2204,7 +2218,7 @@
         'btn.download_zip': 'Скачать всё (ZIP)',
         'btn.download_font': 'Скачать',
         'btn.install': 'Установить',
-        'btn.preview': 'Предпросмотр',
+        'btn.preview': 'Предпросмотр / Скачать шрифты',
         'btn.svg': 'SVG → ASS рисование',
         'change': 'Сменить файл',
         'discuss.header': 'Обсуждение · Discussion',
@@ -2215,7 +2229,6 @@
         'err.zip_depth': '⚠ Вложенность ZIP превышает {limit} уровней — извлечение остановлено.',
         'err.folder_depth': '⚠ Вложенность папки превышает {limit} уровней — обход остановлен.',
         'err.zip_corrupt': '⚠ ZIP-файл повреждён или имеет неподдерживаемый формат.',
-        'err.zip_too_large': '⚠ Файл слишком большой для обработки в браузере. Пожалуйста, разделите его на части.',
         'err.file_too_large': '⚠ Файл превышает 2 ГБ — браузер не может его обработать. Пожалуйста, разделите его перед загрузкой.',
         'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
         'font.chars': '{n} симв.',
@@ -2260,6 +2273,8 @@
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
         'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)…',
+        'log.font.strip.expand': '[font] Удалено {count} встроенных шрифтов (нажмите, чтобы развернуть)',
+        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Перезапись скрипта…',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
@@ -2269,7 +2284,7 @@
         'opt.font.title': 'Встроить используемые шрифты',
         'opt.sysfont.desc': 'Также создаёт подмножество и встраивает системные шрифты, указанные в скрипте.',
         'opt.sysfont.title': 'Встроить системные шрифты',
-        'opt.strip.desc': 'Удаляет существующие нестандартные встроенные шрифты для уменьшения размера файла (сохраняет шрифты векторных рисунков).',
+        'opt.strip.desc': 'Удаляет существующие встроенные шрифты (сохраняет шрифты команд рисования).',
         'opt.strip.title': 'Удалить встроенные шрифты',
         'opt.append_optimize': 'Добавить суффикс _optimized',
         'path.linux': 'Linux: ~/.fonts или /usr/share/fonts',
@@ -2278,9 +2293,10 @@
         'preview.draw.error': 'Ошибка рендеринга: ',
         'preview.error': ' — Ошибка предпросмотра',
         'preview.limit': ' (показаны первые {limit} из {total} символов)',
-        'preview.title': 'Предпросмотр шрифта',
+        'preview.title': 'Предпросмотр / Скачать шрифты',
         'preview.total': ' (всего {total} символов)',
-        'result.detail': '{count} шрифт(ов) встроено · {origKB} КБ → {newKB} КБ',
+        'result.detail': 'Встроено {count} шрифт(ов) · {origKB} КБ → {newKB} КБ',
+        'result.detail.strip': 'Удалено {count} встр. шрифтов · {origKB} КБ → {newKB} КБ',
         'result.done': 'Обработка завершена',
         'stat.chars': 'Символов к встраиванию',
         'stat.drawBlocks': 'Блоки рисования',
@@ -2323,7 +2339,7 @@
         'btn.download_zip': 'Baixar tudo (ZIP)',
         'btn.download_font': 'Baixar',
         'btn.install': 'Instalar',
-        'btn.preview': 'Pré-visualizar',
+        'btn.preview': 'Pré-visualizar / Baixar fontes',
         'btn.svg': 'SVG para ASS Draw',
         'change': 'Trocar arquivo',
         'discuss.header': 'Discussão · Discussion',
@@ -2334,7 +2350,6 @@
         'err.zip_depth': '⚠ O ZIP possui mais de {limit} níveis de aninhamento — extração interrompida.',
         'err.folder_depth': '⚠ A pasta possui mais de {limit} níveis de aninhamento — travessia interrompida.',
         'err.zip_corrupt': '⚠ O arquivo ZIP está corrompido ou em um formato não suportado.',
-        'err.zip_too_large': '⚠ O arquivo é grande demais para o navegador processar. Por favor, divida-o em partes menores.',
         'err.file_too_large': '⚠ Este arquivo supera 2 GB — o navegador não consegue processá-lo. Por favor, divida-o antes de enviar.',
         'ass.loading': 'Lendo arquivos de legenda, aguarde…',
         'font.chars': '{n} caracteres',
@@ -2379,6 +2394,8 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
         'log.font.subsetting': '[font] Criando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
+        'log.font.strip.expand': '[font] {count} fontes incorporadas removidas (clique para expandir)',
+        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Reescrevendo script…',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
@@ -2397,9 +2414,10 @@
         'preview.draw.error': 'Erro de renderização: ',
         'preview.error': ' — Erro de pré-visualização',
         'preview.limit': ' (exibindo {limit} de {total} caracteres)',
-        'preview.title': 'Pré-visualização de fonte',
+        'preview.title': 'Pré-visualizar / Baixar fontes',
         'preview.total': ' ({total} caracteres)',
         'result.detail': '{count} fonte(s) incorporada(s) · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '{count} fonte(s) incorporada(s) removida(s) · {origKB} KB → {newKB} KB',
         'result.done': 'Processamento concluído',
         'stat.chars': 'Chars a incorporar',
         'stat.drawBlocks': 'Blocos de desenho',
@@ -2442,7 +2460,7 @@
         'btn.download_zip': 'تحميل الكل (ZIP)',
         'btn.download_font': 'تنزيل',
         'btn.install': 'تثبيت',
-        'btn.preview': 'معاينة',
+        'btn.preview': 'معاينة / تنزيل الخطوط',
         'btn.svg': 'SVG إلى ASS Draw',
         'change': 'تغيير الملف',
         'discuss.header': 'نقاش · Discussion',
@@ -2453,7 +2471,6 @@
         'err.zip_depth': '⚠ يتجاوز تداخل ZIP {limit} مستويات — توقف الاستخراج.',
         'err.folder_depth': '⚠ يتجاوز تداخل المجلد {limit} مستويات — توقف الاجتياز.',
         'err.zip_corrupt': '⚠ ملف ZIP تالف أو بتنسيق غير مدعوم.',
-        'err.zip_too_large': '⚠ الملف كبير جداً ليعالجه المتصفح. يرجى تقسيمه إلى أجزاء أصغر.',
         'err.file_too_large': '⚠ يتجاوز هذا الملف 2 GB — لا يستطيع المتصفح معالجته. يرجى تقسيمه قبل الرفع.',
         'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
         'font.chars': '{n} حرف',
@@ -2498,6 +2515,8 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
         'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)…',
+        'log.font.strip.expand': '[font] تم إزالة {count} خط مضمن (انقر للتوسيع)',
+        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص…',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
@@ -2507,7 +2526,7 @@
         'opt.font.title': 'تضمين الخطوط المشار إليها',
         'opt.sysfont.desc': 'يُضمّن أيضاً خطوط النظام المشار إليها في النص .',
         'opt.sysfont.title': 'تضمين خطوط النظام',
-        'opt.strip.desc': 'يزيل الخطوط المضمنة غير القياسية الحالية لتقليل حجم الملف (يحتفظ بخطوط الرسم).',
+        'opt.strip.desc': 'يزيل الخطوط المضمنة الموجودة في النص (يحافظ على خطوط الرسم).',
         'opt.strip.title': 'إزالة الخطوط المضمنة',
         'opt.append_optimize': 'إضافة لاحقة _optimized',
         'path.linux': 'Linux: ~/.fonts أو /usr/share/fonts',
@@ -2516,9 +2535,10 @@
         'preview.draw.error': 'خطأ في التصيير: ',
         'preview.error': ' — خطأ في المعاينة',
         'preview.limit': ' (عرض أول {limit} من {total} حرف)',
-        'preview.title': 'معاينة الخط',
+        'preview.title': 'معاينة / تنزيل الخطوط',
         'preview.total': ' ({total} حرف)',
-        'result.detail': '{count} خط مضمّن · {origKB} كيلوبايت → {newKB} كيلوبايت',
+        'result.detail': 'تم تضمين {count} خط · {origKB} كيلوبايت → {newKB} كيلوبايت',
+        'result.detail.strip': 'تم إزالة {count} خط مضمن · {origKB} كيلوبايت → {newKB} كيلوبايت',
         'result.done': 'اكتملت المعالجة',
         'stat.chars': 'أحرف للتضمين',
         'stat.drawBlocks': 'كتل الرسم',
@@ -2560,7 +2580,7 @@
         'btn.download_zip': 'Tümünü indir (ZIP)',
         'btn.download_font': 'İndir',
         'btn.install': 'Yükle',
-        'btn.preview': 'Önizle',
+        'btn.preview': 'Font Önizle / İndir',
         'btn.svg': "SVG'den ASS Draw'a",
         'change': 'Dosyayı değiştir',
         'discuss.header': 'Tartışma · Discussion',
@@ -2571,7 +2591,6 @@
         'err.zip_depth': '⚠ ZIP iç içe geçme {limit} seviyeyi aşıyor — çıkarma durduruldu.',
         'err.folder_depth': '⚠ Klasör iç içe geçme {limit} seviyeyi aşıyor — tarama durduruldu.',
         'err.zip_corrupt': '⚠ ZIP dosyası bozuk veya desteklenmeyen bir formatta.',
-        'err.zip_too_large': '⚠ Dosya tarayıcının işleyemeyeceği kadar büyük. Lütfen daha küçük parçalara bölün.',
         'err.file_too_large': '⚠ Bu dosya 2 GB\'ı aşıyor — tarayıcı bu kadar büyük dosyaları işleyemiyor. Lütfen yüklemeden önce bölün.',
         'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
         'font.chars': '{n} karakter',
@@ -2616,6 +2635,8 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
         'log.font.subsetting': '[font] "{name}" alt kümeleniyor ({weight}, {chars} karakter)…',
+        'log.font.strip.expand': '[font] {count} gömülü font kaldırıldı (genişletmek için tıklayın)',
+        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Script yeniden yazılıyor…',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
@@ -2625,7 +2646,7 @@
         'opt.font.title': 'Kullanılan fontları göm',
         'opt.sysfont.desc': 'Scriptte geçen sistem fontlarını da alt kümeleyerek gömer',
         'opt.sysfont.title': 'Sistem fontlarını göm',
-        'opt.strip.desc': 'Dosya boyutunu küçültmek için mevcut standart dışı gömülü fontları kaldırır (çizim fontları korunur).',
+        'opt.strip.desc': 'Altyazıdaki mevcut gömülü fontları kaldırır (çizim komutu fontlarını korur).',
         'opt.strip.title': 'Gömülü Fontları Kaldır',
         'opt.append_optimize': '_optimized son ekini ekle',
         'path.linux': 'Linux: ~/.fonts veya /usr/share/fonts',
@@ -2634,9 +2655,10 @@
         'preview.draw.error': 'Render hatası: ',
         'preview.error': ' — Önizleme hatası',
         'preview.limit': ' (ilk {limit} / {total} karakter gösteriliyor)',
-        'preview.title': 'Font önizlemesi',
+        'preview.title': 'Font Önizle / İndir',
         'preview.total': ' (toplam {total} karakter)',
         'result.detail': '{count} font gömüldü · {origKB} KB → {newKB} KB',
+        'result.detail.strip': '{count} gömülü font kaldırıldı · {origKB} KB → {newKB} KB',
         'result.done': 'İşlem tamamlandı',
         'stat.chars': 'Gömülecek karakterler',
         'stat.drawBlocks': 'Çizim blokları',
@@ -2735,11 +2757,13 @@
       if (btnConvert && !S.converting) btnConvert.textContent = t('btn.convert');
       const btnDownload = document.getElementById('btn-download');
       if (btnDownload && !btnDownload.classList.contains('hidden') && S.outputBlobs.length === 1) btnDownload.textContent = t('btn.download');
-      
+
       if (typeof renderAssBadge === 'function') renderAssBadge();
       if (typeof renderFontError === 'function') renderFontError();
       if (typeof renderConvertResults === 'function') renderConvertResults();
       if (document.getElementById('preview-modal').classList.contains('open')) {
+        const previewTitle = document.getElementById('preview-title');
+        if (previewTitle) previewTitle.textContent = t('preview.title');
         document.querySelectorAll('.preview-dl-btn').forEach(btn => btn.textContent = t('btn.download_font'));
       }
 
@@ -3306,10 +3330,10 @@
         rowStrip.classList.toggle('selected', cbStrip.checked);
       }
 
-      document.getElementById('drawing-notice').classList.toggle('hidden', true);
-      document.getElementById('copyright-notice').classList.toggle('hidden', true);
-      document.getElementById('font-section').classList.toggle('hidden', true);
-      
+      document.getElementById('drawing-notice').classList.toggle('hidden', preserveState ? !document.getElementById('opt-draw').checked : true);
+      document.getElementById('copyright-notice').classList.toggle('hidden', preserveState ? !document.getElementById('opt-font').checked : true);
+      document.getElementById('font-section').classList.toggle('hidden', preserveState ? !document.getElementById('opt-font').checked : true);
+
       const rowSys = document.getElementById('opt-row-sysfont');
       const cbSys = document.getElementById('opt-sysfont');
       rowSys.classList.remove('hidden'); // No longer hidden
@@ -3343,7 +3367,7 @@
         cbFont.disabled = true;
         optSysFont.disabled = true;
         btnLocal.disabled = true;
-        
+
         document.getElementById('opt-row-draw').classList.add('disabled');
         document.getElementById('opt-row-font').classList.add('disabled');
         document.getElementById('opt-row-sysfont').classList.add('disabled');
@@ -3351,10 +3375,10 @@
         // Embed options enablement depends on analysis results
         cbDraw.disabled = cbDraw.dataset.shouldEnable === 'false';
         document.getElementById('opt-row-draw').classList.toggle('disabled', cbDraw.disabled);
-        
+
         cbFont.disabled = cbFont.dataset.shouldEnable === 'false';
         document.getElementById('opt-row-font').classList.toggle('disabled', cbFont.disabled);
-        
+
         // System font depends on both analysis and cbFont.checked
         if (!cbFont.checked || cbFont.disabled) {
           optSysFont.disabled = true;
@@ -3562,7 +3586,7 @@
       const details = document.createElement('details');
       details.style.cssText = 'margin:0.15rem 0;';
       const summaryEl = document.createElement('summary');
-      summaryEl.style.cssText = 'cursor:pointer;user-select:none;list-style:none;outline:none;';
+      summaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
       summaryEl.textContent = t('font.upload.expand', { total: totalEntries });
       details.appendChild(summaryEl);
       const inner = document.createElement('div');
@@ -3727,7 +3751,7 @@
             const details = document.createElement('details');
             details.style.cssText = 'margin:0.15rem 0;';
             const summaryEl = document.createElement('summary');
-            summaryEl.style.cssText = 'cursor:pointer;user-select:none;list-style:none;outline:none;';
+            summaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
             summaryEl.textContent = t('log.draw.detail.expand', { count: result.detailedDrawings.length });
             details.appendChild(summaryEl);
             const inner = document.createElement('div');
@@ -3742,7 +3766,29 @@
             details.appendChild(inner);
             box.insertBefore(summaryDiv, doneLine);
             box.insertBefore(details, doneLine);
-            box.insertBefore(details, doneLine);
+            box.scrollTop = box.scrollHeight;
+          }
+
+          if (wantStrip && result.stats.strippedNames && result.stats.strippedNames.length > 0) {
+            const box = document.getElementById('log-box');
+            const doneLine = box.lastElementChild;
+            const stripDetails = document.createElement('details');
+            stripDetails.style.cssText = 'margin:0.15rem 0;';
+            const stripSummaryEl = document.createElement('summary');
+            stripSummaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
+            stripSummaryEl.textContent = t('log.font.strip.expand', { count: result.stats.strippedNames.length });
+            stripDetails.appendChild(stripSummaryEl);
+            const stripInner = document.createElement('div');
+            stripInner.style.cssText = 'padding-left:1em;';
+            const stripFrag = document.createDocumentFragment();
+            result.stats.strippedNames.forEach(name => {
+              const div = document.createElement('div');
+              div.textContent = t('log.font.strip.item', { name });
+              stripFrag.appendChild(div);
+            });
+            stripInner.appendChild(stripFrag);
+            stripDetails.appendChild(stripInner);
+            box.insertBefore(stripDetails, doneLine);
             box.scrollTop = box.scrollHeight;
           }
 
@@ -3752,23 +3798,25 @@
             entryName: entry.file.name,
             count: result.stats.embeddedCount,
             origKB, newKB, fileIdx: i,
-            hasFonts: (result.fontBuffers && result.fontBuffers.length > 0)
+            hasFonts: (result.fontBuffers && result.fontBuffers.length > 0),
+            wantStrip,
+            strippedCount: (result.stats.strippedNames ? result.stats.strippedNames.length : 0),
           });
           S.outputBlobs.push({ name: entry.file.name, blob });
         }
 
         renderConvertResults();
-        
+
         const optWrap = document.getElementById('opt-optimize-wrap');
         if (optWrap) optWrap.classList.remove('hidden');
         btnDownload.classList.remove('hidden');
-        
+
         if (S.outputBlobs.length === 1) {
           btnDownload.onclick = () => {
-             const wantOpt = document.getElementById('opt-append-optimize').checked;
-             const origName = S.outputBlobs[0].name;
-             const dlName = wantOpt ? origName.replace(/\.(ass|ssa)$/i, '_optimized.$1') : origName;
-             downloadBlob(S.outputBlobs[0].blob, dlName);
+            const wantOpt = document.getElementById('opt-append-optimize').checked;
+            const origName = S.outputBlobs[0].name;
+            const dlName = wantOpt ? origName.replace(/\.(ass|ssa)$/i, '_optimized.$1') : origName;
+            downloadBlob(S.outputBlobs[0].blob, dlName);
           };
         } else {
           btnDownload.textContent = t('btn.download_zip');
@@ -3790,7 +3838,7 @@
       resetProgress('convert');
       updateStepStatus();
     }
-    
+
     let _convertResultsState = [];
     function renderConvertResults() {
       const resultArea = document.getElementById('result-area');
@@ -3799,24 +3847,26 @@
       for (const st of _convertResultsState) {
         const wrapper = document.createElement('div');
         wrapper.className = 'result-box';
-        
+
         const info = document.createElement('div');
         info.className = 'rb-info';
-        
+
         const title = document.createElement('div');
         title.className = 'rb-title';
         title.textContent = t('result.done') + (S.assFiles.length > 1 ? ' — ' + st.entryName : '');
-        
+
         const detail = document.createElement('div');
         detail.className = 'rb-detail';
-        detail.textContent = t('result.detail', { count: st.count, origKB: st.origKB, newKB: st.newKB });
-        
+        detail.textContent = st.wantStrip
+          ? t('result.detail.strip', { count: st.strippedCount, origKB: st.origKB, newKB: st.newKB })
+          : t('result.detail', { count: st.count, origKB: st.origKB, newKB: st.newKB });
+
         info.appendChild(title);
         info.appendChild(detail);
-        
+
         const actions = document.createElement('div');
         actions.className = 'rb-actions';
-        
+
         if (st.hasFonts) {
           const btn = document.createElement('button');
           btn.className = 'btn btn-outline';
@@ -3824,12 +3874,12 @@
           btn.onclick = () => openPreview(st.fileIdx);
           actions.appendChild(btn);
         }
-        
+
         wrapper.appendChild(info);
         wrapper.appendChild(actions);
         resultArea.appendChild(wrapper);
       }
-      
+
       const btnDownload = document.getElementById('btn-download');
       if (btnDownload && _convertResultsState.length > 0) {
         if (S.outputBlobs.length > 1) {
@@ -4107,10 +4157,10 @@
         dzASS.classList.remove('drag-over');
         try {
           if (e.dataTransfer.items) {
-             const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ass','.ssa','.zip']);
-             if (files.length) handleASSFiles(files);
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ass', '.ssa', '.zip']);
+            if (files.length) handleASSFiles(files);
           } else if (e.dataTransfer.files.length) {
-             handleASSFiles(e.dataTransfer.files);
+            handleASSFiles(e.dataTransfer.files);
           }
         } catch (err) {
           if (err.message === 'err.folder_depth') {
@@ -4163,7 +4213,7 @@
         dzFont.style.borderColor = '';
         try {
           if (e.dataTransfer.items) {
-            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf','.otf','.ttc','.woff','.woff2','.zip']);
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf', '.otf', '.ttc', '.woff', '.woff2', '.zip']);
             if (files.length) handleFonts(files);
           } else if (e.dataTransfer.files.length) {
             handleFonts(Array.from(e.dataTransfer.files));
