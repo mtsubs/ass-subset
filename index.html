@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.2">
+  <meta name="version" content="2.4.3">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -503,6 +503,10 @@
       padding: 0.1rem 0.4rem;
       border-radius: 3px;
       color: var(--ink2);
+      max-width: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .opt-sub {
@@ -1260,6 +1264,10 @@
 
       .footer-line {
         text-align: center;
+      }
+
+      .opt-tag {
+        max-width: 100px;
       }
     }
 
