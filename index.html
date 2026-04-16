@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.5">
+  <meta name="version" content="2.4.6">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2912,6 +2912,14 @@
       if (typeof renderAssBadge === 'function') renderAssBadge();
       if (typeof renderFontError === 'function') renderFontError();
       if (typeof renderConvertResults === 'function') renderConvertResults();
+      const uploadError = document.querySelector('.upload-error');
+      if (uploadError && _assBadgeState && _assBadgeState.type === 'error') {
+        uploadError.textContent = t(_assBadgeState.errKey, _assBadgeState.errParams);
+      }
+      const fbSize = document.querySelector('.file-badge .fb-size');
+      if (fbSize && _assBadgeState && _assBadgeState.type === 'loading') {
+        fbSize.textContent = t('ass.loading');
+      }
       if (document.getElementById('preview-modal').classList.contains('open')) {
         const previewTitle = document.getElementById('preview-title');
         if (previewTitle) previewTitle.textContent = t('preview.title');
@@ -2923,9 +2931,9 @@
         flnNotice.setAttribute('aria-label', t('font.loading.aria'));
         const flnProgressWrap = document.getElementById('fln-progress-wrap');
         const flnText = document.getElementById('fln-text');
-        if (flnProgressWrap && flnProgressWrap.classList.contains('hidden')) {
-          if (flnText) flnText.textContent = t('font.loading.label');
-        } else {
+        if (flnText) flnText.textContent = t('font.loading.label');
+        
+        if (flnProgressWrap && !flnProgressWrap.classList.contains('hidden')) {
           const flnProgressText = document.getElementById('fln-progress-text');
           const currentText = flnProgressText ? flnProgressText.textContent : '';
           const match = currentText.match(/(\d+)\s*\/\s*(\d+)/);
@@ -2959,19 +2967,20 @@
       s.cur = Math.min(s.target, s.cur + Math.max(0, step));
       const pct = Math.floor(s.cur);
       if (s.bar) { s.bar.style.width = pct + '%'; s.bar.setAttribute('aria-valuenow', pct); }
-      if (s.txt) s.txt.textContent = s.prefix + pct + '%';
+      if (s.txt) s.txt.textContent = s.prefix + (s.phaseKey ? t(s.phaseKey) + ' ' : '') + pct + '%';
       s.rafId = s.cur < s.target ? requestAnimationFrame(ts2 => _animProgress(id, ts2)) : null;
     }
-    function updateProgressSmooth(id, targetPct, bar, txt, prefix) {
-      if (!_pState[id]) _pState[id] = { cur: 0, target: 0, rafId: null, lastTs: null, bar: null, txt: null, prefix: '' };
+    function updateProgressSmooth(id, targetPct, bar, txt, prefix, phaseKey) {
+      if (!_pState[id]) _pState[id] = { cur: 0, target: 0, rafId: null, lastTs: null, bar: null, txt: null, prefix: '', phaseKey: '' };
       const s = _pState[id];
       s.target = targetPct;
       s.bar = bar; s.txt = txt; s.prefix = prefix || '';
+      s.phaseKey = phaseKey || '';
       if (s.rafId === null && s.cur < s.target) {
         s.lastTs = null;
         s.rafId = requestAnimationFrame(ts => _animProgress(id, ts));
       } else if (s.cur >= s.target && txt) {
-        txt.textContent = s.prefix + Math.floor(s.cur) + '%';
+        txt.textContent = s.prefix + (s.phaseKey ? t(s.phaseKey) + ' ' : '') + Math.floor(s.cur) + '%';
       }
     }
     function snapProgress(id) {
@@ -3172,7 +3181,7 @@
       }
 
       const phaseKey = { parse: 'status.parsing', draw: 'status.draw', subset: 'status.subset', rewrite: 'status.rewrite' }[msg.phase] || '';
-      updateProgressSmooth(barId, pct, bar, txt, prefix + (phaseKey ? t(phaseKey) + ' ' : ''));
+      updateProgressSmooth(barId, pct, bar, txt, prefix, phaseKey);
 
       if (localPct === 100 && isParse) {
         setTimeout(() => {
@@ -3392,7 +3401,7 @@
             <div id="analysis-progress-text" class="progress-text" aria-live="off"></div>
           </div>
         </div>
-        <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
+        <div data-i18n="status.parsing" style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
       `;
 
       const parseErrors = [];
