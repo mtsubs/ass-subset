@@ -1032,26 +1032,32 @@ function doConvert(data, id) {
         emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
       }
     }
-    if (options.wantSystemFont && parsed.systemFontsReferenced) {
-      for (const fontName of Object.keys(parsed.systemFontsReferenced)) {
-        const charInfo = parsed.systemFontsReferenced[fontName];
-        const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
-        const chars = Array.from(allChars);
-        const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
-        if (!fontFile) continue;
-        try {
-          const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id);
-          embeddedFonts.push({ name: fontName, ttf: result.ttf });
-          emitLog(id, 'log.font.subset_done', 'ok', {
-            name: fontName, weight: 'Merged',
-            origKB: (result.origSize / 1024).toFixed(0),
-            newKB: (result.ttf.length / 1024).toFixed(0),
-            pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0),
-            skipped: result.skipped
-          });
-        } catch (e) {
-          emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
-        }
+  }
+  if (options.wantSystemFont && parsed.systemFontsReferenced) {
+    for (const fontName of Object.keys(parsed.systemFontsReferenced)) {
+      const charInfo = parsed.systemFontsReferenced[fontName];
+      const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
+      const chars = Array.from(allChars);
+      const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
+      if (!fontFile) {
+        emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: '...' });
+        continue;
+      }
+      emitLog(id, 'log.font.subsetting', 'info', {
+        name: fontName, weight: 'Regular', chars: chars.length
+      });
+      try {
+        const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id);
+        embeddedFonts.push({ name: fontName, ttf: result.ttf });
+        emitLog(id, 'log.font.subset_done', 'ok', {
+          name: fontName, weight: 'Merged',
+          origKB: (result.origSize / 1024).toFixed(0),
+          newKB: (result.ttf.length / 1024).toFixed(0),
+          pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0),
+          skipped: result.skipped
+        });
+      } catch (e) {
+        emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
       }
     }
   }

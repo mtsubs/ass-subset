@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.3.2">
+  <meta name="version" content="2.4">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -564,6 +564,51 @@
       flex: 1;
     }
 
+    .info-item.expandable {
+      cursor: pointer;
+      display: block;
+      padding: 0;
+    }
+
+    .info-item.expandable .ii-summary {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.625rem 0;
+    }
+
+    .info-item.expandable .ii-details {
+      display: none;
+      padding: 0 0 0.875rem 1.75rem;
+      font-size: 0.78rem;
+      color: var(--ink2);
+      font-family: var(--mono);
+      line-height: 1.6;
+      border-top: 1px dashed var(--rule2);
+      padding-top: 0.5rem;
+    }
+
+    .info-item.expandable.open .ii-details {
+      display: block;
+    }
+
+    .info-item.expandable .ii-summary::before {
+      content: ' ';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: currentColor;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z'/%3E%3C/svg%3E") no-repeat center / contain;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.59 16.59L13.17 12L8.59 7.41L10 6L16 12L10 18L8.59 16.59Z'/%3E%3C/svg%3E") no-repeat center / contain;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      opacity: 0.5;
+    }
+
+    .info-item.expandable.open .ii-summary::before {
+      transform: rotate(90deg);
+    }
+
     .badge {
       font-family: var(--mono);
       font-size: 0.72rem;
@@ -687,8 +732,9 @@
     }
 
     .fi-system {
-      background: rgba(30, 122, 70, 0.1);
-      color: var(--ok);
+      background: var(--rule2);
+      color: var(--ink2);
+      opacity: 0.85;
     }
 
     .btn {
@@ -1293,6 +1339,7 @@
         <input type="file" id="inp-ass" accept=".ass,.ssa,.zip" multiple class="file-input-hidden"
           data-i18n-aria="aria.dz_ass" aria-label="上传字幕文件，支持拖拽或点击选择">
         <div id="ass-badge" class="hidden mt2"></div>
+        <div class="upload-error hidden"></div>
       </div>
     </div>
 
@@ -1336,6 +1383,7 @@
             <strong data-i18n="opt.sysfont.title">嵌入系统字体</strong>
             <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入</span>
           </div>
+          <span class="opt-tag">TTF / OTF / TTC / WOFF / WOFF2</span>
         </label>
         <label class="opt-row disabled" id="opt-row-strip">
           <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
@@ -1469,12 +1517,21 @@
 
     const I18N = {
       zh: {
-        'analysis.draw.found': '发现 {unique} 个唯一形状，{total} 处引用',
         'analysis.draw.label': '绘图指令（\\p1）',
         'analysis.draw.none': '未发现绘图指令',
-        'analysis.font.found': '发现 {count} 个外部字体，共 {chars} 字符',
-        'analysis.font.label': '外部字体',
-        'analysis.font.none': '未发现外部字体（均为系统字体）',
+        'analysis.draw.status.existing': '已子集化 {count} 个形状，当前无新绘图',
+        'analysis.draw.status.existing_short': '已子集化 {count} 个形状',
+        'analysis.draw.status.new': '全新 {count} 处绘图',
+        'analysis.draw.status.new_short': '全新',
+        'analysis.draw.status.update': '增量更新：{old} 个旧形状 → {new} 个当前形状',
+        'analysis.draw.status.update_short': '需增量更新',
+        'analysis.font.embedded.found': '已内嵌 {count} 个字体',
+        'analysis.font.embedded.label': '已内嵌字体',
+        'analysis.font.embedded.none': '无已内嵌字体',
+        'analysis.font.label': '第三方字体',
+        'analysis.font.none': '未发现第三方字体',
+        'analysis.font.sys.label': '系统字体',
+        'analysis.font.sys.none': '未发现引用的系统字体',
         'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
         'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
         'app.title': 'ASS 在线子集化工具',
@@ -1483,11 +1540,11 @@
         'aria.lang_toggle': '切换语言',
         'aria.log_box': '处理日志',
         'aria.modal_close': '关闭预览',
+        'aria.expand': '点击展开详情',
         'aria.preview_dl_font': '下载字体 {name}',
         'btn.convert': '开始转换',
         'btn.converting': '处理中…',
         'btn.discuss': '讨论',
-
         'btn.download': '下载优化后的字幕',
         'btn.download_zip': '下载全部 (ZIP)',
         'btn.download_font': '下载',
@@ -1516,7 +1573,6 @@
         'font.missing': '待上传',
         'font.path.summary': '💡 常见字体安装路径',
         'font.skipped': '缺失',
-        'font.system.missing': '[系统字体] 需提供',
         'font.upload.drop': '点击选择字体或 .zip 压缩包，或拖拽文件/文件夹到此处（支持 TTF / OTF / TTC…，可多选；不支持可变字体）',
         'font.upload.title': '上传字体文件',
         'font.loading.label': '正在读取字体文件，请稍候…',
@@ -1554,9 +1610,9 @@
         'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
         'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
         'opt.draw.title': '子集化绘图指令',
-        'opt.font.desc': '扫描字幕使用的字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
-        'opt.font.title': '嵌入引用字体',
-        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入',
+        'opt.font.desc': '扫描字幕引用的第三方字体（非系统字体），子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
+        'opt.font.title': '嵌入第三方字体',
+        'opt.sysfont.desc': '扫描字幕引用的系统字体，子集化后嵌入字幕；仅保留实际使用的字符',
         'opt.sysfont.title': '嵌入系统字体',
         'opt.strip.desc': '移除字幕中已有的内嵌字体，但保留子集化绘图指令所用的字型',
         'opt.strip.title': '移除内嵌字体',
@@ -1572,11 +1628,11 @@
         'result.detail': '内嵌 {count} 个字体 · {origKB} KB → {newKB} KB',
         'result.detail.strip': '移除了 {count} 个内嵌字体 · {origKB} KB → {newKB} KB',
         'result.done': '转换完成',
-        'stat.chars': '待嵌入字符',
-        'stat.drawBlocks': '绘图块',
-        'stat.extFonts': '外部字体',
+        'stat.drawBlocks': '绘图块（唯一/总计）',
+        'stat.embeddedFonts': '已内嵌字体',
+        'stat.extFonts': '第三方字体',
+        'stat.sysFonts': '系统字体',
         'stat.uniqueShapes': '唯一形状',
-
         'status.draw': '正在生成绘图字体…',
         'status.parsing': '正在解析字幕…',
         'status.rewrite': '正在重写字幕…',
@@ -1591,12 +1647,21 @@
         'step4.title': '转换 & 下载',
       },
       'zh-TW': {
-        'analysis.draw.found': '發現 {unique} 個唯一形狀，{total} 處引用',
         'analysis.draw.label': '繪圖指令（\\p1）',
         'analysis.draw.none': '未發現繪圖指令',
-        'analysis.font.found': '發現 {count} 個外部字型，共 {chars} 字元',
-        'analysis.font.label': '外部字型',
-        'analysis.font.none': '未發現外部字型（均為系統字型）',
+        'analysis.draw.status.existing': '已子集化 {count} 個形狀，目前無新繪圖',
+        'analysis.draw.status.existing_short': '已子集化 {count} 個形狀',
+        'analysis.draw.status.new': '全新 {count} 處繪圖',
+        'analysis.draw.status.new_short': '全新',
+        'analysis.draw.status.update': '增量更新：{old} 個舊形狀 → {new} 個當前形狀',
+        'analysis.draw.status.update_short': '需增量更新',
+        'analysis.font.embedded.found': '已內嵌 {count} 個字型',
+        'analysis.font.embedded.label': '已內嵌字型',
+        'analysis.font.embedded.none': '無已內嵌字型',
+        'analysis.font.label': '第三方字型',
+        'analysis.font.none': '未發現第三方字型',
+        'analysis.font.sys.label': '系統字型',
+        'analysis.font.sys.none': '未發現引用的系統字型',
         'analysis.resubset': '偵測到已子集化的繪圖指令，將進行增量更新。',
         'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
         'app.title': 'ASS 線上子集化工具',
@@ -1605,6 +1670,7 @@
         'aria.lang_toggle': '切換語言',
         'aria.log_box': '處理日誌',
         'aria.modal_close': '關閉預覽',
+        'aria.expand': '點擊展開詳情',
         'aria.preview_dl_font': '下載字型 {name}',
         'btn.convert': '開始轉換',
         'btn.converting': '處理中…',
@@ -1637,7 +1703,6 @@
         'font.missing': '待上傳',
         'font.path.summary': '💡 常見字型安裝路徑',
         'font.skipped': '缺失',
-        'font.system.missing': '[系統字型] 需提供',
         'font.upload.drop': '點擊選擇字型或 .zip 壓縮包，或拖曳檔案/資料夾到此處（支援 TTF / OTF / TTC…，可多選；不支援可變字型）',
         'font.upload.title': '上傳字型檔',
         'font.loading.label': '正在讀取字型檔，請稍候…',
@@ -1675,9 +1740,9 @@
         'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
         'opt.draw.desc': '將字幕中的 \\p1…\\p0 矢量繪圖數據提取為內嵌 TTF 字型，去除重複繪圖，減小檔案體積',
         'opt.draw.title': '子集化繪圖指令',
-        'opt.font.desc': '掃描字幕使用的字型，子集化後嵌入字幕；僅保留實際使用的字元，大幅縮小字型體積',
-        'opt.font.title': '嵌入引用字型',
-        'opt.sysfont.desc': '將字幕引用的系統字型一併子集化嵌入',
+        'opt.font.desc': '掃描字幕引用的第三方字型（非系統字型），子集化後嵌入字幕；僅保留實際使用的字元，大幅縮小字型體積',
+        'opt.font.title': '嵌入第三方字型',
+        'opt.sysfont.desc': '掃描字幕引用的系統字型，子集化後嵌入字幕；僅保留實際使用的字元',
         'opt.sysfont.title': '嵌入系統字型',
         'opt.strip.desc': '移除字幕中已有的內嵌字型，但保留子集化繪圖指令所用的字型',
         'opt.strip.title': '移除內嵌字型',
@@ -1693,9 +1758,10 @@
         'result.detail': '內嵌 {count} 個字型 · {origKB} KB → {newKB} KB',
         'result.detail.strip': '移除了 {count} 個內嵌字型 · {origKB} KB → {newKB} KB',
         'result.done': '轉換完成',
-        'stat.chars': '待嵌入字元',
-        'stat.drawBlocks': '繪圖塊',
-        'stat.extFonts': '外部字型',
+        'stat.drawBlocks': '繪圖塊（唯一/總計）',
+        'stat.embeddedFonts': '已內嵌字型',
+        'stat.extFonts': '第三方字型',
+        'stat.sysFonts': '系統字型',
         'stat.uniqueShapes': '唯一形狀',
         'status.draw': '正在生成繪圖字型…',
         'status.parsing': '正在解析字幕…',
@@ -1704,32 +1770,41 @@
         'step.active': '（進行中）',
         'step.done': '（已完成）',
         'step1.drop': '拖曳字幕檔到此，或點擊選擇',
-        'step1.hint': '	支援 .ass、.ssa 、zip 壓縮包及資料夾拖曳上傳 — 多選批量轉換',
+        'step1.hint': '支援 .ass、.ssa、zip 壓縮包及資料夾拖曳上傳 — 多選批量轉換',
         'step1.title': '上傳字幕檔',
         'step2.title': '分析結果',
         'step3.title': '選擇操作',
         'step4.title': '轉換 & 下載',
       },
       en: {
-        'analysis.draw.found': '{unique} unique shapes found, {total} references',
         'analysis.draw.label': 'Draw Commands (\\p1)',
         'analysis.draw.none': 'No draw commands found',
-        'analysis.font.found': '{count} non-system font(s) found, {chars} characters to embed',
-        'analysis.font.label': 'Non-System Fonts',
-        'analysis.font.none': 'No non-system fonts (all fonts are system fonts)',
+        'analysis.draw.status.existing': 'Already subsetted {count} shape(s), no new draws currently',
+        'analysis.draw.status.existing_short': '{count} shape(s) subsetted',
+        'analysis.draw.status.new': '{count} draw block(s), all new',
+        'analysis.draw.status.new_short': 'New',
+        'analysis.draw.status.update': 'Incremental update: {old} existing shape(s) → {new} current shape(s)',
+        'analysis.draw.status.update_short': 'Needs update',
+        'analysis.font.embedded.found': '{count} font(s) embedded',
+        'analysis.font.embedded.label': 'Embedded Fonts',
+        'analysis.font.embedded.none': 'No embedded fonts',
+        'analysis.font.label': 'Third-Party Fonts',
+        'analysis.font.none': 'No third-party fonts found',
+        'analysis.font.sys.label': 'System Fonts',
+        'analysis.font.sys.none': 'No system fonts referenced',
         'analysis.resubset': 'Existing draw subset detected — incremental update will run.',
         'app.subtitle': 'Draw Command Subsetting · Font Subset Embedding',
         'app.title': 'ASS Online Subsetter',
-        'aria.dz_ass': 'Upload subtitle script — drag and drop or click to browse',
+        'aria.dz_ass': 'Upload script — drag and drop or click to browse',
         'aria.dz_font': 'Upload font files',
         'aria.lang_toggle': 'Switch language',
         'aria.log_box': 'Processing log',
         'aria.modal_close': 'Close preview',
+        'aria.expand': 'Click to expand details',
         'aria.preview_dl_font': 'Download font {name}',
         'btn.convert': 'Run Subsetter',
         'btn.converting': 'Processing…',
         'btn.discuss': 'Discussion',
-
         'btn.download': 'Download Output',
         'btn.download_zip': 'Download All (ZIP)',
         'btn.download_font': 'Download',
@@ -1758,7 +1833,6 @@
         'font.missing': 'Upload required',
         'font.path.summary': '💡 Common font directories',
         'font.skipped': 'skipped',
-        'font.system.missing': '[System font] Upload required',
         'font.upload.drop': 'Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC…, multi-select; variable fonts not supported)',
         'font.upload.title': 'Font Files',
         'font.loading.label': 'Reading font files, please wait…',
@@ -1796,9 +1870,9 @@
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
         'opt.draw.desc': 'Extract \\p1…\\p0 vector draws into an embedded TTF, deduplicating identical shapes to reduce script size.',
         'opt.draw.title': 'Subset Draw Commands',
-        'opt.font.desc': 'Scan fonts referenced in the script, subset to used characters only, and embed them directly into the output.',
-        'opt.font.title': 'Embed Referenced Fonts',
-        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in the script.',
+        'opt.font.desc': 'Scan third-party (non-system) fonts referenced in the script, subset to used characters only, and embed them directly into the output.',
+        'opt.font.title': 'Embed Third-Party Fonts',
+        'opt.sysfont.desc': 'Scan system fonts referenced in the script, subset to used characters only, and embed them into the output.',
         'opt.sysfont.title': 'Embed System Fonts',
         'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Strip Embedded Fonts',
@@ -1814,9 +1888,10 @@
         'result.detail': '{count} font(s) embedded · {origKB} KB → {newKB} KB',
         'result.detail.strip': '{count} embedded font(s) removed · {origKB} KB → {newKB} KB',
         'result.done': 'Subsetting Complete',
-        'stat.chars': 'Chars to Embed',
-        'stat.drawBlocks': 'Draw Blocks',
-        'stat.extFonts': 'Ext. Fonts',
+        'stat.drawBlocks': 'Draw Blocks (uniq/total)',
+        'stat.embeddedFonts': 'Embedded Fonts',
+        'stat.extFonts': '3rd-Party Fonts',
+        'stat.sysFonts': 'System Fonts',
         'stat.uniqueShapes': 'Unique Shapes',
         'status.draw': 'Building draw font…',
         'status.parsing': 'Parsing script…',
@@ -1832,12 +1907,21 @@
         'step4.title': 'Run & Download',
       },
       ja: {
-        'analysis.draw.found': '{unique} 個のユニーク形状、{total} 件の参照が見つかりました',
         'analysis.draw.label': '描画コマンド（\\p1）',
         'analysis.draw.none': '描画コマンドが見つかりません',
-        'analysis.font.found': '{count} 個の外部フォント、{chars} 文字を検出',
-        'analysis.font.label': '外部フォント',
-        'analysis.font.none': '外部フォントなし（すべてシステムフォント）',
+        'analysis.draw.status.existing': '既にサブセット化された {count} 個の形状、現在新しい描画はありません',
+        'analysis.draw.status.existing_short': '{count} 個の形状をサブセット済み',
+        'analysis.draw.status.new': '{count} 件の描画ブロック（すべて新規）',
+        'analysis.draw.status.new_short': '新規',
+        'analysis.draw.status.update': '増分更新：既存 {old} 形状 → 現在 {new} 形状',
+        'analysis.draw.status.update_short': '更新が必要',
+        'analysis.font.embedded.found': '{count} 個の埋め込みフォント',
+        'analysis.font.embedded.label': '埋め込みフォント',
+        'analysis.font.embedded.none': '埋め込みフォントなし',
+        'analysis.font.label': 'サードパーティフォント',
+        'analysis.font.none': 'サードパーティフォントが見つかりません',
+        'analysis.font.sys.label': 'システムフォント',
+        'analysis.font.sys.none': '参照されているシステムフォントはありません',
         'analysis.resubset': '既存の描画サブセットを検出しました。増分更新を実行します。',
         'app.subtitle': '描画コマンドのサブセット化・フォントサブセット埋め込み',
         'app.title': 'ASS オンラインサブセットツール',
@@ -1846,11 +1930,11 @@
         'aria.lang_toggle': '言語を切り替える',
         'aria.log_box': '処理ログ',
         'aria.modal_close': 'プレビューを閉じる',
+        'aria.expand': 'クリックして詳細を展開',
         'aria.preview_dl_font': 'フォント {name} をダウンロード',
         'btn.convert': '変換開始',
         'btn.converting': '処理中…',
         'btn.discuss': 'ディスカッション',
-
         'btn.download': '最適化済み字幕をダウンロード',
         'btn.download_zip': 'すべてダウンロード (ZIP)',
         'btn.download_font': 'ダウンロード',
@@ -1879,7 +1963,6 @@
         'font.missing': 'アップロード待ち',
         'font.path.summary': '💡 よく使われるフォントディレクトリ',
         'font.skipped': 'スキップ',
-        'font.system.missing': '[システムフォント] アップロードが必要',
         'font.upload.drop': 'フォントまたは .zip ファイルを選択、またはここにファイル/フォルダをドラッグ（TTF / OTF / TTC…対応；可変フォント非対応）',
         'font.upload.title': 'フォントファイル',
         'font.loading.label': 'フォントファイルを読み込んでいます。しばらくお待ちください…',
@@ -1917,9 +2000,9 @@
         'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
         'opt.draw.desc': 'スクリプトの \\p1…\\p0 ベクター描画データを内蔵 TTF フォントに変換し、重複する描画を削除してファイルサイズを削減します。',
         'opt.draw.title': '描画コマンドのサブセット化',
-        'opt.font.desc': 'スクリプトで参照されているフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
-        'opt.font.title': '参照フォントの埋め込み',
-        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントもサブセット化して埋め込みます。',
+        'opt.font.desc': 'スクリプトで参照されているサードパーティフォント（システムフォント以外）を走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
+        'opt.font.title': 'サードパーティフォントの埋め込み',
+        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
         'opt.sysfont.title': 'システムフォントの埋め込み',
         'opt.strip.desc': 'スクリプト内の既存の埋め込みフォントを削除します（描画サブセット字型は保持）。',
         'opt.strip.title': '埋め込みフォントを削除',
@@ -1935,9 +2018,10 @@
         'result.detail': '{count} 個のフォントを埋め込み · {origKB} KB → {newKB} KB',
         'result.detail.strip': '{count} 個の埋め込みフォントを削除 · {origKB} KB → {newKB} KB',
         'result.done': '変換完了',
-        'stat.chars': '埋め込み文字数',
-        'stat.drawBlocks': '描画ブロック',
-        'stat.extFonts': '外部フォント',
+        'stat.drawBlocks': '描画ブロック（唯一/合計）',
+        'stat.embeddedFonts': '埋め込み済みフォント',
+        'stat.extFonts': 'サードパーティフォント',
+        'stat.sysFonts': 'システムフォント',
         'stat.uniqueShapes': 'ユニーク形状',
         'status.draw': '描画フォントを構築中…',
         'status.parsing': 'スクリプトを解析中…',
@@ -1953,12 +2037,21 @@
         'step4.title': '変換 & ダウンロード',
       },
       ko: {
-        'analysis.draw.found': '{unique}개의 고유 도형, {total}개의 참조가 발견되었습니다',
         'analysis.draw.label': '드로우 명령어 (\\p1)',
         'analysis.draw.none': '드로우 명령어가 없습니다',
-        'analysis.font.found': '{count}개의 외부 폰트, {chars}개의 문자 발견',
-        'analysis.font.label': '외부 폰트',
-        'analysis.font.none': '외부 폰트 없음 (모두 시스템 폰트)',
+        'analysis.draw.status.existing': '이미 서브셋화된 {count}개 도형, 신규 드로우 없음',
+        'analysis.draw.status.existing_short': '{count}개 도형 서브셋 완료',
+        'analysis.draw.status.new': '{count}개의 드로우 블록 (모두 신규)',
+        'analysis.draw.status.new_short': '신규',
+        'analysis.draw.status.update': '증분 업데이트: 기존 {old}개 도형 → 현재 {new}개 도형',
+        'analysis.draw.status.update_short': '업데이트 필요',
+        'analysis.font.embedded.found': '{count}개의 내장 폰트',
+        'analysis.font.embedded.label': '내장 폰트',
+        'analysis.font.embedded.none': '내장 폰트 없음',
+        'analysis.font.label': '서드파티 폰트',
+        'analysis.font.none': '서드파티 폰트가 없습니다',
+        'analysis.font.sys.label': '시스템 폰트',
+        'analysis.font.sys.none': '참조된 시스템 폰트가 없습니다',
         'analysis.resubset': '기존 드로우 서브셋이 감지되었습니다. 증분 업데이트를 수행합니다.',
         'app.subtitle': '드로우 명령어 서브셋화 · 폰트 서브셋 삽입',
         'app.title': 'ASS 온라인 서브셋 도구',
@@ -1967,11 +2060,11 @@
         'aria.lang_toggle': '언어 변경',
         'aria.log_box': '처리 로그',
         'aria.modal_close': '미리보기 닫기',
+        'aria.expand': '클릭하여 세부 정보 펼치기',
         'aria.preview_dl_font': '폰트 {name} 다운로드',
         'btn.convert': '변환 시작',
         'btn.converting': '처리 중…',
         'btn.discuss': '토론',
-
         'btn.download': '최적화된 자막 다운로드',
         'btn.download_zip': '전체 다운로드 (ZIP)',
         'btn.download_font': '다운로드',
@@ -2000,7 +2093,6 @@
         'font.missing': '업로드 필요',
         'font.path.summary': '💡 주요 폰트 디렉터리',
         'font.skipped': '건너뜀',
-        'font.system.missing': '[시스템 폰트] 업로드 필요',
         'font.upload.drop': '폰트 또는 .zip 파일을 선택하거나 여기에 파일/폴더를 드래그하세요 (TTF / OTF / TTC… 지원; 가변 폰트 미지원)',
         'font.upload.title': '폰트 파일',
         'font.loading.label': '폰트 파일을 읽는 중입니다. 잠시 기다려 주세요…',
@@ -2038,9 +2130,9 @@
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
         'opt.draw.desc': '자막의 \\p1…\\p0 벡터 드로우 데이터를 내장 TTF 폰트로 추출하고 중복 도형을 제거하여 파일 크기를 줄입니다.',
         'opt.draw.title': '드로우 명령어 서브셋화',
-        'opt.font.desc': '스크립트에서 참조된 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 직접 삽입합니다.',
-        'opt.font.title': '참조 폰트 삽입',
-        'opt.sysfont.desc': '스크립트에서 참조된 시스템 폰트도 서브셋화하여 삽입합니다.',
+        'opt.font.desc': '자막에서 참조된 서드파티(비시스템) 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 직접 삽입합니다.',
+        'opt.font.title': '서드파티 폰트 삽입',
+        'opt.sysfont.desc': '자막에서 참조된 시스템 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 삽입합니다. 서드파티 폰트 삽입과 독립적으로 작동합니다.',
         'opt.sysfont.title': '시스템 폰트 삽입',
         'opt.strip.desc': '자막에 내장된 기존 폰트를 제거합니다(드로우 서브셋 폰트는 유지).',
         'opt.strip.title': '내장 폰트 제거',
@@ -2056,9 +2148,10 @@
         'result.detail': '{count}개 폰트 삽입 · {origKB} KB → {newKB} KB',
         'result.detail.strip': '내장 폰트 {count}개 제거됨 · {origKB} KB → {newKB} KB',
         'result.done': '변환 완료',
-        'stat.chars': '삽입 문자',
-        'stat.drawBlocks': '드로우 블록',
-        'stat.extFonts': '외부 폰트',
+        'stat.drawBlocks': '드로우 블록 (고유/총계)',
+        'stat.embeddedFonts': '내장 폰트',
+        'stat.extFonts': '서드파티 폰트',
+        'stat.sysFonts': '시스템 폰트',
         'stat.uniqueShapes': '고유 도형',
         'status.draw': '드로우 폰트 구축 중…',
         'status.parsing': '스크립트 파싱 중…',
@@ -2074,12 +2167,21 @@
         'step4.title': '변환 & 다운로드',
       },
       es: {
-        'analysis.draw.found': 'Se encontraron {unique} formas únicas, {total} referencias',
         'analysis.draw.label': 'Comandos de dibujo (\\p1)',
         'analysis.draw.none': 'No se encontraron comandos de dibujo',
-        'analysis.font.found': 'Se encontraron {count} fuentes externas, {chars} caracteres en total',
-        'analysis.font.label': 'Fuentes externas',
-        'analysis.font.none': 'No hay fuentes externas (todas son del sistema)',
+        'analysis.draw.status.existing': 'Ya subconjuntadas {count} formas, sin dibujos nuevos actualmente',
+        'analysis.draw.status.existing_short': '{count} formas subconjuntadas',
+        'analysis.draw.status.new': '{count} bloques de dibujo (todos nuevos)',
+        'analysis.draw.status.new_short': 'Nuevos',
+        'analysis.draw.status.update': 'Actualización incremental: {old} formas existentes → {new} formas actuales',
+        'analysis.draw.status.update_short': 'Requiere actualización',
+        'analysis.font.embedded.found': '{count} fuente(s) incrustada(s)',
+        'analysis.font.embedded.label': 'Fuentes incrustadas',
+        'analysis.font.embedded.none': 'Sin fuentes incrustadas',
+        'analysis.font.label': 'Fuentes de terceros',
+        'analysis.font.none': 'No se encontraron fuentes de terceros',
+        'analysis.font.sys.label': 'Fuentes del sistema',
+        'analysis.font.sys.none': 'No hay referencias a fuentes del sistema',
         'analysis.resubset': 'Se detectó un subconjunto de dibujo existente; se realizará una actualización incremental.',
         'app.subtitle': 'Subconjunto de comandos de dibujo · Incrustación de fuentes',
         'app.title': 'Herramienta ASS de subconjunto',
@@ -2088,11 +2190,11 @@
         'aria.lang_toggle': 'Cambiar idioma',
         'aria.log_box': 'Registro de procesamiento',
         'aria.modal_close': 'Cerrar vista previa',
+        'aria.expand': 'Haz clic para expandir los detalles',
         'aria.preview_dl_font': 'Descargar fuente {name}',
         'btn.convert': 'Iniciar conversión',
         'btn.converting': 'Procesando…',
         'btn.discuss': 'Discusión',
-
         'btn.download': 'Descargar subtítulo optimizado',
         'btn.download_zip': 'Descargar todo (ZIP)',
         'btn.download_font': 'Descargar',
@@ -2121,7 +2223,6 @@
         'font.missing': 'Pendiente de subir',
         'font.path.summary': '💡 Directorios de fuentes comunes',
         'font.skipped': 'omitida',
-        'font.system.missing': '[Fuente del sistema] Requiere subir',
         'font.upload.drop': 'Haz clic para seleccionar fuentes o un .zip, o arrastra archivos/carpetas aquí (TTF / OTF / TTC…; fuentes variables no compatibles)',
         'font.upload.title': 'Archivos de fuentes',
         'font.loading.label': 'Leyendo archivos de fuentes, por favor esperá…',
@@ -2149,19 +2250,19 @@
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) no fue subida, omitiendo.',
         'log.font.none_external': '[font] No hay fuentes externas para incrustar.',
         'log.font.parse_fail': '[font] Error al parsear fuente: {error}',
+        'log.font.strip.expand': '[font] {count} fuentes incrustadas eliminadas (clic para expandir)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
         'log.font.subsetting': '[font] Creando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.font.strip.expand': '[font] {count} fuentes incrustadas eliminadas (clic para expandir)',
-        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Reescribiendo el script…',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
         'opt.draw.desc': 'Extrae los vectores \\p1…\\p0 en una fuente TTF incrustada, eliminando formas duplicadas para reducir el tamaño del script.',
         'opt.draw.title': 'Subconjunto de comandos de dibujo',
-        'opt.font.desc': 'Escanea las fuentes del script, crea subconjuntos con solo los caracteres usados y los incrusta en la salida.',
-        'opt.font.title': 'Incrustar fuentes referenciadas',
-        'opt.sysfont.desc': 'También crea subconjunto e incrusta las fuentes del sistema referenciadas.',
+        'opt.font.desc': 'Escanea las fuentes de terceros (no del sistema) referenciadas en el guion, crea subconjunto solo con los caracteres usados y las incrusta directamente en la salida.',
+        'opt.font.title': 'Incrustar fuentes de terceros',
+        'opt.sysfont.desc': 'Escanea las fuentes del sistema referenciadas en el guion, subconjunta solo los caracteres usados y las incrusta en la salida. Opera de forma independiente a la incrustación de fuentes de terceros.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
         'opt.strip.desc': 'Elimina las fuentes incrustadas existentes en el guion (conserva las fuentes de dibujo).',
         'opt.strip.title': 'Eliminar fuentes incrustadas',
@@ -2177,9 +2278,10 @@
         'result.detail': '{count} fuente(s) incrustada(s) · {origKB} KB → {newKB} KB',
         'result.detail.strip': 'Se eliminaron {count} fuentes incrustadas · {origKB} KB → {newKB} KB',
         'result.done': 'Conversión completada',
-        'stat.chars': 'Caracteres',
-        'stat.drawBlocks': 'Bloques de dibujo',
-        'stat.extFonts': 'Fuentes ext.',
+        'stat.drawBlocks': 'Bloques de dibujo (únicos/total)',
+        'stat.embeddedFonts': 'Fuentes incrustadas',
+        'stat.extFonts': 'Fuentes de terceros',
+        'stat.sysFonts': 'Fuentes del sistema',
         'stat.uniqueShapes': 'Formas únicas',
         'status.draw': 'Construyendo fuente de dibujo…',
         'status.parsing': 'Parseando el script…',
@@ -2195,12 +2297,21 @@
         'step4.title': 'Convertir y descargar',
       },
       ru: {
-        'analysis.draw.found': 'Найдено {unique} уникальных форм, {total} ссылок',
         'analysis.draw.label': 'Команды рисования (\\p1)',
         'analysis.draw.none': 'Команды рисования не найдены',
-        'analysis.font.found': 'Найдено {count} внешних шрифтов, {chars} символов для встраивания',
-        'analysis.font.label': 'Внешние шрифты',
-        'analysis.font.none': 'Внешние шрифты не найдены (все шрифты системные)',
+        'analysis.draw.status.existing': 'Уже субсетизированы {count} форм, новых рисунков нет',
+        'analysis.draw.status.existing_short': '{count} форм субсетизированы',
+        'analysis.draw.status.new': '{count} блок(ов) рисования (все новые)',
+        'analysis.draw.status.new_short': 'Новые',
+        'analysis.draw.status.update': 'Инкрементальное обновление: {old} существующих форм → {new} текущих форм',
+        'analysis.draw.status.update_short': 'Требует обновления',
+        'analysis.font.embedded.found': '{count} шрифт(ов) встроено',
+        'analysis.font.embedded.label': 'Встроенные шрифты',
+        'analysis.font.embedded.none': 'Нет встроенных шрифтов',
+        'analysis.font.label': 'Шрифты третьих сторон',
+        'analysis.font.none': 'Шрифты третьих сторон не найдены',
+        'analysis.font.sys.label': 'Системные шрифты',
+        'analysis.font.sys.none': 'Нет ссылок на системные шрифты',
         'analysis.resubset': 'Обнаружен существующий блок рисования — будет выполнено инкрементальное обновление.',
         'app.subtitle': 'Подмножество команд рисования · Встраивание шрифтов',
         'app.title': 'ASS онлайн-субсеттер',
@@ -2209,11 +2320,11 @@
         'aria.lang_toggle': 'Сменить язык',
         'aria.log_box': 'Журнал обработки',
         'aria.modal_close': 'Закрыть предпросмотр',
+        'aria.expand': 'Нажмите для раскрытия деталей',
         'aria.preview_dl_font': 'Скачать шрифт {name}',
         'btn.convert': 'Запустить субсеттер',
         'btn.converting': 'Обработка…',
         'btn.discuss': 'Обсуждение',
-
         'btn.download': 'Скачать результат',
         'btn.download_zip': 'Скачать всё (ZIP)',
         'btn.download_font': 'Скачать',
@@ -2242,7 +2353,6 @@
         'font.missing': 'Требует загрузки',
         'font.path.summary': '💡 Стандартные папки шрифтов',
         'font.skipped': 'пропущен',
-        'font.system.missing': '[Системный шрифт] Требует загрузки',
         'font.upload.drop': 'Нажмите для выбора шрифтов или .zip-архива, или перетащите файлы/папки сюда (TTF / OTF / TTC…; вариативные шрифты не поддерживаются)',
         'font.upload.title': 'Файлы шрифтов',
         'font.loading.label': 'Чтение файлов шрифтов, пожалуйста подождите…',
@@ -2270,19 +2380,19 @@
         'log.font.missing': '[font] ⚠ «{name}» ({weight}) не загружен, пропуск.',
         'log.font.none_external': '[font] Внешние шрифты для встраивания не найдены.',
         'log.font.parse_fail': '[font] Ошибка разбора шрифта: {error}',
+        'log.font.strip.expand': '[font] Удалено {count} встроенных шрифтов (нажмите, чтобы развернуть)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
         'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)…',
-        'log.font.strip.expand': '[font] Удалено {count} встроенных шрифтов (нажмите, чтобы развернуть)',
-        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Перезапись скрипта…',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
         'opt.draw.desc': 'Извлекает векторные данные \\p1…\\p0 в встроенный TTF-шрифт, устраняя дублирующиеся формы для уменьшения объёма скрипта.',
         'opt.draw.title': 'Подмножество команд рисования',
-        'opt.font.desc': 'Сканирует шрифты, используемые в скрипте, создаёт подмножество из реально применяемых символов и встраивает их в выходной файл.',
-        'opt.font.title': 'Встроить используемые шрифты',
-        'opt.sysfont.desc': 'Также создаёт подмножество и встраивает системные шрифты, указанные в скрипте.',
+        'opt.font.desc': 'Сканирует шрифты третьих сторон (не системные), указанные в скрипте, создаёт подмножество только из реально применяемых символов и встраивает их напрямую в вывод.',
+        'opt.font.title': 'Встроить шрифты третьих сторон',
+        'opt.sysfont.desc': 'Сканирует системные шрифты, указанные в скрипте, создаёт подмножество только из используемых символов и встраивает их в вывод. Работает независимо от встраивания шрифтов третьих сторон.',
         'opt.sysfont.title': 'Встроить системные шрифты',
         'opt.strip.desc': 'Удаляет существующие встроенные шрифты (сохраняет шрифты команд рисования).',
         'opt.strip.title': 'Удалить встроенные шрифты',
@@ -2298,10 +2408,11 @@
         'result.detail': 'Встроено {count} шрифт(ов) · {origKB} КБ → {newKB} КБ',
         'result.detail.strip': 'Удалено {count} встр. шрифтов · {origKB} КБ → {newKB} КБ',
         'result.done': 'Обработка завершена',
-        'stat.chars': 'Символов к встраиванию',
-        'stat.drawBlocks': 'Блоки рисования',
-        'stat.extFonts': 'Внеш. шрифты',
-        'stat.uniqueShapes': 'Уник. формы',
+        'stat.drawBlocks': 'Блоки рисования (уникальные/всего)',
+        'stat.embeddedFonts': 'Встроенные шрифты',
+        'stat.extFonts': 'Шрифты третьих сторон',
+        'stat.sysFonts': 'Системные шрифты',
+        'stat.uniqueShapes': 'Уникальные формы',
         'status.draw': 'Построение шрифта рисования…',
         'status.parsing': 'Разбор скрипта…',
         'status.rewrite': 'Перезапись скрипта…',
@@ -2316,12 +2427,21 @@
         'step4.title': 'Обработка и скачивание',
       },
       'pt-BR': {
-        'analysis.draw.found': 'Encontradas {unique} formas únicas, {total} referências',
         'analysis.draw.label': 'Comandos de desenho (\\p1)',
         'analysis.draw.none': 'Nenhum comando de desenho encontrado',
-        'analysis.font.found': '{count} fonte(s) externa(s) encontrada(s), {chars} caracteres para incorporar',
-        'analysis.font.label': 'Fontes externas',
-        'analysis.font.none': 'Nenhuma fonte externa (todas são fontes do sistema)',
+        'analysis.draw.status.existing': 'Já subconjuntadas {count} formas, sem novos desenhos atualmente',
+        'analysis.draw.status.existing_short': '{count} formas subconjuntadas',
+        'analysis.draw.status.new': '{count} blocos de desenho, todos novos',
+        'analysis.draw.status.new_short': 'Novos',
+        'analysis.draw.status.update': 'Atualização incremental: {old} formas existentes → {new} formas atuais',
+        'analysis.draw.status.update_short': 'Precisa de atualização',
+        'analysis.font.embedded.found': '{count} fonte(s) incorporada(s)',
+        'analysis.font.embedded.label': 'Fontes incorporadas',
+        'analysis.font.embedded.none': 'Nenhuma fonte incorporada',
+        'analysis.font.label': 'Fontes de terceiros',
+        'analysis.font.none': 'Nenhuma fonte de terceiros encontrada',
+        'analysis.font.sys.label': 'Fontes do sistema',
+        'analysis.font.sys.none': 'Nenhuma fonte do sistema referenciada',
         'analysis.resubset': 'Subconjunto de desenho existente detectado — atualização incremental será executada.',
         'app.subtitle': 'Subconjunto de comandos de desenho · Incorporação de fontes',
         'app.title': 'ASS Subsetter Online',
@@ -2330,11 +2450,11 @@
         'aria.lang_toggle': 'Alterar idioma',
         'aria.log_box': 'Log de processamento',
         'aria.modal_close': 'Fechar pré-visualização',
+        'aria.expand': 'Clique para expandir os detalhes',
         'aria.preview_dl_font': 'Baixar fonte {name}',
         'btn.convert': 'Executar Subsetter',
         'btn.converting': 'Processando…',
         'btn.discuss': 'Discussão',
-
         'btn.download': 'Baixar legenda otimizada',
         'btn.download_zip': 'Baixar tudo (ZIP)',
         'btn.download_font': 'Baixar',
@@ -2363,7 +2483,6 @@
         'font.missing': 'Aguardando envio',
         'font.path.summary': '💡 Diretórios de fontes comuns',
         'font.skipped': 'ignorada',
-        'font.system.missing': '[Fonte do sistema] Envio necessário',
         'font.upload.drop': 'Clique para selecionar fontes ou um .zip, ou arraste arquivos/pastas aqui (TTF / OTF / TTC…; fontes variáveis não suportadas)',
         'font.upload.title': 'Arquivos de fonte',
         'font.loading.label': 'Lendo arquivos de fonte, aguarde…',
@@ -2391,19 +2510,19 @@
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) não foi enviado, pulando.',
         'log.font.none_external': '[font] Nenhuma fonte externa para incorporar.',
         'log.font.parse_fail': '[font] Falha ao analisar fonte: {error}',
+        'log.font.strip.expand': '[font] {count} fontes incorporadas removidas (clique para expandir)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
         'log.font.subsetting': '[font] Criando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.font.strip.expand': '[font] {count} fontes incorporadas removidas (clique para expandir)',
-        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Reescrevendo script…',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
         'opt.draw.desc': 'Extrai dados vetoriais \\p1…\\p0 para uma TTF incorporada, removendo formas duplicadas para reduzir o tamanho do script.',
         'opt.draw.title': 'Subconjunto de comandos de desenho',
-        'opt.font.desc': 'Escaneia as fontes referenciadas no script, cria subconjunto com apenas os caracteres usados e incorpora diretamente na saída.',
-        'opt.font.title': 'Incorporar fontes referenciadas',
-        'opt.sysfont.desc': 'Também cria subconjunto e incorpora fontes do sistema referenciadas no script.',
+        'opt.font.desc': 'Escaneia as fontes de terceiros (não do sistema) referenciadas no script, cria subconjunto apenas com os caracteres usados e as incorpora diretamente na saída.',
+        'opt.font.title': 'Incorporar fontes de terceiros',
+        'opt.sysfont.desc': 'Escaneia as fontes do sistema referenciadas no script, cria subconjunto apenas com os caracteres usados e as incorpora na saída. Funciona independentemente da incorporação de fontes de terceiros.',
         'opt.sysfont.title': 'Incorporar fontes do sistema',
         'opt.strip.desc': 'Remove fontes embutidas não padronizadas existentes para reduzir o tamanho do arquivo (mantém fontes de desenho).',
         'opt.strip.title': 'Remover Fontes Embutidas',
@@ -2419,9 +2538,10 @@
         'result.detail': '{count} fonte(s) incorporada(s) · {origKB} KB → {newKB} KB',
         'result.detail.strip': '{count} fonte(s) incorporada(s) removida(s) · {origKB} KB → {newKB} KB',
         'result.done': 'Processamento concluído',
-        'stat.chars': 'Chars a incorporar',
-        'stat.drawBlocks': 'Blocos de desenho',
-        'stat.extFonts': 'Fontes ext.',
+        'stat.drawBlocks': 'Blocos de desenho (únicos/total)',
+        'stat.embeddedFonts': 'Fontes incorporadas',
+        'stat.extFonts': 'Fontes de terceiros',
+        'stat.sysFonts': 'Fontes do sistema',
         'stat.uniqueShapes': 'Formas únicas',
         'status.draw': 'Construindo fonte de desenho…',
         'status.parsing': 'Analisando script…',
@@ -2437,12 +2557,21 @@
         'step4.title': 'Executar e baixar',
       },
       ar: {
-        'analysis.draw.found': 'تم العثور على {unique} شكل فريد، {total} إحالة',
         'analysis.draw.label': 'أوامر الرسم (\\p1)',
         'analysis.draw.none': 'لم يتم العثور على أوامر رسم',
-        'analysis.font.found': 'تم العثور على {count} خط خارجي، {chars} حرف للتضمين',
-        'analysis.font.label': 'الخطوط الخارجية',
-        'analysis.font.none': 'لا توجد خطوط خارجية (جميعها خطوط نظام)',
+        'analysis.draw.status.existing': 'تم بالفعل تقليص {count} شكل، لا توجد رسوم جديدة حالياً',
+        'analysis.draw.status.existing_short': 'تم تقليص {count} شكل',
+        'analysis.draw.status.new': '{count} كتلة رسم (كلها جديدة)',
+        'analysis.draw.status.new_short': 'جديدة',
+        'analysis.draw.status.update': 'تحديث تدريجي: {old} أشكال موجودة → {new} أشكال حالية',
+        'analysis.draw.status.update_short': 'يحتاج تحديث',
+        'analysis.font.embedded.found': 'تم تضمين {count} خط',
+        'analysis.font.embedded.label': 'الخطوط المضمنة',
+        'analysis.font.embedded.none': 'لا توجد خطوط مضمنة',
+        'analysis.font.label': 'خطوط الطرف الثالث',
+        'analysis.font.none': 'لم يتم العثور على خطوط الطرف الثالث',
+        'analysis.font.sys.label': 'خطوط النظام',
+        'analysis.font.sys.none': 'لا توجد إشارات إلى خطوط النظام',
         'analysis.resubset': 'تم اكتشاف مجموعة رسم فرعية موجودة — سيتم تشغيل تحديث تدريجي.',
         'app.subtitle': 'تقليص أوامر الرسم · تضمين الخطوط',
         'app.title': 'أداة ASS للتقليص عبر الإنترنت',
@@ -2451,11 +2580,11 @@
         'aria.lang_toggle': 'تغيير اللغة',
         'aria.log_box': 'سجل المعالجة',
         'aria.modal_close': 'إغلاق المعاينة',
+        'aria.expand': 'انقر لتوسيع التفاصيل',
         'aria.preview_dl_font': 'تنزيل خط {name}',
         'btn.convert': 'تشغيل المُقلِّص',
         'btn.converting': 'جارٍ المعالجة…',
         'btn.discuss': 'نقاش',
-
         'btn.download': 'تحميل الناتج',
         'btn.download_zip': 'تحميل الكل (ZIP)',
         'btn.download_font': 'تنزيل',
@@ -2484,7 +2613,6 @@
         'font.missing': 'في انتظار الرفع',
         'font.path.summary': '💡 مسارات الخطوط الشائعة',
         'font.skipped': 'تم التخطي',
-        'font.system.missing': '[خط النظام] يلزم الرفع',
         'font.upload.drop': 'انقر لاختيار الخطوط أو ملف .zip، أو اسحب الملفات/المجلدات هنا (TTF / OTF / TTC…؛ الخطوط المتغيرة غير مدعومة)',
         'font.upload.title': 'ملفات الخطوط',
         'font.loading.label': 'جارٍ قراءة ملفات الخطوط، يرجى الانتظار…',
@@ -2512,19 +2640,19 @@
         'log.font.missing': '[font] ⚠ لم يتم رفع "{name}" ({weight})، جارٍ التخطي.',
         'log.font.none_external': '[font] لا توجد خطوط خارجية للتضمين.',
         'log.font.parse_fail': '[font] فشل تحليل الخط: {error}',
+        'log.font.strip.expand': '[font] تم إزالة {count} خط مضمن (انقر للتوسيع)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
         'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)…',
-        'log.font.strip.expand': '[font] تم إزالة {count} خط مضمن (انقر للتوسيع)',
-        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص…',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
         'opt.draw.desc': 'يستخرج بيانات الرسم المتجه \\p1…\\p0 في خط TTF مضمّن، مع إزالة الأشكال المتكررة للحد من حجم الملف.',
         'opt.draw.title': 'تقليص أوامر الرسم',
-        'opt.font.desc': 'يفحص الخطوط المشار إليها في النص، ويُنشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها مباشرةً في الملف الناتج.',
-        'opt.font.title': 'تضمين الخطوط المشار إليها',
-        'opt.sysfont.desc': 'يُضمّن أيضاً خطوط النظام المشار إليها في النص .',
+        'opt.font.desc': 'يفحص خطوط الطرف الثالث (غير النظامية) المشار إليها في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها مباشرةً في الملف الناتج.',
+        'opt.font.title': 'تضمين خطوط الطرف الثالث',
+        'opt.sysfont.desc': 'يفحص خطوط النظام المشار إليها في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط ويضمنها في المخرج. يعمل بشكل مستقل عن تضمين خطوط الطرف الثالث.',
         'opt.sysfont.title': 'تضمين خطوط النظام',
         'opt.strip.desc': 'يزيل الخطوط المضمنة الموجودة في النص (يحافظ على خطوط الرسم).',
         'opt.strip.title': 'إزالة الخطوط المضمنة',
@@ -2540,9 +2668,10 @@
         'result.detail': 'تم تضمين {count} خط · {origKB} كيلوبايت → {newKB} كيلوبايت',
         'result.detail.strip': 'تم إزالة {count} خط مضمن · {origKB} كيلوبايت → {newKB} كيلوبايت',
         'result.done': 'اكتملت المعالجة',
-        'stat.chars': 'أحرف للتضمين',
-        'stat.drawBlocks': 'كتل الرسم',
-        'stat.extFonts': 'خطوط خارجية',
+        'stat.drawBlocks': 'كتل الرسم (فريدة/الإجمالي)',
+        'stat.embeddedFonts': 'الخطوط المضمنة',
+        'stat.extFonts': 'خطوط الطرف الثالث',
+        'stat.sysFonts': 'خطوط النظام',
         'stat.uniqueShapes': 'أشكال فريدة',
         'status.draw': 'جارٍ بناء خط الرسم…',
         'status.parsing': 'جارٍ تحليل النص…',
@@ -2558,12 +2687,21 @@
         'step4.title': 'تشغيل وتحميل',
       },
       tr: {
-        'analysis.draw.found': '{unique} benzersiz şekil, {total} referans bulundu',
         'analysis.draw.label': 'Çizim komutları (\\p1)',
         'analysis.draw.none': 'Çizim komutu bulunamadı',
-        'analysis.font.found': '{count} harici font, {chars} karakter bulundu',
-        'analysis.font.label': 'Harici fontlar',
-        'analysis.font.none': 'Harici font yok (tümü sistem fontu)',
+        'analysis.draw.status.existing': 'Zaten {count} şekil alt kümeleştirildi, şu anda yeni çizim yok',
+        'analysis.draw.status.existing_short': '{count} şekil alt kümeleştirildi',
+        'analysis.draw.status.new': '{count} çizim bloğu (hepsi yeni)',
+        'analysis.draw.status.new_short': 'Yeni',
+        'analysis.draw.status.update': 'Artımlı güncelleme: {old} mevcut şekil → {new} mevcut şekil',
+        'analysis.draw.status.update_short': 'Güncelleme gerekiyor',
+        'analysis.font.embedded.found': '{count} font gömüldü',
+        'analysis.font.embedded.label': 'Gömülü fontlar',
+        'analysis.font.embedded.none': 'Gömülü font yok',
+        'analysis.font.label': 'Üçüncü taraf fontlar',
+        'analysis.font.none': 'Üçüncü taraf font bulunamadı',
+        'analysis.font.sys.label': 'Sistem fontları',
+        'analysis.font.sys.none': 'Sistem fontlarına referans yok',
         'analysis.resubset': 'Mevcut çizim alt kümesi tespit edildi — artımlı güncelleme yapılacak.',
         'app.subtitle': 'Çizim komutu alt kümeleme · Font gömme',
         'app.title': 'ASS Çevrimiçi Alt Kümeleme Aracı',
@@ -2572,10 +2710,11 @@
         'aria.lang_toggle': 'Dil değiştir',
         'aria.log_box': 'İşlem günlüğü',
         'aria.modal_close': 'Önizlemeyi kapat',
+        'aria.expand': 'Ayrıntıları genişletmek için tıklayın',
+        'aria.preview_dl_font': 'Font {name} indir',
         'btn.convert': 'Alt Kümelemeyi Çalıştır',
         'btn.converting': 'İşleniyor…',
         'btn.discuss': 'Tartışma',
-
         'btn.download': 'Çıktıyı indir',
         'btn.download_zip': 'Tümünü indir (ZIP)',
         'btn.download_font': 'İndir',
@@ -2604,7 +2743,6 @@
         'font.missing': 'Yükleme bekleniyor',
         'font.path.summary': '💡 Yaygın font dizinleri',
         'font.skipped': 'atlandı',
-        'font.system.missing': '[Sistem fontu] Yükleme gerekli',
         'font.upload.drop': 'Font veya .zip dosyası seçmek için tıklayın ya da dosya/klasör buraya sürükleyin (TTF / OTF / TTC… desteklenir; değişken fontlar desteklenmez)',
         'font.upload.title': 'Font dosyaları',
         'font.loading.label': 'Font dosyaları okunuyor, lütfen bekleyin…',
@@ -2632,19 +2770,19 @@
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) yüklenmedi, atlanıyor.',
         'log.font.none_external': '[font] Gömülecek harici font yok.',
         'log.font.parse_fail': '[font] Font ayrıştırma hatası: {error}',
+        'log.font.strip.expand': '[font] {count} gömülü font kaldırıldı (genişletmek için tıklayın)',
+        'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
         'log.font.subsetting': '[font] "{name}" alt kümeleniyor ({weight}, {chars} karakter)…',
-        'log.font.strip.expand': '[font] {count} gömülü font kaldırıldı (genişletmek için tıklayın)',
-        'log.font.strip.item': '  - {name}',
         'log.rewrite.start': '[ass] Script yeniden yazılıyor…',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
         'opt.draw.desc': '\\p1…\\p0 vektör çizim verilerini gömülü TTF fontuna çıkarır; tekrarlayan şekilleri kaldırarak dosya boyutunu küçültür.',
         'opt.draw.title': 'Çizim komutlarını alt kümele',
-        'opt.font.desc': 'Scriptte kullanılan fontları tarar, yalnızca kullanılan karakterleri alt kümeleyerek çıktıya gömer.',
-        'opt.font.title': 'Kullanılan fontları göm',
-        'opt.sysfont.desc': 'Scriptte geçen sistem fontlarını da alt kümeleyerek gömer',
+        'opt.font.desc': 'Scriptte referans verilen üçüncü taraf (sistem dışı) fontları tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve doğrudan çıktıya gömer.',
+        'opt.font.title': 'Üçüncü taraf fontları göm',
+        'opt.sysfont.desc': 'Scriptte referans verilen sistem fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer. Üçüncü taraf font gömme işleminden bağımsız çalışır.',
         'opt.sysfont.title': 'Sistem fontlarını göm',
         'opt.strip.desc': 'Altyazıdaki mevcut gömülü fontları kaldırır (çizim komutu fontlarını korur).',
         'opt.strip.title': 'Gömülü Fontları Kaldır',
@@ -2660,9 +2798,10 @@
         'result.detail': '{count} font gömüldü · {origKB} KB → {newKB} KB',
         'result.detail.strip': '{count} gömülü font kaldırıldı · {origKB} KB → {newKB} KB',
         'result.done': 'İşlem tamamlandı',
-        'stat.chars': 'Gömülecek karakterler',
-        'stat.drawBlocks': 'Çizim blokları',
-        'stat.extFonts': 'Harici fontlar',
+        'stat.drawBlocks': 'Çizim blokları (benzersiz/toplam)',
+        'stat.embeddedFonts': 'Gömülü fontlar',
+        'stat.extFonts': 'Üçüncü taraf fontlar',
+        'stat.sysFonts': 'Sistem fontları',
         'stat.uniqueShapes': 'Benzersiz şekiller',
         'status.draw': 'Çizim fontu oluşturuluyor…',
         'status.parsing': 'Script ayrıştırılıyor…',
@@ -2750,7 +2889,7 @@
       renderFontPaths();
       if (S.assFiles.length > 0) {
         renderAnalysis(true);
-        if (document.getElementById('opt-font').checked) renderFontList();
+        if (document.getElementById('opt-font').checked || document.getElementById('opt-sysfont').checked) renderFontList();
       }
       updateStepStatus();
       const btnConvert = document.getElementById('btn-convert');
@@ -3043,7 +3182,18 @@
       if (depth >= ZIP_MAX_DEPTH) throw new Error('err.zip_depth');
       let zip;
       try {
-        zip = await JSZip.loadAsync(file);
+        let buffer;
+        if (file instanceof File || file instanceof Blob) {
+          buffer = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsArrayBuffer(file);
+          });
+        } else {
+          buffer = file;
+        }
+        zip = await JSZip.loadAsync(buffer);
       } catch (e) {
         throw new Error(classifyZipError(e));
       }
@@ -3084,10 +3234,11 @@
         _assBadgeState = { type: 'error', fileName, errKey, errParams: errParams || null };
         renderAssBadge();
       };
+      const errors = [];
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT) {
-          showAssError(f.name, 'err.file_too_large');
-          return;
+          errors.push({ name: f.name, key: 'err.file_too_large' });
+          continue;
         }
         if (f.name.toLowerCase().endsWith('.zip')) {
           _assBadgeState = { type: 'loading', fileName: f.name };
@@ -3097,27 +3248,45 @@
             assEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
-            showAssError(f.name,
-              key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt',
-              key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
-            );
-            return;
+            errors.push({
+              name: f.name,
+              key: key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt',
+              params: key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
+            });
           }
           _assBadgeState = null;
           badge.innerHTML = '';
           badge.classList.add('hidden');
           dzAss.style.display = '';
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
-          const buf = await f.arrayBuffer();
-          const uint8 = new Uint8Array(buf);
-          const hasBOM = (uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF);
-          const text = await decodeText(buf);
-          const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
-          assEntries.push({ file: f, content, rawBuffer: buf, hasBOM: hasBOM });
+          try {
+            const buf = await f.arrayBuffer();
+            const uint8 = new Uint8Array(buf);
+            const hasBOM = (uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF);
+            const text = await decodeText(buf);
+            const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
+            assEntries.push({ file: f, content, rawBuffer: buf, hasBOM: hasBOM });
+          } catch (e) {
+            errors.push({ name: f.name, key: 'err.zip_corrupt' });
+          }
+        } else {
+          errors.push({ name: f.name, key: 'err.format' });
         }
       }
+
+      const errBox = document.querySelector('#step1 .upload-error');
+      if (errBox) {
+        if (errors.length > 0) {
+          errBox.textContent = errors.map(e => `⚠ ${e.name}: ${t(e.key, e.params)}`).join('\n');
+          errBox.classList.remove('hidden');
+        } else {
+          errBox.textContent = '';
+          errBox.classList.add('hidden');
+        }
+      }
+
       if (assEntries.length === 0) {
-        showAssError(Array.from(files).map(f => f.name).join(', '), 'err.format');
+        if (errors.length === 0) showAssError(Array.from(files).map(f => f.name).join(', '), 'err.format');
         return;
       }
       S.assFiles = [];
@@ -3225,43 +3394,120 @@
       area.innerHTML = '';
 
       let totalDrawings = 0, totalUnique = 0, totalExtFonts = new Set(), totalChars = 0;
-      let hasDrawings = false, hasFonts = false, hasResubset = false;
+      let totalSysFonts = new Set(), totalSysChars = 0;
+      let totalEmbedded = new Set();
+      let hasNewDrawings = false, hasExistingDrawOnly = false, hasFonts = false, hasResubset = false, hasSysFonts = false;
+      let totalExistingSubsetShapes = 0;
+
+      const drawingsDetails = [];
+      const extFontsDetails = [];
+      const sysFontsDetails = [];
+      const embeddedDetails = [];
 
       for (const entry of S.assFiles) {
         const p = entry.parsed;
         totalDrawings += p.drawings;
         totalUnique += p.uniqueDrawings.length;
+
         const extKeys = Object.keys(p.externalFonts);
-        extKeys.forEach(k => totalExtFonts.add(k));
+        extKeys.forEach(k => {
+          totalExtFonts.add(k);
+          if (!extFontsDetails.includes(k)) extFontsDetails.push(k);
+        });
         for (const info of Object.values(p.externalFonts)) {
           totalChars += info.normal.length + info.bold.length;
         }
-        if (p.drawings > 0 || p.hasExistingDrawSubset) hasDrawings = true;
+
+        const sysKeys = Object.keys(p.systemFontsReferenced || {});
+        sysKeys.forEach(k => {
+          totalSysFonts.add(k);
+          if (!sysFontsDetails.includes(k)) sysFontsDetails.push(k);
+        });
+        for (const info of Object.values(p.systemFontsReferenced || {})) {
+          totalSysChars += info.normal.length + info.bold.length;
+        }
+
+        if (p.embeddedFonts) {
+          Object.keys(p.embeddedFonts).forEach(k => {
+            const base = k.replace(/_\d+\.ttf$/i, '');
+            if (!base.toLowerCase().startsWith('assdrawsubset')) {
+              totalEmbedded.add(k);
+              if (!embeddedDetails.includes(k)) embeddedDetails.push(k);
+            }
+          });
+        }
+
+        if (p.drawings > 0) {
+          hasNewDrawings = true;
+          if (p.hasExistingDrawSubset) {
+            drawingsDetails.push(t('analysis.draw.status.update', { old: p.subsetReferencedChars.length, new: p.uniqueDrawings.length }));
+          } else {
+            drawingsDetails.push(t('analysis.draw.status.new', { count: p.drawings }));
+          }
+        } else if (p.hasExistingDrawSubset) {
+          hasExistingDrawOnly = true;
+          totalExistingSubsetShapes += p.subsetReferencedChars.length;
+          drawingsDetails.push(t('analysis.draw.status.existing', { count: p.subsetReferencedChars.length }));
+        }
         if (extKeys.length > 0) hasFonts = true;
+        if (sysKeys.length > 0) hasSysFonts = true;
         if (p.subsetNeedsUpdate) hasResubset = true;
       }
 
+      const hasDrawings = hasNewDrawings || hasExistingDrawOnly;
+
       area.innerHTML = '<div class="stats-bar">' +
-        '<div class="stat"><div class="stat-val">' + totalDrawings + '</div><div class="stat-lbl">' + t('stat.drawBlocks') + '</div></div>' +
-        '<div class="stat"><div class="stat-val">' + totalUnique + '</div><div class="stat-lbl">' + t('stat.uniqueShapes') + '</div></div>' +
+        '<div class="stat"><div class="stat-val">' + totalUnique + '/' + totalDrawings + '</div><div class="stat-lbl">' + t('stat.drawBlocks') + '</div></div>' +
         '<div class="stat"><div class="stat-val">' + totalExtFonts.size + '</div><div class="stat-lbl">' + t('stat.extFonts') + '</div></div>' +
-        '<div class="stat"><div class="stat-val">' + totalChars + '</div><div class="stat-lbl">' + t('stat.chars') + '</div></div>' +
+        '<div class="stat"><div class="stat-val">' + totalSysFonts.size + '</div><div class="stat-lbl">' + t('stat.sysFonts') + '</div></div>' +
+        '<div class="stat"><div class="stat-val">' + totalEmbedded.size + '</div><div class="stat-lbl">' + t('stat.embeddedFonts') + '</div></div>' +
         '</div>';
 
-      const addRow = (label, cls, text) => {
+      const createExpandableRow = (label, badgeCls, badgeText, details) => {
         const row = document.createElement('div');
-        row.className = 'info-item';
-        row.innerHTML = '<span class="ii-label">' + label + '</span><span class="badge ' + cls + '">' + text + '</span>';
+        row.className = 'info-item expandable';
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('aria-expanded', 'false');
+        row.setAttribute('aria-label', `${label} (${badgeText}). ${t('aria.expand')}`);
+        row.innerHTML = `
+          <div class="ii-summary">
+            <span class="ii-label">${label}</span>
+            <span class="badge ${badgeCls}">${badgeText}</span>
+          </div>
+          <div class="ii-details">${details.join('<br>')}</div>
+        `;
+        const toggle = () => {
+          const isOpen = row.classList.toggle('open');
+          row.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        };
+        row.onclick = toggle;
+        row.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
         area.appendChild(row);
       };
 
-      addRow(t('analysis.draw.label'),
-        hasDrawings ? 'badge-ok' : 'badge-info',
-        hasDrawings ? t('analysis.draw.found', { unique: totalUnique, total: totalDrawings }) : t('analysis.draw.none')
+      createExpandableRow(t('analysis.draw.label'),
+        hasNewDrawings ? 'badge-ok' : (hasExistingDrawOnly ? 'badge-info' : 'badge-info'),
+        hasNewDrawings ? (hasResubset ? t('analysis.draw.status.update_short') : t('analysis.draw.status.new_short')) : (hasExistingDrawOnly ? t('analysis.draw.status.existing_short', { count: totalExistingSubsetShapes }) : t('analysis.draw.none')),
+        hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.drawBlocks')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
       );
-      addRow(t('analysis.font.label'),
+
+      createExpandableRow(t('analysis.font.label'),
         hasFonts ? 'badge-ok' : 'badge-info',
-        hasFonts ? t('analysis.font.found', { count: totalExtFonts.size, chars: totalChars }) : t('analysis.font.none')
+        hasFonts ? t('font.chars', { n: totalChars }) : t('analysis.font.none'),
+        hasFonts ? extFontsDetails : [t('analysis.font.none')]
+      );
+
+      createExpandableRow(t('analysis.font.sys.label'),
+        hasSysFonts ? 'badge-ok' : 'badge-info',
+        hasSysFonts ? t('font.chars', { n: totalSysChars }) : t('analysis.font.sys.none'),
+        hasSysFonts ? sysFontsDetails : [t('analysis.font.sys.none')]
+      );
+
+      createExpandableRow(t('analysis.font.embedded.label'),
+        totalEmbedded.size > 0 ? 'badge-warn' : 'badge-info',
+        totalEmbedded.size > 0 ? t('analysis.font.embedded.found', { count: totalEmbedded.size }) : t('analysis.font.embedded.none'),
+        totalEmbedded.size > 0 ? embeddedDetails : [t('analysis.font.embedded.none')]
       );
 
       if (hasResubset) {
@@ -3300,10 +3546,6 @@
         cbStrip.disabled = false;
         cbStrip.dataset.forceDisabled = 'false';
       } else {
-        const hasAnyEmbedded = S.assFiles.some(e => {
-          if (!e.parsed.embeddedFonts) return false;
-          return Object.keys(e.parsed.embeddedFonts).length > 0;
-        });
         rowStrip.classList.add('disabled');
         cbStrip.disabled = true;
         cbStrip.dataset.forceDisabled = 'true';
@@ -3312,38 +3554,37 @@
 
       cbDraw.dataset.shouldEnable = hasDrawings && shouldDraw ? 'true' : 'false';
       cbFont.dataset.shouldEnable = hasFonts ? 'true' : 'false';
-      cbDraw.dataset.wasChecked = 'false';
-      cbFont.dataset.wasChecked = 'false';
-
+      
       cbDraw.disabled = !hasDrawings || !shouldDraw;
-      if (!preserveState) cbDraw.checked = false; // Default unchecked
-      rowDraw.classList.toggle('selected', preserveState ? cbDraw.checked : false);
-      rowDraw.classList.toggle('disabled', !hasDrawings || !shouldDraw);
-      rowDraw.classList.remove('hidden');
+      if (!preserveState) cbDraw.checked = false;
+      rowDraw.classList.toggle('selected', cbDraw.checked);
+      rowDraw.classList.toggle('disabled', cbDraw.disabled);
 
       cbFont.disabled = !hasFonts;
-      if (!preserveState) cbFont.checked = false; // Default unchecked
-      rowFont.classList.toggle('selected', preserveState ? cbFont.checked : false);
-      rowFont.classList.toggle('disabled', !hasFonts);
+      if (!preserveState) cbFont.checked = false;
+      rowFont.classList.toggle('selected', cbFont.checked);
+      rowFont.classList.toggle('disabled', cbFont.disabled);
+
+      const rowSys = document.getElementById('opt-row-sysfont');
+      const cbSys = document.getElementById('opt-sysfont');
+      cbSys.dataset.shouldEnable = hasSysFonts ? 'true' : 'false';
+      cbSys.disabled = !hasSysFonts;
+      rowSys.classList.toggle('disabled', !hasSysFonts);
+      if (!preserveState) cbSys.checked = false;
+      rowSys.classList.toggle('selected', cbSys.checked);
 
       if (hasStripFonts) {
         rowStrip.classList.toggle('selected', cbStrip.checked);
       }
 
-      document.getElementById('drawing-notice').classList.toggle('hidden', preserveState ? !document.getElementById('opt-draw').checked : true);
-      document.getElementById('copyright-notice').classList.toggle('hidden', preserveState ? !document.getElementById('opt-font').checked : true);
-      document.getElementById('font-section').classList.toggle('hidden', preserveState ? !document.getElementById('opt-font').checked : true);
+      document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
+      document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
+      document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
 
-      const rowSys = document.getElementById('opt-row-sysfont');
-      const cbSys = document.getElementById('opt-sysfont');
-      rowSys.classList.remove('hidden'); // No longer hidden
-      if (!preserveState) cbSys.checked = false;
-      cbSys.dataset.shouldEnable = hasFonts ? 'true' : 'false';
-
-      if (hasFonts) renderFontList();
+      if (hasFonts || hasSysFonts) renderFontList();
 
       const hasAnyEmbeddedForStep3 = S.assFiles.some(e => e.parsed.embeddedFonts && Object.keys(e.parsed.embeddedFonts).length > 0);
-      if (shouldDraw || hasFonts || hasStripFonts || cbStrip.checked || hasAnyEmbeddedForStep3) {
+      if (shouldDraw || hasFonts || hasSysFonts || hasStripFonts || hasAnyEmbeddedForStep3) {
         document.getElementById('step3').style.display = '';
         document.getElementById('step3').classList.add('active');
         updateStep4Visibility();
@@ -3367,33 +3608,22 @@
         cbFont.disabled = true;
         optSysFont.disabled = true;
         btnLocal.disabled = true;
-
         document.getElementById('opt-row-draw').classList.add('disabled');
         document.getElementById('opt-row-font').classList.add('disabled');
         document.getElementById('opt-row-sysfont').classList.add('disabled');
       } else {
-        // Embed options enablement depends on analysis results
         cbDraw.disabled = cbDraw.dataset.shouldEnable === 'false';
         document.getElementById('opt-row-draw').classList.toggle('disabled', cbDraw.disabled);
 
         cbFont.disabled = cbFont.dataset.shouldEnable === 'false';
         document.getElementById('opt-row-font').classList.toggle('disabled', cbFont.disabled);
 
-        // System font depends on both analysis and cbFont.checked
-        if (!cbFont.checked || cbFont.disabled) {
-          optSysFont.disabled = true;
-          optSysFont.checked = false;
-          btnLocal.disabled = true;
-          document.getElementById('opt-row-sysfont').classList.add('disabled');
-        } else {
-          optSysFont.disabled = false;
-          btnLocal.disabled = false;
-          document.getElementById('opt-row-sysfont').classList.remove('disabled');
-        }
+        optSysFont.disabled = optSysFont.dataset.shouldEnable === 'false';
+        document.getElementById('opt-row-sysfont').classList.toggle('disabled', optSysFont.disabled);
+        btnLocal.disabled = optSysFont.disabled && cbFont.disabled;
 
-        // Strip option enablement
         const canStrip = cbStrip.dataset.hasStripFonts === 'true';
-        if (canStrip && cbStrip.dataset.forceDisabled !== 'true' && !anyEmbed) {
+        if (canStrip && !anyEmbed) {
           cbStrip.disabled = false;
           document.getElementById('opt-row-strip').classList.remove('disabled');
         } else {
@@ -3406,10 +3636,11 @@
     function updateStep4Visibility() {
       const wantDraw = document.getElementById('opt-draw').checked;
       const wantFont = document.getElementById('opt-font').checked;
+      const wantSys = document.getElementById('opt-sysfont').checked;
       const wantStrip = document.getElementById('opt-strip').checked;
       const step4 = document.getElementById('step4');
       const optOptimizeWrap = document.getElementById('opt-optimize-wrap');
-      if (wantDraw || wantFont || wantStrip) {
+      if (wantDraw || wantFont || wantSys || wantStrip) {
         step4.style.display = '';
         step4.classList.add('active');
       } else {
@@ -3420,12 +3651,15 @@
 
     function renderFontList() {
       const allFonts = {};
+      const wantFont = document.getElementById('opt-font').checked;
       const wantSys = document.getElementById('opt-sysfont').checked;
       for (const entry of S.assFiles) {
-        for (const [name, info] of Object.entries(entry.parsed.externalFonts)) {
-          if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: false };
-          allFonts[name].normal += info.normal.length;
-          allFonts[name].bold += info.bold.length;
+        if (wantFont) {
+          for (const [name, info] of Object.entries(entry.parsed.externalFonts)) {
+            if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: false };
+            allFonts[name].normal += info.normal.length;
+            allFonts[name].bold += info.bold.length;
+          }
         }
         if (wantSys && entry.parsed.systemFontsReferenced) {
           for (const [name, info] of Object.entries(entry.parsed.systemFontsReferenced)) {
@@ -3448,7 +3682,7 @@
         if (uploaded) {
           statusHtml = '<span class="fi-status fi-uploaded">' + t('font.uploaded', { name: uploaded.file.name }) + '</span>';
         } else {
-          statusHtml = '<span class="fi-status fi-missing">' + t(info.isSystem ? 'font.system.missing' : 'font.missing') + '</span>';
+          statusHtml = '<span class="fi-status fi-missing">' + t('font.missing') + '</span>';
         }
 
         const div = document.createElement('div');
@@ -3478,9 +3712,12 @@
       flnProgressText.textContent = '';
 
       const requiredFonts = new Set();
+      const wantFont = document.getElementById('opt-font').checked;
       const wantSys = document.getElementById('opt-sysfont').checked;
       for (const entry of S.assFiles) {
-        for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name);
+        if (wantFont) {
+          for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name);
+        }
         if (wantSys && entry.parsed.systemFontsReferenced) {
           for (const name of Object.keys(entry.parsed.systemFontsReferenced)) requiredFonts.add(name);
         }
@@ -3490,10 +3727,11 @@
       const fontEntries = [];
       let fontLoadErrKey = null;
       let fontLoadErrParams = null;
+      const errors = [];
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT_FONT) {
-          fontLoadErrKey = 'err.file_too_large';
-          break;
+          errors.push({ name: f.name, key: 'err.file_too_large' });
+          continue;
         }
         if (f.name.toLowerCase().endsWith('.zip')) {
           try {
@@ -3501,30 +3739,42 @@
             fontEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
-            fontLoadErrKey = key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt';
-            fontLoadErrParams = key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null;
-            break;
+            errors.push({
+              name: f.name,
+              key: key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt',
+              params: key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
+            });
           }
         } else {
           try {
-            const buf = await f.arrayBuffer();
-            fontEntries.push({ file: f, buffer: buf });
-          } catch (_) { }
+            const buffer = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = () => reject(reader.error);
+              reader.readAsArrayBuffer(f);
+            });
+            fontEntries.push({ file: f, buffer: buffer });
+          } catch (e) {
+            errors.push({ name: f.name, key: 'err.zip_corrupt' });
+          }
         }
       }
-      if (fontLoadErrKey) {
-        notice.classList.add('hidden');
-        dz.style.display = '';
-        _fontErrState = { errKey: fontLoadErrKey, errParams: fontLoadErrParams };
+
+      if (errors.length > 0) {
+        const errLines = errors.map(e => `⚠ ${e.name}: ${t(e.key, e.params)}`).join('\n');
         const fontSection = document.getElementById('font-section');
-        const existing = fontSection.querySelector('.upload-error');
-        if (existing) existing.remove();
-        const errDiv = document.createElement('div');
-        errDiv.className = 'upload-error';
-        errDiv.style.marginBottom = '0.75rem';
-        errDiv.textContent = t(fontLoadErrKey, fontLoadErrParams);
-        dz.insertAdjacentElement('afterend', errDiv);
-        return;
+        let errDiv = fontSection.querySelector('.font-upload-error');
+        if (!errDiv) {
+          errDiv = document.createElement('div');
+          errDiv.className = 'upload-error font-upload-error';
+          errDiv.style.marginBottom = '0.75rem';
+          dz.insertAdjacentElement('afterend', errDiv);
+        }
+        errDiv.textContent = errLines;
+      } else {
+        const fontSection = document.getElementById('font-section');
+        const errDiv = fontSection.querySelector('.font-upload-error');
+        if (errDiv) errDiv.remove();
       }
       const totalEntries = fontEntries.length;
 
@@ -3717,7 +3967,7 @@
 
           const p = entry.parsed;
           const needDraw = wantDraw && (p.subsetNeedsUpdate || (p.drawings > 0 && !p.hasExistingDrawSubset) || (p.drawings === 0 && p.hasExistingDrawSubset));
-          const needFont = wantFont && ((p.systemFontsReferenced && p.systemFontsReferenced.length > 0) || (p.externalFonts && Object.keys(p.externalFonts).length > 0));
+          const needFont = (wantFont && p.externalFonts && Object.keys(p.externalFonts).length > 0) || (wantSystemFont && p.systemFontsReferenced && Object.keys(p.systemFontsReferenced).length > 0);
           const needStrip = wantStrip;
 
           let result;
@@ -4187,15 +4437,18 @@
       });
       cbFont.addEventListener('change', () => {
         rowFont.classList.toggle('selected', cbFont.checked);
-        document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
-        document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked);
+        document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
+        document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
         enforceMutualExclusion();
         updateStep4Visibility();
       });
       optSysFont.addEventListener('change', () => {
         rowSysFont.classList.toggle('selected', optSysFont.checked);
+        document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
+        document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
         enforceMutualExclusion();
         renderFontList();
+        updateStep4Visibility();
       });
       cbStrip.addEventListener('change', () => {
         rowStrip.classList.toggle('selected', cbStrip.checked);
