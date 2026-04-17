@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.11">
+  <meta name="version" content="2.4.12">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1573,6 +1573,7 @@
         'err.folder_depth': '文件夹嵌套层数超过 {limit} 层限制，已停止遍历。',
         'err.zip_corrupt': 'ZIP 文件已损坏或格式不受支持，无法读取',
         'err.file_too_large': '文件超过 2 GB，浏览器内存限制，请拆分后上传',
+        'err.ass_too_large': '单个 ASS/SSA 文件超过 512 MB，无法处理',
         'ass.loading': '正在读取字幕文件，请稍候…',
         'font.chars': '{n} 字符',
         'font.local.btn': '从系统自动加载字体',
@@ -1704,6 +1705,7 @@
         'err.folder_depth': '資料夾嵌套層數超過 {limit} 層限制，已停止遍歷。',
         'err.zip_corrupt': 'ZIP 檔案已損毀或格式不受支援，無法讀取',
         'err.file_too_large': '檔案超過 2 GB，瀏覽器記憶體限制，請拆分後上傳',
+        'err.ass_too_large': '單個 ASS/SSA 檔案超過 512 MB，無法處理',
         'ass.loading': '正在讀取字幕檔，請稍候…',
         'font.chars': '{n} 字元',
         'font.local.btn': '從系統自動載入字型',
@@ -1835,6 +1837,7 @@
         'err.folder_depth': 'Folder nesting exceeds {limit} levels — traversal stopped.',
         'err.zip_corrupt': 'ZIP file is corrupted or unsupported format',
         'err.file_too_large': 'File exceeds 2 GB — browser limit. Please split before uploading',
+        'err.ass_too_large': 'Single ASS/SSA file exceeds 512 MB — too large to process.',
         'ass.loading': 'Reading subtitle files, please wait…',
         'font.chars': '{n} chars',
         'font.local.btn': 'Load System Fonts',
@@ -1966,6 +1969,7 @@
         'err.folder_depth': 'フォルダのネストが {limit} 層を超えました',
         'err.zip_corrupt': 'ZIP ファイルが破損しているか、サポートされていない形式です',
         'err.file_too_large': 'ファイルが 2 GB を超えており、処理できません。分割してください',
+        'err.ass_too_large': 'ASS/SSA ファイルが 512 MB を超えており、処理できません',
         'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
         'font.chars': '{n} 文字',
         'font.local.btn': 'システムフォントを自動読み込み',
@@ -2097,6 +2101,7 @@
         'err.folder_depth': '폴더 중첩이 {limit}단계를 초과했습니다',
         'err.zip_corrupt': 'ZIP 파일이 손상되었거나 지원되지 않는 형식입니다',
         'err.file_too_large': '파일이 2 GB를 초과합니다. 분할 후 업로드해 주세요',
+        'err.ass_too_large': 'ASS/SSA 파일이 512 MB를 초과합니다',
         'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.chars': '{n}자',
         'font.local.btn': '시스템 폰트 자동 로드',
@@ -2228,6 +2233,7 @@
         'err.folder_depth': 'La carpeta tiene más de {limit} niveles de anidación',
         'err.zip_corrupt': 'El archivo ZIP está dañado o en un formato no compatible',
         'err.file_too_large': 'El archivo supera 2 GB — divídalo antes de subir',
+        'err.ass_too_large': 'El archivo ASS/SSA supera 512 MB — demasiado grande para procesar.',
         'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Cargar fuentes del sistema',
@@ -2359,6 +2365,7 @@
         'err.folder_depth': 'Вложенность папки превышает {limit} уровней',
         'err.zip_corrupt': 'ZIP-файл повреждён или имеет неподдерживаемый формат',
         'err.file_too_large': 'Файл превышает 2 ГБ — разделите его перед загрузкой',
+        'err.ass_too_large': 'Файл ASS/SSA превышает 512 МБ — слишком велик для обработки.',
         'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
         'font.chars': '{n} симв.',
         'font.local.btn': 'Загрузить системные шрифты',
@@ -2490,6 +2497,7 @@
         'err.folder_depth': 'A pasta possui mais de {limit} níveis de aninhamento',
         'err.zip_corrupt': 'O arquivo ZIP está corrompido ou em um formato não suportado',
         'err.file_too_large': 'Arquivo supera 2 GB — divida-o antes de enviar',
+        'err.ass_too_large': 'O arquivo ASS/SSA supera 512 MB — grande demais para processar.',
         'ass.loading': 'Lendo arquivos de legenda, aguarde…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Carregar fontes do sistema',
@@ -2621,6 +2629,7 @@
         'err.folder_depth': 'يتجاوز تداخل المجلد {limit} مستويات',
         'err.zip_corrupt': 'ملف ZIP تالف أو بتنسيق غير مدعوم',
         'err.file_too_large': 'يتجاوز هذا الملف 2 GB — يرجى تقسيمه قبل الرفع',
+        'err.ass_too_large': 'ملف ASS/SSA يتجاوز 512 MB — كبير جداً للمعالجة.',
         'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
         'font.chars': '{n} حرف',
         'font.local.btn': 'تحميل خطوط النظام',
@@ -2752,6 +2761,7 @@
         'err.folder_depth': 'Klasör iç içe geçme {limit} seviyeyi aşıyor',
         'err.zip_corrupt': 'ZIP dosyası bozuk veya desteklenmeyen bir formatta',
         'err.file_too_large': 'Dosya 2 GB\'ı aşıyor — lütfen yüklemeden önce bölün',
+        'err.ass_too_large': 'ASS/SSA dosyası 512 MB\'ı aşıyor — işlemek için çok büyük.',
         'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
         'font.chars': '{n} karakter',
         'font.local.btn': 'Sistem fontlarını yükle',
@@ -3197,6 +3207,47 @@
       log(text, msg.level);
     }
 
+    function logExpandable(summaryText, lines, insertBefore) {
+      const box = document.getElementById('log-box');
+      box.classList.remove('hidden');
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'margin:0.15rem 0;';
+      const header = document.createElement('div');
+      header.style.cssText = 'cursor:pointer;display:flex;align-items:baseline;gap:0.35em;';
+      const arrow = document.createElement('span');
+      arrow.textContent = '▶';
+      arrow.style.cssText = 'font-size:0.65em;transition:transform 0.15s;display:inline-block;flex-shrink:0;user-select:none;';
+      const label = document.createElement('span');
+      label.textContent = summaryText;
+      label.style.cssText = 'user-select:text;';
+      header.appendChild(arrow);
+      header.appendChild(label);
+      const inner = document.createElement('div');
+      inner.style.cssText = 'padding-left:1.2em;display:none;';
+      const frag = document.createDocumentFragment();
+      lines.forEach(text => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        frag.appendChild(div);
+      });
+      inner.appendChild(frag);
+      let open = false;
+      header.onclick = () => {
+        const selection = window.getSelection().toString();
+        if (selection.length > 0) return;
+        open = !open;
+        inner.style.display = open ? '' : 'none';
+        arrow.style.transform = open ? 'rotate(90deg)' : '';
+      };
+      wrap.appendChild(header);
+      wrap.appendChild(inner);
+      if (insertBefore) insertBefore.parentNode.insertBefore(wrap, insertBefore);
+      else box.appendChild(wrap);
+      if (!_logScrollRaf) {
+        _logScrollRaf = requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; _logScrollRaf = null; });
+      }
+    }
+
     let _logScrollRaf = null;
     function log(msg, cls) {
       const box = document.getElementById('log-box');
@@ -3283,6 +3334,7 @@
           const strippedContent = rawContent.startsWith('\uFEFF') ? rawContent.slice(1) : rawContent;
           results.push({
             file: { name: entry.name, size: buf.byteLength },
+            zipPath: entry.name,
             content: strippedContent,
             rawBuffer: buf,
             hasBOM: hasBOM
@@ -3315,6 +3367,7 @@
           renderAssBadge();
           try {
             const extracted = await processZipFile(f, 'ass');
+            extracted.forEach(e => { e._sourceZipName = f.name; });
             assEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
@@ -3329,15 +3382,19 @@
           badge.classList.add('hidden');
           dzAss.style.display = '';
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
+          if (f.size > 512 * 1024 * 1024) {
+            fileErrors.push({ name: f.name, key: 'err.ass_too_large' });
+            continue;
+          }
           try {
             const buf = await f.arrayBuffer();
             const uint8 = new Uint8Array(buf);
             const hasBOM = (uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF);
             const text = await decodeText(buf);
             const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
-            assEntries.push({ file: f, content, rawBuffer: buf, hasBOM: hasBOM });
+            assEntries.push({ file: f, zipPath: null, content, rawBuffer: buf, hasBOM: hasBOM });
           } catch (e) {
-            fileErrors.push({ name: f.name, key: 'err.zip_corrupt' });
+            fileErrors.push({ name: f.name, key: 'err.invalid' });
           }
         } else {
           fileErrors.push({ name: f.name, key: 'err.format' });
@@ -3406,6 +3463,8 @@
           const result = await workerCall('parseASS', { text: entry.content });
           S.assFiles.push({
             file: entry.file,
+            zipPath: entry.zipPath || null,
+            sourceZipName: entry._sourceZipName || null,
             content: entry.content,
             hasBOM: entry.hasBOM,
             rawBuffer: entry.rawBuffer,
@@ -3474,6 +3533,12 @@
 
     function renderAnalysis(preserveState = false) {
       const area = document.getElementById('analysis-area');
+      const expandedStates = [];
+      if (preserveState) {
+        area.querySelectorAll('.info-item.expandable').forEach(el => {
+          expandedStates.push(el.classList.contains('open'));
+        });
+      }
       area.innerHTML = '';
 
       let totalDrawings = 0, totalUnique = 0, totalExtFonts = new Set(), totalChars = 0;
@@ -3566,6 +3631,11 @@
         };
         row.onclick = toggle;
         row.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+        const rowIdx = area.querySelectorAll('.info-item.expandable').length;
+        if (preserveState && expandedStates[rowIdx]) {
+          row.classList.add('open');
+          row.setAttribute('aria-expanded', 'true');
+        }
         area.appendChild(row);
       };
 
@@ -3905,25 +3975,7 @@
       notice.classList.add('hidden');
       dz.style.display = '';
 
-      const box = document.getElementById('log-box');
-      box.classList.remove('hidden');
-      const details = document.createElement('details');
-      details.style.cssText = 'margin:0.15rem 0;';
-      const summaryEl = document.createElement('summary');
-      summaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
-      summaryEl.textContent = t('font.upload.expand', { total: totalEntries });
-      details.appendChild(summaryEl);
-      const inner = document.createElement('div');
-      inner.style.cssText = 'padding-left:1em;';
-      const frag = document.createDocumentFragment();
-      itemLines.forEach(line => {
-        const div = document.createElement('div');
-        div.textContent = line;
-        frag.appendChild(div);
-      });
-      inner.appendChild(frag);
-      details.appendChild(inner);
-      box.appendChild(details);
+      logExpandable(t('font.upload.expand', { total: totalEntries }), itemLines, null);
 
       log(t('font.upload.done', { matched }), 'ok');
       if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
@@ -4072,48 +4124,16 @@
             const doneLine = box.lastElementChild;
             const summaryDiv = document.createElement('div');
             summaryDiv.textContent = t('log.draw.summary', { count: result.detailedDrawings.length });
-            const details = document.createElement('details');
-            details.style.cssText = 'margin:0.15rem 0;';
-            const summaryEl = document.createElement('summary');
-            summaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
-            summaryEl.textContent = t('log.draw.detail.expand', { count: result.detailedDrawings.length });
-            details.appendChild(summaryEl);
-            const inner = document.createElement('div');
-            inner.style.cssText = 'padding-left:1em;';
-            const frag = document.createDocumentFragment();
-            result.detailedDrawings.forEach(d => {
-              const div = document.createElement('div');
-              div.textContent = t('log.draw.item', { char: d.char, count: d.count, start: d.firstStart, end: d.lastStart });
-              frag.appendChild(div);
-            });
-            inner.appendChild(frag);
-            details.appendChild(inner);
             box.insertBefore(summaryDiv, doneLine);
-            box.insertBefore(details, doneLine);
-            box.scrollTop = box.scrollHeight;
+            const drawLines = result.detailedDrawings.map(d => t('log.draw.item', { char: d.char, count: d.count, start: d.firstStart, end: d.lastStart }));
+            logExpandable(t('log.draw.detail.expand', { count: result.detailedDrawings.length }), drawLines, doneLine);
           }
 
           if (wantStrip && result.stats.strippedNames && result.stats.strippedNames.length > 0) {
             const box = document.getElementById('log-box');
             const doneLine = box.lastElementChild;
-            const stripDetails = document.createElement('details');
-            stripDetails.style.cssText = 'margin:0.15rem 0;';
-            const stripSummaryEl = document.createElement('summary');
-            stripSummaryEl.style.cssText = 'cursor:pointer;list-style:none;outline:none;';
-            stripSummaryEl.textContent = t('log.font.strip.expand', { count: result.stats.strippedNames.length });
-            stripDetails.appendChild(stripSummaryEl);
-            const stripInner = document.createElement('div');
-            stripInner.style.cssText = 'padding-left:1em;';
-            const stripFrag = document.createDocumentFragment();
-            result.stats.strippedNames.forEach(name => {
-              const div = document.createElement('div');
-              div.textContent = t('log.font.strip.item', { name });
-              stripFrag.appendChild(div);
-            });
-            stripInner.appendChild(stripFrag);
-            stripDetails.appendChild(stripInner);
-            box.insertBefore(stripDetails, doneLine);
-            box.scrollTop = box.scrollHeight;
+            const stripLines = result.stats.strippedNames.map(name => t('log.font.strip.item', { name }));
+            logExpandable(t('log.font.strip.expand', { count: result.stats.strippedNames.length }), stripLines, doneLine);
           }
 
           const origKB = (result.origSize / 1024).toFixed(0);
@@ -4126,7 +4146,7 @@
             wantStrip,
             strippedCount: (result.stats.strippedNames ? result.stats.strippedNames.length : 0),
           });
-          S.outputBlobs.push({ name: entry.file.name, blob });
+          S.outputBlobs.push({ name: entry.file.name, zipPath: entry.zipPath || null, sourceZipName: entry.sourceZipName || null, blob });
         }
 
         renderConvertResults();
@@ -4231,12 +4251,91 @@
         document.head.appendChild(s);
         await new Promise((r, j) => { s.onload = r; s.onerror = j; });
       }
-      const zip = new JSZip();
-      for (const o of S.outputBlobs) {
-        zip.file(o.name, o.blob);
-      }
-      const content = await zip.generateAsync({ type: 'blob' });
       const wantOpt = document.getElementById('opt-append-optimize').checked;
+    
+      const sourceZipNames = new Set(S.outputBlobs.map(o => o.sourceZipName).filter(Boolean));
+      const isSingleZip = sourceZipNames.size === 1 && S.outputBlobs.every(o => o.sourceZipName);
+    
+      if (isSingleZip) {
+        const originalZipName = [...sourceZipNames][0];
+        const innerZip = new JSZip();
+        const usedPaths = new Set();
+        for (const o of S.outputBlobs) {
+          let zipPath = o.zipPath
+            ? (wantOpt ? o.zipPath.replace(/\.(ass|ssa)$/i, '_optimized.$1') : o.zipPath)
+            : (wantOpt ? o.name.replace(/\.(ass|ssa)$/i, '_optimized.$1') : o.name);
+          if (usedPaths.has(zipPath)) {
+            const ext = zipPath.match(/\.[^.]+$/)?.[0] ?? '';
+            const stem = zipPath.slice(0, zipPath.length - ext.length);
+            let n = 2;
+            while (usedPaths.has(stem + '_' + n + ext)) n++;
+            zipPath = stem + '_' + n + ext;
+          }
+          usedPaths.add(zipPath);
+          innerZip.file(zipPath, o.blob);
+        }
+        const innerContent = await innerZip.generateAsync({ type: 'blob' });
+        const dlName = wantOpt ? originalZipName.replace(/\.zip$/i, '_optimized.zip') : originalZipName;
+        downloadBlob(innerContent, dlName);
+        return;
+      }
+    
+      const outerZip = new JSZip();
+      const zipGroups = {};
+      const looseBlobs = [];
+      for (const o of S.outputBlobs) {
+        if (o.sourceZipName) {
+          if (!zipGroups[o.sourceZipName]) zipGroups[o.sourceZipName] = [];
+          zipGroups[o.sourceZipName].push(o);
+        } else {
+          looseBlobs.push(o);
+        }
+      }
+    
+      const usedOuter = new Set();
+      for (const [zipName, blobs] of Object.entries(zipGroups)) {
+        const innerZip = new JSZip();
+        const usedPaths = new Set();
+        for (const o of blobs) {
+          let zipPath = o.zipPath
+            ? (wantOpt ? o.zipPath.replace(/\.(ass|ssa)$/i, '_optimized.$1') : o.zipPath)
+            : (wantOpt ? o.name.replace(/\.(ass|ssa)$/i, '_optimized.$1') : o.name);
+          if (usedPaths.has(zipPath)) {
+            const ext = zipPath.match(/\.[^.]+$/)?.[0] ?? '';
+            const stem = zipPath.slice(0, zipPath.length - ext.length);
+            let n = 2;
+            while (usedPaths.has(stem + '_' + n + ext)) n++;
+            zipPath = stem + '_' + n + ext;
+          }
+          usedPaths.add(zipPath);
+          innerZip.file(zipPath, o.blob);
+        }
+        const innerContent = await innerZip.generateAsync({ type: 'blob' });
+        const innerName = wantOpt ? zipName.replace(/\.zip$/i, '_optimized.zip') : zipName;
+        let outerPath = innerName;
+        if (usedOuter.has(outerPath)) {
+          let n = 2;
+          while (usedOuter.has(outerPath.replace(/\.zip$/i, '_' + n + '.zip'))) n++;
+          outerPath = outerPath.replace(/\.zip$/i, '_' + n + '.zip');
+        }
+        usedOuter.add(outerPath);
+        outerZip.file(outerPath, innerContent);
+      }
+    
+      for (const o of looseBlobs) {
+        let p = wantOpt ? o.name.replace(/\.(ass|ssa)$/i, '_optimized.$1') : o.name;
+        if (usedOuter.has(p)) {
+          const ext = p.match(/\.[^.]+$/)?.[0] ?? '';
+          const stem = p.slice(0, p.length - ext.length);
+          let n = 2;
+          while (usedOuter.has(stem + '_' + n + ext)) n++;
+          p = stem + '_' + n + ext;
+        }
+        usedOuter.add(p);
+        outerZip.file(p, o.blob);
+      }
+    
+      const content = await outerZip.generateAsync({ type: 'blob' });
       const fn = wantOpt ? 'ass_subset_output_optimized.zip' : 'ass_subset_output.zip';
       downloadBlob(content, fn);
     }
