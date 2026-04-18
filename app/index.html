@@ -21,9 +21,9 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.3">
+  <meta name="version" content="2.5.4">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="ASS Subsetter· MontageSubs">
+  <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
   <meta property="og:url" content="https://subs.js.org/ass-subset/">
   <meta property="og:site_name" content="MontageSubs">
@@ -1408,7 +1408,7 @@
             <strong data-i18n="opt.font.title">Embed Third-Party Fonts</strong>
             <span id="opt-font-desc" data-i18n="opt.font.desc">Scan third-party (non-system) fonts referenced in the script, subset to used characters only, and embed them directly into the output</span>
           </div>
-          <span class="opt-tag">TTF / OTF / TTC / WOFF / WOFF2</span>
+          <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
         <label class="opt-row" id="opt-row-sysfont">
           <input type="checkbox" id="opt-sysfont" aria-describedby="opt-sysfont-desc">
@@ -1416,7 +1416,14 @@
             <strong data-i18n="opt.sysfont.title">Embed System Fonts</strong>
             <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">Scan system fonts referenced in the script, subset to used characters only, and embed them into the output</span>
           </div>
-          <span class="opt-tag">TTF / OTF / TTC / WOFF / WOFF2</span>
+          <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
+        </label>
+        <label class="opt-row hidden" id="opt-row-ascii">
+          <input type="checkbox" id="opt-ascii" checked aria-describedby="opt-ascii-desc">
+          <div class="opt-label">
+            <strong data-i18n="opt.ascii.title">Include ASCII Characters</strong>
+            <span id="opt-ascii-desc" data-i18n="opt.ascii.desc">Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.</span>
+          </div>
         </label>
         <label class="opt-row disabled" id="opt-row-strip">
           <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
@@ -1441,7 +1448,7 @@
               <div class="progress-text" id="fln-progress-text" aria-live="off"></div>
             </div>
           </div>
-          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.woff,.woff2,.zip" multiple class="file-input-hidden"
+          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.otc,.woff,.woff2,.zip" multiple class="file-input-hidden"
             data-i18n-aria="aria.dz_font" aria-label="Upload font files">
           <details class="font-path-hint">
             <summary data-i18n="font.path.summary">💡 Common font directories</summary>
@@ -1646,6 +1653,8 @@
         'opt.font.title': '嵌入第三方字体',
         'opt.sysfont.desc': '扫描字幕引用的系统字体，子集化后嵌入字幕；仅保留实际使用的字符',
         'opt.sysfont.title': '嵌入系统字体',
+        'opt.ascii.title': '补全 ASCII 字符',
+        'opt.ascii.desc': '在子集字体中保留原字体所有可用 ASCII 字符，提高播放器兼容性',
         'opt.strip.desc': '移除字幕中已有的内嵌字体，但保留子集化绘图指令所用的字型',
         'opt.strip.title': '移除内嵌字体',
         'opt.append_optimize': '追加 _optimized 后缀',
@@ -1778,6 +1787,8 @@
         'opt.font.title': '嵌入第三方字型',
         'opt.sysfont.desc': '掃描字幕引用的系統字型，子集化後嵌入字幕；僅保留實際使用的字元',
         'opt.sysfont.title': '嵌入系統字型',
+        'opt.ascii.title': '補全 ASCII 字元',
+        'opt.ascii.desc': '在子集字型中保留原字型所有可用 ASCII 字元，提高播放器相容性',
         'opt.strip.desc': '移除字幕中已有的內嵌字型，但保留子集化繪圖指令所用的字型',
         'opt.strip.title': '移除內嵌字型',
         'opt.append_optimize': '追加 _optimized 後綴',
@@ -1910,6 +1921,8 @@
         'opt.font.title': 'Embed Third-Party Fonts',
         'opt.sysfont.desc': 'Scan system fonts referenced in the script, subset to used characters only, and embed them into the output.',
         'opt.sysfont.title': 'Embed System Fonts',
+        'opt.ascii.title': 'Include ASCII Characters',
+        'opt.ascii.desc': 'Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.',
         'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Strip Embedded Fonts',
         'opt.append_optimize': 'Add _optimized suffix',
@@ -2042,6 +2055,8 @@
         'opt.font.title': 'サードパーティフォントの埋め込み',
         'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
         'opt.sysfont.title': 'システムフォントの埋め込み',
+        'opt.ascii.title': 'ASCII 文字を補完',
+        'opt.ascii.desc': '元フォントに含まれる全 ASCII 文字をサブセットに保持し、メディアプレイヤーとの互換性を向上させます。',
         'opt.strip.desc': 'スクリプト内の既存の埋め込みフォントを削除します（描画サブセット字型は保持）。',
         'opt.strip.title': '埋め込みフォントを削除',
         'opt.append_optimize': '_optimized 接尾辞を追加',
@@ -2174,6 +2189,8 @@
         'opt.font.title': '서드파티 폰트 삽입',
         'opt.sysfont.desc': '자막에서 참조된 시스템 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 삽입합니다. 서드파티 폰트 삽입과 독립적으로 작동합니다.',
         'opt.sysfont.title': '시스템 폰트 삽입',
+        'opt.ascii.title': 'ASCII 문자 보완',
+        'opt.ascii.desc': '원본 폰트에 있는 모든 ASCII 문자를 서브셋에 보존하여 미디어 플레이어 호환성을 높입니다.',
         'opt.strip.desc': '자막에 내장된 기존 폰트를 제거합니다(드로우 서브셋 폰트는 유지).',
         'opt.strip.title': '내장 폰트 제거',
         'opt.append_optimize': '_optimized 접미사 추가',
@@ -2306,6 +2323,8 @@
         'opt.font.title': 'Incrustar fuentes de terceros',
         'opt.sysfont.desc': 'Escanea las fuentes del sistema referenciadas en el guion, subconjunta solo los caracteres usados y las incrusta en la salida. Opera de forma independiente a la incrustación de fuentes de terceros.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
+        'opt.ascii.title': 'Incluir caracteres ASCII',
+        'opt.ascii.desc': 'Conserva todos los caracteres ASCII disponibles de la fuente original en el subconjunto, mejorando la compatibilidad con reproductores.',
         'opt.strip.desc': 'Elimina las fuentes incrustadas existentes en el guion (conserva las fuentes de dibujo).',
         'opt.strip.title': 'Eliminar fuentes incrustadas',
         'opt.append_optimize': 'Añadir sufijo _optimized',
@@ -2438,6 +2457,8 @@
         'opt.font.title': 'Встроить шрифты третьих сторон',
         'opt.sysfont.desc': 'Сканирует системные шрифты, указанные в скрипте, создаёт подмножество только из используемых символов и встраивает их в вывод. Работает независимо от встраивания шрифтов третьих сторон.',
         'opt.sysfont.title': 'Встроить системные шрифты',
+        'opt.ascii.title': 'Включить символы ASCII',
+        'opt.ascii.desc': 'Сохраняет все доступные ASCII-символы из исходного шрифта в подмножестве, улучшая совместимость с медиаплеерами.',
         'opt.strip.desc': 'Удаляет существующие встроенные шрифты (сохраняет шрифты команд рисования).',
         'opt.strip.title': 'Удалить встроенные шрифты',
         'opt.append_optimize': 'Добавить суффикс _optimized',
@@ -2570,6 +2591,8 @@
         'opt.font.title': 'Incorporar fontes de terceiros',
         'opt.sysfont.desc': 'Escaneia as fontes do sistema referenciadas no script, cria subconjunto apenas com os caracteres usados e as incorpora na saída. Funciona independentemente da incorporação de fontes de terceiros.',
         'opt.sysfont.title': 'Incorporar fontes do sistema',
+        'opt.ascii.title': 'Incluir caracteres ASCII',
+        'opt.ascii.desc': 'Preserva todos os caracteres ASCII disponíveis da fonte original no subconjunto, melhorando a compatibilidade com players de mídia.',
         'opt.strip.desc': 'Remove fontes embutidas não padronizadas existentes para reduzir o tamanho do arquivo (mantém fontes de desenho).',
         'opt.strip.title': 'Remover Fontes Embutidas',
         'opt.append_optimize': 'Adicionar sufixo _optimized',
@@ -2702,6 +2725,8 @@
         'opt.font.title': 'تضمين خطوط الطرف الثالث',
         'opt.sysfont.desc': 'يفحص خطوط النظام المشار إليها في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط ويضمنها في المخرج. يعمل بشكل مستقل عن تضمين خطوط الطرف الثالث.',
         'opt.sysfont.title': 'تضمين خطوط النظام',
+        'opt.ascii.title': 'تضمين أحرف ASCII',
+        'opt.ascii.desc': 'يحتفظ بجميع أحرف ASCII المتاحة من الخط الأصلي في المجموعة الفرعية، مما يحسّن التوافق مع مشغلات الوسائط.',
         'opt.strip.desc': 'يزيل الخطوط المضمنة الموجودة في النص (يحافظ على خطوط الرسم).',
         'opt.strip.title': 'إزالة الخطوط المضمنة',
         'opt.append_optimize': 'إضافة لاحقة _optimized',
@@ -2834,6 +2859,8 @@
         'opt.font.title': 'Üçüncü taraf fontları göm',
         'opt.sysfont.desc': 'Scriptte referans verilen sistem fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer. Üçüncü taraf font gömme işleminden bağımsız çalışır.',
         'opt.sysfont.title': 'Sistem fontlarını göm',
+        'opt.ascii.title': 'ASCII karakterleri dahil et',
+        'opt.ascii.desc': 'Orijinal fontun mevcut tüm ASCII karakterlerini alt kümede saklayarak medya oynatıcı uyumluluğunu artırır.',
         'opt.strip.desc': 'Altyazıdaki mevcut gömülü fontları kaldırır (çizim komutu fontlarını korur).',
         'opt.strip.title': 'Gömülü Fontları Kaldır',
         'opt.append_optimize': '_optimized son ekini ekle',
@@ -3380,7 +3407,7 @@
             rawBuffer: buf,
             hasBOM: hasBOM
           });
-        } else if (type === 'font' && (lowName.endsWith('.ttf') || lowName.endsWith('.otf') || lowName.endsWith('.ttc'))) {
+        } else if (type === 'font' && (lowName.endsWith('.ttf') || lowName.endsWith('.otf') || lowName.endsWith('.ttc') || lowName.endsWith('.otc'))) {
           const buf = await entry.async('arraybuffer');
           results.push({ file: { name: entry.name, size: buf.byteLength }, buffer: buf });
         } else if (lowName.endsWith('.zip')) {
@@ -3774,6 +3801,7 @@
       document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
       document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
       document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
+      document.getElementById('opt-row-ascii').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
 
       if (hasFonts || hasSysFonts) renderFontList();
 
@@ -4151,7 +4179,7 @@
               text: entry.content,
               forceHasBOM: entry.hasBOM,
               fonts,
-              options: { wantDraw, wantFont, wantSystemFont, wantStrip },
+              options: { wantDraw, wantFont, wantSystemFont, wantStrip, wantAscii: document.getElementById('opt-ascii').checked },
             });
           }
 
@@ -4473,6 +4501,18 @@
 
           let glyphs = allGlyphs;
           let limitMsg = '';
+          if (!fb.isDrawing && fb.usedChars && fb.usedChars.length > 0) {
+            const glyphByUnicode = new Map();
+            for (const g of allGlyphs) glyphByUnicode.set(g.unicode, g);
+            const usedCpSet = new Set(fb.usedChars.map(c => c.codePointAt(0)));
+            const ordered = [];
+            for (const c of fb.usedChars) {
+              const g = glyphByUnicode.get(c.codePointAt(0));
+              if (g) ordered.push(g);
+            }
+            const rest = allGlyphs.filter(g => !usedCpSet.has(g.unicode));
+            glyphs = [...ordered, ...rest];
+          }
           if (glyphs.length > 80) {
             glyphs = glyphs.slice(0, 80);
             limitMsg = t('preview.limit', { limit: 80, total: allGlyphs.length });
@@ -4652,6 +4692,8 @@
         rowFont.classList.toggle('selected', cbFont.checked);
         document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
         document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
+        const showAscii = cbFont.checked || optSysFont.checked;
+        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
         renderFontList();
         enforceMutualExclusion();
         updateStep4Visibility();
@@ -4660,6 +4702,8 @@
         rowSysFont.classList.toggle('selected', optSysFont.checked);
         document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
         document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
+        const showAscii = cbFont.checked || optSysFont.checked;
+        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
         enforceMutualExclusion();
         renderFontList();
         updateStep4Visibility();
@@ -4680,7 +4724,7 @@
         dzFont.style.borderColor = '';
         try {
           if (e.dataTransfer.items) {
-            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf', '.otf', '.ttc', '.woff', '.woff2', '.zip']);
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf', '.otf', '.ttc', '.otc', '.woff', '.woff2', '.zip']);
             if (files.length) handleFonts(files);
           } else if (e.dataTransfer.files.length) {
             handleFonts(Array.from(e.dataTransfer.files));
