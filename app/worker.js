@@ -1,6 +1,7 @@
 'use strict';
 function runWorker() {
-const DRAW_FONT_NAME = 'ASSDrawSubset_MontageSubs';
+const DRAW_FONT_NAME = 'ASSDrawSubset';
+const PROJECT_URL = 'https://github.com/MontageSubs/ass-subset';
 const EM = 1024;
 const TARGET = 820;
 const MARGIN = (EM - TARGET) / 2;
@@ -510,7 +511,7 @@ function buildDrawGlyph(drawStr, charCode) {
   if (hasContent) path.close();
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
-function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id, familyName, onProgress) {
+function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id, familyName, onProgress, fileName) {
   const referencedCharsMap = new Map();
   referencedCharsArray.forEach(item => referencedCharsMap.set(item.char, item.firstSeenMs));
 
@@ -614,16 +615,21 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     glyphs: glyphs
   });
   const drawDateStr = buildSubsetDateString();
+
   font.names = {
-    copyright: { en: `MontageSubs; Subsetted via ASS Subsetter (https://montagesubs.github.io/ass-subset/) on ${drawDateStr}` },
+    copyright: { en: `MontageSubs; Subsetted via ASS Subsetter (${PROJECT_URL}) on ${drawDateStr}` },
     fontFamily: { en: drawFamilyName },
     fontSubfamily: { en: 'Regular' },
     fullName: { en: drawFamilyName },
     version: { en: drawVersion },
     postScriptName: { en: drawFamilyName.replace(/\s+/g, '') + '-Regular' },
+    manufacturer: { en: 'MontageSubs' },
     designer: { en: 'MontageSubs (ASS Subsetter)' },
-    license: { en: 'MontageSubs (ASS Subsetter)' },
-    licenseURL: { en: 'https://montagesubs.github.io/ass-subset/' },
+    description: { en: `ASS Subsetter - Drawing Command Font generated for ${fileName || 'unknown subtitle'}` },
+    manufacturerURL: { en: PROJECT_URL },
+    designerURL: { en: PROJECT_URL },
+    license: { en: 'MIT; MontageSubs (ASS Subsetter)' },
+    licenseURL: { en: PROJECT_URL },
   };
   return {
     ttf: repairFontBuffer(new Uint8Array(font.toArrayBuffer())),
@@ -631,6 +637,7 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     charRemap
   };
 }
+
 function decodeFontName(v, key) {
   if (typeof v === 'string') return v.trim();
   if (v && (Array.isArray(v) || (typeof Uint8Array !== 'undefined' && v instanceof Uint8Array))) {
@@ -954,7 +961,7 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
     newFont.tables.os2 = Object.assign({}, orig.tables.os2);
   }
   const dateStr = buildSubsetDateString();
-  const subsetSuffix = `; Subsetted via ASS Subsetter (https://montagesubs.github.io/ass-subset/) on ${dateStr}`;
+  const subsetSuffix = `; Subsetted via ASS Subsetter (${PROJECT_URL}) on ${dateStr}`;
   const vendorSuffix = '; MontageSubs (ASS Subsetter)';
   const familyLangKeys = extractOrigNameLangKeys(orig, 'fontFamily', fontName);
   const langKeysForFamily = familyLangKeys.length > 0 ? familyLangKeys : ['en'];
@@ -1009,22 +1016,47 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
   const copyrightStr = (baseCopyrightStr || 'MontageSubs') + subsetSuffix;
   const copyrightEntry = {};
   for (const lk of langKeysForFamily) copyrightEntry[lk] = copyrightStr;
-  const origManufacturer = getOrigNameField(orig, 'designer');
-  let baseManufacturerStr = '';
-  if (origManufacturer) {
-    const enVal = origManufacturer['en'];
+  const origDesigner = getOrigNameField(orig, 'designer');
+  let baseDesignerStr = '';
+  if (origDesigner) {
+    const enVal = origDesigner['en'];
     if (typeof enVal === 'string' && enVal.trim()) {
-      baseManufacturerStr = enVal.trim();
+      baseDesignerStr = enVal.trim();
     } else {
-      const anyVal = Object.values(origManufacturer).find(v => typeof v === 'string' && v.trim());
-      if (anyVal) baseManufacturerStr = anyVal.trim();
+      const anyVal = Object.values(origDesigner).find(v => typeof v === 'string' && v.trim());
+      if (anyVal) baseDesignerStr = anyVal.trim();
     }
   }
-  const manufacturerStr = (baseManufacturerStr || 'MontageSubs (ASS Subsetter)') + vendorSuffix;
-  const manufacturerEntry = {};
-  for (const lk of langKeysForFamily) manufacturerEntry[lk] = manufacturerStr;
+  const designerStr = (baseDesignerStr || 'MontageSubs (ASS Subsetter)') + vendorSuffix;
+  const designerEntry = {};
+  for (const lk of langKeysForFamily) designerEntry[lk] = designerStr;
+
+  const origRealManufacturer = getOrigNameField(orig, 'manufacturer');
+  let baseRealManufacturerStr = '';
+  if (origRealManufacturer) {
+    const enVal = origRealManufacturer['en'];
+    if (typeof enVal === 'string' && enVal.trim()) {
+      baseRealManufacturerStr = enVal.trim();
+    } else {
+      const anyVal = Object.values(origRealManufacturer).find(v => typeof v === 'string' && v.trim());
+      if (anyVal) baseRealManufacturerStr = anyVal.trim();
+    }
+  }
+
+  const realManufacturerStr = baseRealManufacturerStr ? (baseRealManufacturerStr + '; MontageSubs') : 'MontageSubs';
+  const realManufacturerEntry = {};
+  for (const lk of langKeysForFamily) realManufacturerEntry[lk] = realManufacturerStr;
+
   const origLicense = getOrigNameField(orig, 'license');
   const origLicenseURL = getOrigNameField(orig, 'licenseURL');
+
+  const descriptionEntry = {};
+  const urlEntry = {};
+  for (const lk of langKeysForFamily) {
+    descriptionEntry[lk] = `ASS Subsetter (${PROJECT_URL})`;
+    urlEntry[lk] = PROJECT_URL;
+  }
+  
   const newNames = {
     copyright: copyrightEntry,
     fontFamily: familyEntry,
@@ -1032,7 +1064,11 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
     fullName: fullNameEntry,
     version: normalizedVersion,
     postScriptName: { en: psName },
-    designer: manufacturerEntry,
+    manufacturer: realManufacturerEntry,
+    designer: designerEntry,
+    description: descriptionEntry,
+    manufacturerURL: urlEntry,
+    designerURL: urlEntry,
   };
   if (origLicense) {
     newNames.license = {};
@@ -1269,7 +1305,7 @@ function replaceDrawingsInLine(line, dataToCharArr, fontFamily) {
   return result;
 }
 function doConvert(data, id) {
-  const { text, fonts, options, forceHasBOM } = data;
+  const { text, fonts, options, forceHasBOM, fileName } = data;
   emitLog(id, 'log.convert.start', 'info', {});
   const parsed = parseASSText(text, id, forceHasBOM);
   let drawTTF = null, drawingDataToChar = null, drawCharRemap = null;
@@ -1289,7 +1325,8 @@ function doConvert(data, id) {
         parsed.subsetReferencedChars,
         id,
         drawFontFamily,
-        (cur, total) => emitProgress(id, 'draw', cur, total)
+        (cur, total) => emitProgress(id, 'draw', cur, total),
+        fileName
       );
       drawTTF = result.ttf;
       drawingDataToChar = result.dataToCharArr;
