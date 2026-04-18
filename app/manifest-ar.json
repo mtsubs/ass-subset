@@ -1,13 +1,13 @@
 {
-  "name": "ASS Subsetter",
+  "name": "أداة تحديد مجموعة فرعية ASS",
   "short_name": "ASS Subset",
-  "description": "Online font subsetting tool for ASS/SSA subtitles. Supports drawing subsetting and font embedding, processed locally in your browser.",
+  "description": "أداة عبر الإنترنت لتحديد مجموعات فرعية من الخطوط لترجمات ASS/SSA. تدعم تحديد مجموعات الرسم وتضمين الخطوط، وتعمل محليًا في المتصفح.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",
   "background_color": "#f6f5f2",
   "theme_color": "#c0392b",
-  "lang": "en",
+  "lang": "ar",
   "icons": [
     {
       "src": "icons/icon-192.png",

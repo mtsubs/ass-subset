@@ -1,13 +1,13 @@
 {
-  "name": "ASS Subsetter",
+  "name": "ASS Сабсеттер",
   "short_name": "ASS Subset",
-  "description": "Online font subsetting tool for ASS/SSA subtitles. Supports drawing subsetting and font embedding, processed locally in your browser.",
+  "description": "Онлайн-инструмент для создания поднаборов шрифтов для субтитров ASS/SSA. Поддерживает поднабор рисунков и встраивание шрифтов, обрабатывается локально в браузере.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",
   "background_color": "#f6f5f2",
   "theme_color": "#c0392b",
-  "lang": "en",
+  "lang": "ru",
   "icons": [
     {
       "src": "icons/icon-192.png",

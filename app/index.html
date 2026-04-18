@@ -10,7 +10,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="alternate" hreflang="en" href="https://subs.js.org/ass-subset/">
-  <link rel="alternate" hreflang="zh-CN" href="https://subs.js.org/ass-subset/?lang=zh">
+  <link rel="alternate" hreflang="zh-CN" href="https://subs.js.org/ass-subset/?lang=zh-CN">
   <link rel="alternate" hreflang="zh-TW" href="https://subs.js.org/ass-subset/?lang=zh-TW">
   <link rel="alternate" hreflang="ja" href="https://subs.js.org/ass-subset/?lang=ja">
   <link rel="alternate" hreflang="ko" href="https://subs.js.org/ass-subset/?lang=ko">
@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.19">
+  <meta name="version" content="2.5">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter· MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -1342,7 +1342,7 @@
           aria-label="Switch language" aria-haspopup="menu" aria-expanded="false">A/文</button>
         <div class="lang-menu" id="lang-menu" role="menu">
           <button onclick="setLang('ar')" id="lang-ar" role="menuitem">Arabic · العربية</button>
-          <button onclick="setLang('zh')" id="lang-zh" class="active" role="menuitem">Chinese Simplified · 简体中文</button>
+          <button onclick="setLang('zh-CN')" id="lang-zh-CN" class="active" role="menuitem">Chinese Simplified · 简体中文</button>
           <button onclick="setLang('zh-TW')" id="lang-zh-TW" role="menuitem">Chinese Traditional · 繁體中文</button>
           <button onclick="setLang('en')" id="lang-en" role="menuitem">English</button>
           <button onclick="setLang('ja')" id="lang-ja" role="menuitem">Japanese · 日本語</button>
@@ -1547,7 +1547,7 @@
     'use strict';
 
     const I18N = {
-      zh: {
+      'zh-CN': {
         'analysis.draw.label': '绘图指令（\\p1）',
         'analysis.draw.none': '未发现绘图指令',
         'analysis.draw.status.existing': '已子集化 {count} 个形状，当前无新绘图',
@@ -2871,28 +2871,46 @@
 
     function normFont(name) { return name.replace(/^@/, '').trim(); }
 
-    let currentLang = 'zh';
+    let currentLang = 'en';
     (function () {
+      function normalizeLang(raw) {
+        const s = (raw || '').toLowerCase().trim();
+        if (!s) return null;
+        if (s.startsWith('zh-tw')) return 'zh-TW';
+        if (s.startsWith('zh-hk') || s.startsWith('zh-mo')) return 'zh-TW';
+        if (s.startsWith('zh')) return 'zh-CN';
+        if (s.startsWith('en')) return 'en';
+        if (s.startsWith('ja')) return 'ja';
+        if (s.startsWith('ko')) return 'ko';
+        if (s.startsWith('ar')) return 'ar';
+        if (s.startsWith('ru')) return 'ru';
+        if (s.startsWith('tr')) return 'tr';
+        if (s.startsWith('pt')) return 'pt-BR';
+        if (s.startsWith('es')) return 'es';
+        return null;
+      }
+      const VALID = {'ar':1,'zh-CN':1,'zh-TW':1,'en':1,'ja':1,'ko':1,'pt-BR':1,'ru':1,'es':1,'tr':1};
+      try {
+        const urlLang = new URLSearchParams(window.location.search).get('lang');
+        if (urlLang) {
+          const norm = normalizeLang(urlLang);
+          if (norm && VALID[norm]) {
+            currentLang = norm;
+            try { localStorage.setItem('ass-subset-lang', norm); } catch(_) {}
+            return;
+          }
+        }
+      } catch(_) {}
       try {
         const saved = localStorage.getItem('ass-subset-lang');
-        if (saved && I18N[saved]) { currentLang = saved; return; }
+        if (saved && VALID[saved]) { currentLang = saved; return; }
       } catch (_) { }
       const nav = (navigator.language || '').toLowerCase();
-      if (nav.startsWith('zh-tw') || nav.startsWith('zh-hk') || nav.startsWith('zh-mo')) currentLang = 'zh-TW';
-      else if (nav.startsWith('zh')) currentLang = 'zh';
-      else if (nav.startsWith('en')) currentLang = 'en';
-      else if (nav.startsWith('ja')) currentLang = 'ja';
-      else if (nav.startsWith('ko')) currentLang = 'ko';
-      else if (nav.startsWith('ar')) currentLang = 'ar';
-      else if (nav.startsWith('ru')) currentLang = 'ru';
-      else if (nav.startsWith('tr')) currentLang = 'tr';
-      else if (nav.startsWith('pt')) currentLang = 'pt-BR';
-      else if (nav.startsWith('es')) currentLang = 'es';
-      else currentLang = 'en';
+      currentLang = normalizeLang(nav) || 'en';
     })();
 
     function t(key, params) {
-      let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
+      let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
       if (params) {
         for (const [k, v] of Object.entries(params)) str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), v);
       }
@@ -2913,9 +2931,9 @@
         el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
       });
 
-      const langAttrMap = { zh: 'zh-CN', 'zh-TW': 'zh-TW', en: 'en-US', ja: 'ja', ko: 'ko', ar: 'ar', ru: 'ru', tr: 'tr', 'pt-BR': 'pt-BR', es: 'es-419' };
+      const langAttrMap = { 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW', en: 'en', ja: 'ja', ko: 'ko', ar: 'ar', ru: 'ru', tr: 'tr', 'pt-BR': 'pt-BR', es: 'es' };
       document.documentElement.lang = langAttrMap[currentLang] || currentLang;
-      ['zh', 'zh-TW', 'en', 'ja', 'ko', 'ar', 'pt-BR', 'ru', 'es', 'tr'].forEach(l => {
+      ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'ar', 'pt-BR', 'ru', 'es', 'tr'].forEach(l => {
         document.getElementById('lang-' + l)?.classList.toggle('active', currentLang === l);
       });
 
@@ -2926,7 +2944,10 @@
       document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
       document.querySelector('meta[property="og:description"]')?.setAttribute('content', t('app.subtitle'));
       const manifest = document.getElementById('pwa-manifest');
-      if (manifest) manifest.setAttribute('href', currentLang === 'zh' ? 'manifest.json' : 'manifest-en.json');
+      if (manifest) {
+        const mLangs = {'zh-CN':'manifest-zh-CN.json','zh-TW':'manifest-zh-TW.json','ja':'manifest-ja.json','ko':'manifest-ko.json','es':'manifest-es.json','pt-BR':'manifest-pt-BR.json','ru':'manifest-ru.json','ar':'manifest-ar.json','tr':'manifest-tr.json'};
+        manifest.setAttribute('href', mLangs[currentLang] || 'manifest.json');
+      }
 
       const v = document.querySelector('meta[name="version"]');
       const verEl = document.getElementById('ver');
@@ -4712,8 +4733,8 @@
       script.setAttribute('data-reactions-enabled', '0');
       script.setAttribute('data-emit-metadata', '0');
       script.setAttribute('data-theme', theme);
-      const langMap = { 'ar': 'ar', 'zh': 'zh-CN', 'zh-TW': 'zh-TW', 'en': 'en', 'ja': 'ja', 'ko': 'ko', 'pt-BR': 'pt-BR', 'ru': 'ru', 'es': 'es', 'tr': 'tr' };
-      script.setAttribute('data-lang', langMap[currentLang] || 'zh-CN');
+      const langMap = { 'ar': 'ar', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW', 'en': 'en', 'ja': 'ja', 'ko': 'ko', 'pt-BR': 'pt-BR', 'ru': 'ru', 'es': 'es', 'tr': 'tr' };
+      script.setAttribute('data-lang', langMap[currentLang] || 'en');
       script.crossOrigin = 'anonymous';
       script.async = true;
       script.onload = () => { const el = document.getElementById('discuss-loading'); if (el) el.remove(); };

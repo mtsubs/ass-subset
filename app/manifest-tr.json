@@ -1,13 +1,13 @@
 {
-  "name": "ASS Subsetter",
+  "name": "ASS Alt Küme Aracı",
   "short_name": "ASS Subset",
-  "description": "Online font subsetting tool for ASS/SSA subtitles. Supports drawing subsetting and font embedding, processed locally in your browser.",
+  "description": "ASS/SSA altyazılar için çevrimiçi yazı tipi alt küme aracı. Çizim alt kümeleme ve yazı tipi gömmeyi destekler, tarayıcınızda yerel olarak işlenir.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",
   "background_color": "#f6f5f2",
   "theme_color": "#c0392b",
-  "lang": "en",
+  "lang": "tr",
   "icons": [
     {
       "src": "icons/icon-192.png",
